@@ -291,7 +291,7 @@
   <header>
     <div>
       <h1>☽ Nifty 50 · Planetary Positions</h1>
-      <div class="subtitle">KP Sidereal (Krishnamurti) · NSE · Since Inception</div>
+      <div class="subtitle" id="ayanSubtitle">Lahiri Sidereal · NSE · Since Inception</div>
     </div>
     <div class="controls">
       <label>From</label>
@@ -303,6 +303,10 @@
       <button class="btn btn-outline" onclick="resetFilters()">Reset</button>
       <button class="btn btn-outline" onclick="downloadCSV()">⬇ CSV</button>
       <button class="btn btn-outline" id="langBtn" onclick="toggleLang()" title="Switch language">தமிழ் / EN</button>
+    </div>
+    <div class="controls" style="padding-top:0;gap:4px">
+      <span style="font-size:11px;color:rgba(255,255,255,.55);margin-right:2px" id="ayanLabel">Ayanamsa:</span>
+      <div id="ayanBtns" style="display:flex;gap:3px;flex-wrap:wrap"></div>
     </div>
   </header>
 
@@ -321,93 +325,147 @@
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
-const PAGE_SIZE  = 100;
-const PLANETS    = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Rahu','Ketu'];
-const P_CLASS    = { Sun:'sun', Moon:'moon', Mercury:'mercury', Venus:'venus', Mars:'mars',
-                     Jupiter:'jupiter', Saturn:'saturn', Rahu:'rahu', Ketu:'ketu' };
+const PAGE_SIZE = 100;
+
+// Planet keys match data.json 'p' object keys
+const PLANETS = ['Su','Mo','Me','Ve','Ma','Ju','Sa','Ra','Ke'];
+const P_NAME  = { Su:'Sun', Mo:'Moon',    Me:'Mercury', Ve:'Venus',   Ma:'Mars',
+                  Ju:'Jupiter', Sa:'Saturn', Ra:'Rahu', Ke:'Ketu' };
+const P_CLASS = { Su:'sun', Mo:'moon',    Me:'mercury', Ve:'venus',   Ma:'mars',
+                  Ju:'jupiter', Sa:'saturn', Ra:'rahu', Ke:'ketu' };
+
+const SIGNS = ['Ari','Tau','Gem','Can','Leo','Vir','Lib','Sco','Sag','Cap','Aqu','Pis'];
+const NAKS  = ['Ashw','Bhar','Krit','Rohi','Mrig','Ardr','Puna','Push','Ashl','Magh',
+               'PPha','UPha','Hast','Chit','Swat','Vish','Anur','Jyes','Mula','PAsh',
+               'UAsh','Shra','Dhan','Shat','PBha','UBha','Reva'];
+
+// ── Ayanamsa systems ──────────────────────────────────────────────────────────
+const AYANS = [
+  { key:'la', label:'Lahiri',      ta:'லாஹிரி',          subtitle:'Lahiri Sidereal'       },
+  { key:'kp', label:'KP',          ta:'KP',               subtitle:'KP (Krishnamurti)'     },
+  { key:'ra', label:'Raman',       ta:'ராமன்',            subtitle:'B.V. Raman Sidereal'   },
+  { key:'yu', label:'Yukteshwar',  ta:'யுக்தேஷ்வர்',     subtitle:'Sri Yukteshwar'         },
+  { key:'va', label:'Vakkiyam',    ta:'வாக்கியம்',        subtitle:'Vakkiyam (Suryasiddhanta)' },
+];
+let selectedAyan = 'la';
 
 // ── Tamil translations ────────────────────────────────────────────────────────
 const TA = {
-  planets: {
-    Sun:'சூரியன்', Moon:'சந்திரன்', Mercury:'புதன்', Venus:'சுக்கிரன்',
-    Mars:'செவ்வாய்', Jupiter:'குரு', Saturn:'சனி', Rahu:'ராகு', Ketu:'கேது',
-  },
-  signs: {
-    Ari:'மேஷம்', Tau:'ரிஷபம்', Gem:'மிதுனம்', Can:'கடகம்', Leo:'சிம்மம்',
-    Vir:'கன்னி', Lib:'துலாம்', Sco:'விருச்சிகம்', Sag:'தனுசு',
-    Cap:'மகரம்', Aqu:'கும்பம்', Pis:'மீனம்',
-  },
-  naks: {
-    Ashw:'அசுவினி', Bhar:'பரணி',   Krit:'கிருத்திகை', Rohi:'ரோகிணி',
-    Mrig:'மிருகசீரிஷம்', Ardr:'திருவாதிரை', Puna:'புனர்பூசம்', Push:'பூசம்',
-    Ashl:'ஆயில்யம்', Magh:'மகம்',   PPha:'பூரம்',    UPha:'உத்திரம்',
-    Hast:'அஸ்தம்',  Chit:'சித்திரை', Swat:'சுவாதி', Vish:'விசாகம்',
-    Anur:'அனுஷம்',  Jyes:'கேட்டை',  Mula:'மூலம்',   PAsh:'பூராடம்',
-    UAsh:'உத்திராடம்', Shra:'திருவோணம்', Dhan:'அவிட்டம்', Shat:'சதயம்',
-    PBha:'பூரட்டாதி', UBha:'உத்திரட்டாதி', Reva:'ரேவதி',
-  },
-  ui: {
-    date:'தேதி', open:'திறப்பு', high:'உயர்வு', low:'தாழ்வு',
-    close:'மூடல்', chg:'மாற்றம் %', deg:'பாகை', sign:'ராசி', nak:'நட்சத்திரம்',
-    from:'இருந்து', to:'வரை', filter:'வடிகட்டு', reset:'மீட்டமை',
-    showing:'காட்டுகிறது', of:'இல்', first:'முதல்', latest:'கடைசி',
-  },
+  planets: { Su:'சூரியன்', Mo:'சந்திரன்', Me:'புதன்', Ve:'சுக்கிரன்',
+             Ma:'செவ்வாய்', Ju:'குரு', Sa:'சனி', Ra:'ராகு', Ke:'கேது' },
+  signs:   { Ari:'மேஷம்', Tau:'ரிஷபம்', Gem:'மிதுனம்', Can:'கடகம்', Leo:'சிம்மம்',
+             Vir:'கன்னி', Lib:'துலாம்', Sco:'விருச்சிகம்', Sag:'தனுசு',
+             Cap:'மகரம்', Aqu:'கும்பம்', Pis:'மீனம்' },
+  naks:    { Ashw:'அசுவினி', Bhar:'பரணி', Krit:'கிருத்திகை', Rohi:'ரோகிணி',
+             Mrig:'மிருகசீரிஷம்', Ardr:'திருவாதிரை', Puna:'புனர்பூசம்', Push:'பூசம்',
+             Ashl:'ஆயில்யம்', Magh:'மகம்', PPha:'பூரம்', UPha:'உத்திரம்',
+             Hast:'அஸ்தம்', Chit:'சித்திரை', Swat:'சுவாதி', Vish:'விசாகம்',
+             Anur:'அனுஷம்', Jyes:'கேட்டை', Mula:'மூலம்', PAsh:'பூராடம்',
+             UAsh:'உத்திராடம்', Shra:'திருவோணம்', Dhan:'அவிட்டம்', Shat:'சதயம்',
+             PBha:'பூரட்டாதி', UBha:'உத்திரட்டாதி', Reva:'ரேவதி' },
+  ui:      { date:'தேதி', open:'திறப்பு', high:'உயர்வு', low:'தாழ்வு',
+             close:'மூடல்', chg:'மாற்றம் %', deg:'பாகை', sign:'ராசி', nak:'நட்சத்திரம்',
+             from:'இருந்து', to:'வரை', filter:'வடிகட்டு', reset:'மீட்டமை',
+             ayan:'அயனாம்சம்' },
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let allRecords   = [];
-let filtered     = [];
-let currentPage  = 1;
-let sortCol      = null;
-let sortDir      = 'desc'; // newest first by default
-let lang         = 'en';
+let allRecords  = [];
+let filtered    = [];
+let currentPage = 1;
+let sortCol     = null;
+let sortDir     = 'desc';
+let lang        = 'en';
+
+// ── Sidereal computation (client-side) ───────────────────────────────────────
+function normLon(lon) { return ((lon % 360) + 360) % 360; }
+
+function lonInfo(tropLon, ayanVal) {
+  const lon  = normLon(tropLon - ayanVal);
+  const si   = Math.floor(lon / 30);
+  const w    = lon - si * 30;
+  const d    = Math.floor(w);
+  const m    = Math.floor((w - d) * 60);
+  const ni   = Math.floor(lon / (360 / 27));
+  const pada = Math.min(Math.floor((lon % (360 / 27)) / (360 / 108)) + 1, 4);
+  return {
+    lon,
+    deg:  `${d}°${String(m).padStart(2,'0')}'`,
+    sign: SIGNS[si]         ?? '—',
+    nak:  NAKS[Math.min(ni, 26)] ?? '—',
+    pada,
+  };
+}
+
+function getPInfo(r, pk) {
+  const tropLon = r.p?.[pk];
+  if (tropLon == null) return {};
+  const ayanVal = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
+  return lonInfo(tropLon, ayanVal);
+}
 
 // ── i18n helpers ──────────────────────────────────────────────────────────────
-function t(key) { return lang === 'ta' ? (TA.ui[key] || key) : key; }
-function tPlanet(p) { return lang === 'ta' ? (TA.planets[p] || p) : p; }
-function tSign(s) { return lang === 'ta' ? (TA.signs[s] || s) : s; }
-function tNak(n) { return lang === 'ta' ? (TA.naks[n]  || n) : n; }
+function tPlanet(pk) { return lang === 'ta' ? (TA.planets[pk] || P_NAME[pk] || pk) : (P_NAME[pk] || pk); }
+function tSign(s)    { return lang === 'ta' ? (TA.signs[s] || s) : s; }
+function tNak(n)     { return lang === 'ta' ? (TA.naks[n]  || n) : n; }
+function tUI(key, en) { return lang === 'ta' ? (TA.ui[key] || en) : en; }
 
-// ── Build static table header ─────────────────────────────────────────────────
+// ── Ayanamsa selector ─────────────────────────────────────────────────────────
+function buildAyanBtns() {
+  const wrap = document.getElementById('ayanBtns');
+  wrap.innerHTML = AYANS.map(a => {
+    const active = a.key === selectedAyan;
+    const lbl    = lang === 'ta' ? a.ta : a.label;
+    return `<button onclick="selectAyan('${a.key}')"
+      style="background:${active?'var(--saffron)':'rgba(255,255,255,.1)'};
+             color:${active?'var(--indigo)':'#fff'};border:1px solid ${active?'var(--saffron)':'rgba(255,255,255,.25)'};
+             border-radius:4px;padding:3px 9px;font-size:11px;font-weight:${active?700:500};cursor:pointer"
+    >${lbl}</button>`;
+  }).join('');
+  document.getElementById('ayanLabel').textContent =
+    lang === 'ta' ? 'அயனாம்சம்:' : 'Ayanamsa:';
+}
+
+function selectAyan(key) {
+  selectedAyan = key;
+  const a = AYANS.find(x => x.key === key);
+  document.getElementById('ayanSubtitle').textContent = `${a.subtitle} · NSE · Since Inception`;
+  buildAyanBtns();
+  renderPage();
+}
+
+// ── Table header ──────────────────────────────────────────────────────────────
 function buildHeader() {
   const thead = document.getElementById('thead');
 
-  // Row 1: group headers
   let r1 = '<tr>';
-  r1 += `<th rowspan="2" class="sortable td-date" data-col="date">${t('date')||'Date'}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="open">${t('open')||'Open'}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="high">${t('high')||'High'}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="low">${t('low')||'Low'}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="close">${t('close')||'Close'}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-chg" data-col="chg">${lang==='ta'?TA.ui.chg:'Chg %'}</th>`;
-  for (const p of PLANETS) {
-    const cls = `hdr-${P_CLASS[p]}`;
-    r1 += `<th colspan="3" class="${cls} group-start">${tPlanet(p)}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-date"  data-col="date">${tUI('date','Date')}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="open">${tUI('open','Open')}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="high">${tUI('high','High')}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="low">${tUI('low','Low')}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="close">${tUI('close','Close')}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-chg"   data-col="chg">${tUI('chg','Chg %')}</th>`;
+  for (const pk of PLANETS) {
+    r1 += `<th colspan="3" class="hdr-${P_CLASS[pk]} group-start">${tPlanet(pk)}</th>`;
   }
   r1 += '</tr>';
 
-  // Row 2: sub-headers
   let r2 = '<tr>';
-  for (const p of PLANETS) {
-    const cls = `sub-${P_CLASS[p]}`;
-    r2 += `<th class="${cls} group-start sortable" data-col="${p}_deg">${lang==='ta'?TA.ui.deg:'Deg'}</th>`;
-    r2 += `<th class="${cls} sortable" data-col="${p}_sign">${lang==='ta'?TA.ui.sign:'Sign'}</th>`;
-    r2 += `<th class="${cls} sortable" data-col="${p}_nak">${lang==='ta'?TA.ui.nak:'Nak'}</th>`;
+  for (const pk of PLANETS) {
+    const sub = `sub-${P_CLASS[pk]}`;
+    r2 += `<th class="${sub} group-start sortable" data-col="${pk}_deg">${tUI('deg','Deg')}</th>`;
+    r2 += `<th class="${sub} sortable"             data-col="${pk}_sign">${tUI('sign','Sign')}</th>`;
+    r2 += `<th class="${sub} sortable"             data-col="${pk}_nak">${tUI('nak','Nak')}</th>`;
   }
   r2 += '</tr>';
 
   thead.innerHTML = r1 + r2;
 
-  // Attach sort listeners
   thead.querySelectorAll('.sortable').forEach(th => {
     th.addEventListener('click', () => {
       const col = th.dataset.col;
-      if (sortCol === col) {
-        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-      } else {
-        sortCol = col;
-        sortDir = 'desc';
-      }
+      sortDir = (sortCol === col && sortDir === 'desc') ? 'asc' : 'desc';
+      sortCol = col;
       thead.querySelectorAll('.sortable').forEach(t => t.classList.remove('sort-asc','sort-desc'));
       th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
       applyFilters();
@@ -415,20 +473,18 @@ function buildHeader() {
   });
 }
 
-// ── Render a page of rows ─────────────────────────────────────────────────────
+// ── Render page ───────────────────────────────────────────────────────────────
 function renderPage() {
   const start = (currentPage - 1) * PAGE_SIZE;
   const end   = Math.min(start + PAGE_SIZE, filtered.length);
-  const rows  = filtered.slice(start, end);
-
   const tbody = document.getElementById('tbody');
-  let html = '';
+  let html    = '';
 
-  for (const r of rows) {
+  for (const r of filtered.slice(start, end)) {
     const chgCls = r.chg > 0 ? 'up' : r.chg < 0 ? 'down' : '';
     const chgStr = r.chg > 0 ? `+${r.chg.toFixed(2)}%` : `${r.chg.toFixed(2)}%`;
 
-    html += `<tr>`;
+    html += '<tr>';
     html += `<td class="td-date">${r.date}</td>`;
     html += `<td class="td-price">${r.open.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-price">${r.high.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
@@ -436,29 +492,27 @@ function renderPage() {
     html += `<td class="td-price">${r.close.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-chg ${chgCls}">${chgStr}</td>`;
 
-    for (const p of PLANETS) {
-      const info  = r.p?.[p] || {};
-      const pc    = P_CLASS[p];
-      const first = ` group-start`;
-      html += `<td class="td-deg${first}">${info.deg ?? '—'}</td>`;
-      html += `<td class="td-sign p-${pc}">${tSign(info.sign) ?? '—'}</td>`;
-      html += `<td class="td-nak">${tNak(info.nak) ?? '—'}${info.pada ? ` P${info.pada}` : ''}</td>`;
+    for (const pk of PLANETS) {
+      const info = getPInfo(r, pk);
+      const pc   = P_CLASS[pk];
+      html += `<td class="td-deg group-start">${info.deg ?? '—'}</td>`;
+      html += `<td class="td-sign p-${pc}">${tSign(info.sign ?? '—')}</td>`;
+      html += `<td class="td-nak">${tNak(info.nak ?? '—')}${info.pada ? ` P${info.pada}` : ''}</td>`;
     }
-
-    html += `</tr>`;
+    html += '</tr>';
   }
 
   tbody.innerHTML = html;
 
   // Stats bar
   const lbl = lang === 'ta'
-    ? { showing: 'காட்டுகிறது', of: 'இல்', days: 'வர்த்தக நாட்கள்', first: 'முதல்', latest: 'கடைசி' }
-    : { showing: 'Showing', of: 'of', days: 'trading days', first: 'First', latest: 'Latest' };
+    ? { showing:'காட்டுகிறது', of:'இல்', days:'வர்த்தக நாட்கள்', first:'முதல்', latest:'கடைசி' }
+    : { showing:'Showing',     of:'of',   days:'trading days',      first:'First',  latest:'Latest' };
+
   document.getElementById('statsBar').innerHTML =
-    `<span>${lbl.showing} <strong>${start + 1}–${end}</strong> ${lbl.of} <strong>${filtered.length.toLocaleString()}</strong> ${lbl.days}</span>` +
+    `<span>${lbl.showing} <strong>${start+1}–${end}</strong> ${lbl.of} <strong>${filtered.length.toLocaleString()}</strong> ${lbl.days}</span>` +
     (filtered.length !== allRecords.length
-      ? `<span style="color:#f59e0b;font-weight:600">(filtered from ${allRecords.length.toLocaleString()} total)</span>`
-      : '') +
+      ? `<span style="color:#f59e0b;font-weight:600">(filtered from ${allRecords.length.toLocaleString()} total)</span>` : '') +
     `<span>${lbl.first}: <strong>${allRecords.at(0)?.date ?? '—'}</strong></span>` +
     `<span>${lbl.latest}: <strong>${allRecords.at(-1)?.date ?? '—'}</strong></span>`;
 
@@ -475,14 +529,12 @@ function renderPagination() {
   html += `<button onclick="goPage(1)" ${currentPage===1?'disabled':''}>«</button>`;
   html += `<button onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
 
-  const range = 3;
-  const lo = Math.max(1, currentPage - range);
-  const hi = Math.min(totalPages, currentPage + range);
+  const lo = Math.max(1, currentPage - 3);
+  const hi = Math.min(totalPages, currentPage + 3);
   if (lo > 1) html += `<button onclick="goPage(1)">1</button>${lo > 2 ? '<span style="padding:0 4px;color:#94a3b8">…</span>' : ''}`;
-  for (let p = lo; p <= hi; p++) {
+  for (let p = lo; p <= hi; p++)
     html += `<button class="${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
-  }
-  if (hi < totalPages) html += `${hi < totalPages - 1 ? '<span style="padding:0 4px;color:#94a3b8">…</span>' : ''}<button onclick="goPage(${totalPages})">${totalPages}</button>`;
+  if (hi < totalPages) html += `${hi < totalPages-1 ? '<span style="padding:0 4px;color:#94a3b8">…</span>' : ''}<button onclick="goPage(${totalPages})">${totalPages}</button>`;
 
   html += `<button onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>`;
   html += `<button onclick="goPage(${totalPages})" ${currentPage===totalPages?'disabled':''}>»</button>`;
@@ -507,21 +559,20 @@ function applyFilters() {
     if (from && r.date < from) return false;
     if (to   && r.date > to)   return false;
     if (sigTerm) {
-      const match = Object.values(r.p || {}).some(pInfo =>
-        (pInfo.sign || '').toLowerCase().includes(sigTerm) ||
-        (pInfo.nak  || '').toLowerCase().includes(sigTerm)
-      );
+      const match = PLANETS.some(pk => {
+        const info = getPInfo(r, pk);
+        return (info.sign || '').toLowerCase().includes(sigTerm) ||
+               (info.nak  || '').toLowerCase().includes(sigTerm);
+      });
       if (!match) return false;
     }
     return true;
   });
 
-  // Sort
   if (sortCol) {
     filtered.sort((a, b) => {
-      const va = colVal(a, sortCol);
-      const vb = colVal(b, sortCol);
-      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      const va = colVal(a, sortCol), vb = colVal(b, sortCol);
+      if (va < vb) return sortDir === 'asc' ? -1 :  1;
       if (va > vb) return sortDir === 'asc' ?  1 : -1;
       return 0;
     });
@@ -538,18 +589,17 @@ function colVal(r, col) {
   if (col === 'low')   return r.low;
   if (col === 'close') return r.close;
   if (col === 'chg')   return r.chg;
-  // Planet sub-cols: e.g. "Sun_sign"
-  const [planet, field] = col.split('_');
-  const info = r.p?.[planet] || {};
-  if (field === 'deg')  return info.lon ?? 0;
+  const [pk, field] = col.split('_');
+  const info = getPInfo(r, pk);
+  if (field === 'deg')  return info.lon  ?? 0;
   if (field === 'sign') return info.sign ?? '';
   if (field === 'nak')  return info.nak  ?? '';
   return '';
 }
 
 function resetFilters() {
-  document.getElementById('dateFrom').value  = '';
-  document.getElementById('dateTo').value    = '';
+  document.getElementById('dateFrom').value   = '';
+  document.getElementById('dateTo').value     = '';
   document.getElementById('searchSign').value = '';
   sortCol = null;
   document.querySelectorAll('.sortable').forEach(t => t.classList.remove('sort-asc','sort-desc'));
@@ -560,18 +610,19 @@ function resetFilters() {
 
 // ── CSV download ──────────────────────────────────────────────────────────────
 function downloadCSV() {
+  const ayanKey = AYANS.find(a => a.key === selectedAyan)?.label || selectedAyan;
   const cols = ['Date','Open','High','Low','Close','Change%'];
-  for (const p of PLANETS) cols.push(`${p}_Deg`,`${p}_Sign`,`${p}_Nak`,`${p}_Pada`);
+  for (const pk of PLANETS) {
+    const n = P_NAME[pk];
+    cols.push(`${n}_Deg(${ayanKey})`, `${n}_Sign`, `${n}_Nak`, `${n}_Pada`);
+  }
 
   const lines = [cols.join(',')];
   for (const r of filtered) {
     const row = [r.date, r.open, r.high, r.low, r.close, r.chg];
-    for (const p of PLANETS) {
-      const info = r.p?.[p] || {};
-      row.push(`"${info.deg??''}"`);
-      row.push(info.sign ?? '');
-      row.push(info.nak  ?? '');
-      row.push(info.pada ?? '');
+    for (const pk of PLANETS) {
+      const info = getPInfo(r, pk);
+      row.push(`"${info.deg ?? ''}"`, info.sign ?? '', info.nak ?? '', info.pada ?? '');
     }
     lines.push(row.join(','));
   }
@@ -579,8 +630,7 @@ function downloadCSV() {
   const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `nifty50_planets_${new Date().toISOString().slice(0,10)}.csv`;
+  a.href = url; a.download = `nifty50_${ayanKey}_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -589,26 +639,23 @@ function downloadCSV() {
 function toggleLang() {
   lang = lang === 'en' ? 'ta' : 'en';
   const btn = document.getElementById('langBtn');
-  btn.textContent = lang === 'ta' ? 'EN / தமிழ்' : 'தமிழ் / EN';
+  btn.textContent  = lang === 'ta' ? 'EN / தமிழ்' : 'தமிழ் / EN';
   btn.style.background = lang === 'ta' ? 'rgba(245,158,11,.35)' : 'transparent';
 
-  // Update control labels
-  const [lFrom, lTo] = document.querySelectorAll('.controls label');
-  if (lFrom) lFrom.textContent = lang === 'ta' ? TA.ui.from : 'From';
-  if (lTo)   lTo.textContent   = lang === 'ta' ? TA.ui.to   : 'To';
+  const labels = document.querySelectorAll('.controls label');
+  if (labels[0]) labels[0].textContent = lang === 'ta' ? TA.ui.from : 'From';
+  if (labels[1]) labels[1].textContent = lang === 'ta' ? TA.ui.to   : 'To';
 
-  const searchInput = document.getElementById('searchSign');
-  if (searchInput) searchInput.placeholder = lang === 'ta' ? 'ராசி / நட்சத்திரம்…' : 'Sign / Nakshatra…';
+  const si = document.getElementById('searchSign');
+  if (si) si.placeholder = lang === 'ta' ? 'ராசி / நட்சத்திரம்…' : 'Sign / Nakshatra…';
 
-  const [filterBtn, resetBtn] = document.querySelectorAll('.controls .btn:not(.btn-outline), .controls .btn.btn-outline');
-  // Re-query by onclick
   document.querySelectorAll('.controls button').forEach(b => {
-    if (b.id === 'langBtn') return;
     const oc = b.getAttribute('onclick') || '';
     if (oc.includes('applyFilters')) b.textContent = lang === 'ta' ? TA.ui.filter : 'Filter';
     if (oc.includes('resetFilters')) b.textContent = lang === 'ta' ? TA.ui.reset  : 'Reset';
   });
 
+  buildAyanBtns();
   buildHeader();
   renderPage();
 }
@@ -622,10 +669,10 @@ async function init() {
     allRecords = json.records || [];
     filtered   = [...allRecords];
 
+    buildAyanBtns();
     buildHeader();
     applyFilters();
 
-    // Set date range defaults
     if (allRecords.length) {
       document.getElementById('dateFrom').value = allRecords.at(0).date;
       document.getElementById('dateTo').value   = allRecords.at(-1).date;
@@ -633,7 +680,6 @@ async function init() {
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display     = 'block';
-
   } catch (err) {
     document.getElementById('loading').style.display    = 'none';
     document.getElementById('error').style.display      = 'block';
