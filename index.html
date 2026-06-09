@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nifty 50 · Planetary Positions</title>
+<style>
+  :root {
+    --indigo:  #1e1b4b;
+    --saffron: #f59e0b;
+    --green:   #16a34a;
+    --red:     #dc2626;
+    --border:  #e2e8f0;
+    --bg:      #f8fafc;
+    --text:    #0f172a;
+    --muted:   #64748b;
+    --sun:     #f97316;
+    --moon:    #8b5cf6;
+    --mars:    #ef4444;
+    --mercury: #10b981;
+    --venus:   #ec4899;
+    --jupiter: #f59e0b;
+    --saturn:  #6366f1;
+    --rahu:    #78716c;
+    --ketu:    #d97706;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+  }
+
+  /* ── Top bar ── */
+  header {
+    background: var(--indigo);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  header h1 { font-size: 16px; font-weight: 800; color: var(--saffron); letter-spacing: .04em; }
+  header .subtitle { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 1px; }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .controls label { font-size: 11px; color: rgba(255,255,255,.7); }
+  .controls input[type=date], .controls input[type=text], .controls select {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 5px;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 12px;
+    outline: none;
+  }
+  .controls input[type=date]::-webkit-calendar-picker-indicator { filter: invert(1); }
+
+  .btn {
+    background: var(--saffron);
+    color: var(--indigo);
+    border: none;
+    border-radius: 5px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.35);
+    color: #fff;
+  }
+
+  /* ── Stats bar ── */
+  .stats-bar {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 8px 20px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .stats-bar strong { color: var(--text); }
+
+  /* ── Table wrapper ── */
+  .table-wrap {
+    overflow: auto;
+    max-height: calc(100vh - 120px);
+  }
+
+  table {
+    border-collapse: collapse;
+    white-space: nowrap;
+    min-width: 100%;
+  }
+
+  /* Sticky header rows */
+  thead tr:first-child th { position: sticky; top: 0; z-index: 100; }
+  thead tr:nth-child(2) th { position: sticky; top: 33px; z-index: 99; }
+
+  /* Sticky first column */
+  td:first-child, th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 50;
+    background: inherit;
+  }
+  thead td:first-child, thead th:first-child { z-index: 110; }
+
+  /* ── Header rows ── */
+  thead tr:first-child th {
+    background: var(--indigo);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 7px 10px;
+    border-right: 1px solid rgba(255,255,255,.15);
+    text-align: center;
+  }
+  thead tr:nth-child(2) th {
+    background: #2d2a6e;
+    color: rgba(255,255,255,.75);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 5px 8px;
+    border-right: 1px solid rgba(255,255,255,.1);
+    text-align: center;
+  }
+
+  /* Planet group header colours */
+  .hdr-sun     { background: #7c2d12 !important; }
+  .hdr-moon    { background: #3b0764 !important; }
+  .hdr-mercury { background: #064e3b !important; }
+  .hdr-venus   { background: #831843 !important; }
+  .hdr-mars    { background: #7f1d1d !important; }
+  .hdr-jupiter { background: #78350f !important; }
+  .hdr-saturn  { background: #1e1b4b !important; border-top: 2px solid var(--saffron) !important; }
+  .hdr-rahu    { background: #292524 !important; }
+  .hdr-ketu    { background: #451a03 !important; }
+
+  /* Sub-header colours (slightly lighter) */
+  .sub-sun     { background: #9a3412 !important; }
+  .sub-moon    { background: #4c1d95 !important; }
+  .sub-mercury { background: #065f46 !important; }
+  .sub-venus   { background: #9d174d !important; }
+  .sub-mars    { background: #991b1b !important; }
+  .sub-jupiter { background: #92400e !important; }
+  .sub-saturn  { background: #312e81 !important; }
+  .sub-rahu    { background: #3c3836 !important; }
+  .sub-ketu    { background: #5c3317 !important; }
+
+  /* Sortable */
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { opacity: .8; }
+  th.sort-asc::after  { content: ' ▲'; font-size: 9px; }
+  th.sort-desc::after { content: ' ▼'; font-size: 9px; }
+
+  /* ── Body rows ── */
+  tbody tr { background: #fff; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:hover { background: #eff6ff !important; }
+
+  tbody td {
+    padding: 5px 8px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  tbody td:first-child { text-align: left; font-weight: 600; color: var(--indigo); }
+
+  .td-date { min-width: 90px; }
+  .td-price { min-width: 72px; }
+  .td-chg { min-width: 64px; font-weight: 600; }
+  .td-chg.up   { color: var(--green); }
+  .td-chg.down { color: var(--red); }
+
+  .td-deg  { min-width: 54px; font-size: 11px; color: #475569; }
+  .td-sign { min-width: 44px; font-size: 11px; font-weight: 600; }
+  .td-nak  { min-width: 44px; font-size: 11px; color: var(--muted); }
+
+  /* Planet sign colours in cells */
+  .p-sun     { color: var(--sun); }
+  .p-moon    { color: var(--moon); }
+  .p-mercury { color: var(--mercury); }
+  .p-venus   { color: var(--venus); }
+  .p-mars    { color: var(--mars); }
+  .p-jupiter { color: var(--jupiter); }
+  .p-saturn  { color: var(--saturn); }
+  .p-rahu    { color: var(--rahu); }
+  .p-ketu    { color: var(--ketu); }
+
+  /* Divider between planet groups */
+  .group-start { border-left: 2px solid rgba(0,0,0,.1) !important; }
+
+  /* ── Pagination ── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 20px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .pagination button {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--indigo);
+    font-weight: 600;
+  }
+  .pagination button:hover   { background: var(--bg); }
+  .pagination button.active  { background: var(--indigo); color: var(--saffron); border-color: var(--indigo); }
+  .pagination button:disabled { opacity: .35; cursor: default; }
+  .pagination .page-info     { font-size: 12px; color: var(--muted); padding: 0 8px; }
+
+  /* ── Loading overlay ── */
+  #loading {
+    position: fixed; inset: 0;
+    background: var(--indigo);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #fff; z-index: 999; gap: 16px;
+  }
+  #loading h2 { color: var(--saffron); font-size: 20px; }
+  #loading p  { font-size: 13px; color: rgba(255,255,255,.7); }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--saffron);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Error ── */
+  #error {
+    display: none;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  #error h2 { color: var(--red); margin-bottom: 8px; }
+  #error pre { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 12px; text-align: left; display: inline-block; margin-top: 12px; max-width: 600px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading">
+  <div class="spinner"></div>
+  <h2>Nifty 50 · Planetary Positions</h2>
+  <p>Loading data…</p>
+</div>
+
+<!-- Error state -->
+<div id="error">
+  <h2>Could not load data.json</h2>
+  <p>Make sure <code>data.json</code> is in the same folder as this file.<br>
+     Run <code>python generate_data.py</code> to generate it.</p>
+  <pre id="error-detail"></pre>
+</div>
+
+<!-- Main app (hidden until data loads) -->
+<div id="app" style="display:none">
+
+  <header>
+    <div>
+      <h1>☽ Nifty 50 · Planetary Positions</h1>
+      <div class="subtitle">KP Sidereal (Krishnamurti) · NSE · Since Inception</div>
+    </div>
+    <div class="controls">
+      <label>From</label>
+      <input type="date" id="dateFrom" />
+      <label>To</label>
+      <input type="date" id="dateTo" />
+      <input type="text" id="searchSign" placeholder="Sign / Nakshatra…" style="width:150px" />
+      <button class="btn" onclick="applyFilters()">Filter</button>
+      <button class="btn btn-outline" onclick="resetFilters()">Reset</button>
+      <button class="btn btn-outline" onclick="downloadCSV()">⬇ CSV</button>
+    </div>
+  </header>
+
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
+
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+const PAGE_SIZE  = 100;
+const PLANETS    = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Rahu','Ketu'];
+const P_CLASS    = { Sun:'sun', Moon:'moon', Mercury:'mercury', Venus:'venus', Mars:'mars',
+                     Jupiter:'jupiter', Saturn:'saturn', Rahu:'rahu', Ketu:'ketu' };
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let allRecords   = [];
+let filtered     = [];
+let currentPage  = 1;
+let sortCol      = null;
+let sortDir      = 'desc'; // newest first by default
+
+// ── Build static table header ─────────────────────────────────────────────────
+function buildHeader() {
+  const thead = document.getElementById('thead');
+
+  // Row 1: group headers
+  let r1 = '<tr>';
+  r1 += `<th rowspan="2" class="sortable td-date" data-col="date">Date</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="open">Open</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="high">High</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="low">Low</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="close">Close</th>`;
+  r1 += `<th rowspan="2" class="sortable td-chg" data-col="chg">Chg %</th>`;
+  for (const p of PLANETS) {
+    const cls = `hdr-${P_CLASS[p]}`;
+    r1 += `<th colspan="3" class="${cls} group-start">${p}</th>`;
+  }
+  r1 += '</tr>';
+
+  // Row 2: sub-headers
+  let r2 = '<tr>';
+  for (const p of PLANETS) {
+    const cls = `sub-${P_CLASS[p]}`;
+    const pc  = P_CLASS[p];
+    r2 += `<th class="${cls} group-start sortable" data-col="${p}_deg">Deg</th>`;
+    r2 += `<th class="${cls} sortable" data-col="${p}_sign">Sign</th>`;
+    r2 += `<th class="${cls} sortable" data-col="${p}_nak">Nak</th>`;
+  }
+  r2 += '</tr>';
+
+  thead.innerHTML = r1 + r2;
+
+  // Attach sort listeners
+  thead.querySelectorAll('.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (sortCol === col) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortCol = col;
+        sortDir = 'desc';
+      }
+      thead.querySelectorAll('.sortable').forEach(t => t.classList.remove('sort-asc','sort-desc'));
+      th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+      applyFilters();
+    });
+  });
+}
+
+// ── Render a page of rows ─────────────────────────────────────────────────────
+function renderPage() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end   = Math.min(start + PAGE_SIZE, filtered.length);
+  const rows  = filtered.slice(start, end);
+
+  const tbody = document.getElementById('tbody');
+  let html = '';
+
+  for (const r of rows) {
+    const chgCls = r.chg > 0 ? 'up' : r.chg < 0 ? 'down' : '';
+    const chgStr = r.chg > 0 ? `+${r.chg.toFixed(2)}%` : `${r.chg.toFixed(2)}%`;
+
+    html += `<tr>`;
+    html += `<td class="td-date">${r.date}</td>`;
+    html += `<td class="td-price">${r.open.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+    html += `<td class="td-price">${r.high.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+    html += `<td class="td-price">${r.low.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+    html += `<td class="td-price">${r.close.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+    html += `<td class="td-chg ${chgCls}">${chgStr}</td>`;
+
+    for (const p of PLANETS) {
+      const info  = r.p?.[p] || {};
+      const pc    = P_CLASS[p];
+      const first = ` group-start`;
+      html += `<td class="td-deg${first}">${info.deg ?? '—'}</td>`;
+      html += `<td class="td-sign p-${pc}">${info.sign ?? '—'}</td>`;
+      html += `<td class="td-nak">${info.nak ?? '—'}${info.pada ? ` P${info.pada}` : ''}</td>`;
+    }
+
+    html += `</tr>`;
+  }
+
+  tbody.innerHTML = html;
+
+  // Stats bar
+  document.getElementById('statsBar').innerHTML =
+    `<span>Showing <strong>${start + 1}–${end}</strong> of <strong>${filtered.length.toLocaleString()}</strong> trading days</span>` +
+    (filtered.length !== allRecords.length
+      ? `<span style="color:#f59e0b;font-weight:600">(filtered from ${allRecords.length.toLocaleString()} total)</span>`
+      : '') +
+    `<span>First: <strong>${allRecords.at(0)?.date ?? '—'}</strong></span>` +
+    `<span>Latest: <strong>${allRecords.at(-1)?.date ?? '—'}</strong></span>`;
+
+  renderPagination();
+}
+
+// ── Pagination ─────────────────────────────────────────────────────────────────
+function renderPagination() {
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const el = document.getElementById('pagination');
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+  let html = '';
+  html += `<button onclick="goPage(1)" ${currentPage===1?'disabled':''}>«</button>`;
+  html += `<button onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+
+  const range = 3;
+  const lo = Math.max(1, currentPage - range);
+  const hi = Math.min(totalPages, currentPage + range);
+  if (lo > 1) html += `<button onclick="goPage(1)">1</button>${lo > 2 ? '<span style="padding:0 4px;color:#94a3b8">…</span>' : ''}`;
+  for (let p = lo; p <= hi; p++) {
+    html += `<button class="${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  }
+  if (hi < totalPages) html += `${hi < totalPages - 1 ? '<span style="padding:0 4px;color:#94a3b8">…</span>' : ''}<button onclick="goPage(${totalPages})">${totalPages}</button>`;
+
+  html += `<button onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>`;
+  html += `<button onclick="goPage(${totalPages})" ${currentPage===totalPages?'disabled':''}>»</button>`;
+  html += `<span class="page-info">Page ${currentPage} of ${totalPages} (${PAGE_SIZE} rows/page)</span>`;
+
+  el.innerHTML = html;
+}
+
+function goPage(p) {
+  currentPage = p;
+  renderPage();
+  document.querySelector('.table-wrap').scrollTop = 0;
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function applyFilters() {
+  const from    = document.getElementById('dateFrom').value;
+  const to      = document.getElementById('dateTo').value;
+  const sigTerm = document.getElementById('searchSign').value.trim().toLowerCase();
+
+  filtered = allRecords.filter(r => {
+    if (from && r.date < from) return false;
+    if (to   && r.date > to)   return false;
+    if (sigTerm) {
+      const match = Object.values(r.p || {}).some(pInfo =>
+        (pInfo.sign || '').toLowerCase().includes(sigTerm) ||
+        (pInfo.nak  || '').toLowerCase().includes(sigTerm)
+      );
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  if (sortCol) {
+    filtered.sort((a, b) => {
+      const va = colVal(a, sortCol);
+      const vb = colVal(b, sortCol);
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ?  1 : -1;
+      return 0;
+    });
+  }
+
+  currentPage = 1;
+  renderPage();
+}
+
+function colVal(r, col) {
+  if (col === 'date')  return r.date;
+  if (col === 'open')  return r.open;
+  if (col === 'high')  return r.high;
+  if (col === 'low')   return r.low;
+  if (col === 'close') return r.close;
+  if (col === 'chg')   return r.chg;
+  // Planet sub-cols: e.g. "Sun_sign"
+  const [planet, field] = col.split('_');
+  const info = r.p?.[planet] || {};
+  if (field === 'deg')  return info.lon ?? 0;
+  if (field === 'sign') return info.sign ?? '';
+  if (field === 'nak')  return info.nak  ?? '';
+  return '';
+}
+
+function resetFilters() {
+  document.getElementById('dateFrom').value  = '';
+  document.getElementById('dateTo').value    = '';
+  document.getElementById('searchSign').value = '';
+  sortCol = null;
+  document.querySelectorAll('.sortable').forEach(t => t.classList.remove('sort-asc','sort-desc'));
+  filtered = [...allRecords];
+  currentPage = 1;
+  renderPage();
+}
+
+// ── CSV download ──────────────────────────────────────────────────────────────
+function downloadCSV() {
+  const cols = ['Date','Open','High','Low','Close','Change%'];
+  for (const p of PLANETS) cols.push(`${p}_Deg`,`${p}_Sign`,`${p}_Nak`,`${p}_Pada`);
+
+  const lines = [cols.join(',')];
+  for (const r of filtered) {
+    const row = [r.date, r.open, r.high, r.low, r.close, r.chg];
+    for (const p of PLANETS) {
+      const info = r.p?.[p] || {};
+      row.push(`"${info.deg??''}"`);
+      row.push(info.sign ?? '');
+      row.push(info.nak  ?? '');
+      row.push(info.pada ?? '');
+    }
+    lines.push(row.join(','));
+  }
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `nifty50_planets_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Bootstrap ─────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res  = await fetch('data.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
+    const json = await res.json();
+    allRecords = json.records || [];
+    filtered   = [...allRecords];
+
+    buildHeader();
+    applyFilters();
+
+    // Set date range defaults
+    if (allRecords.length) {
+      document.getElementById('dateFrom').value = allRecords.at(0).date;
+      document.getElementById('dateTo').value   = allRecords.at(-1).date;
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display     = 'block';
+
+  } catch (err) {
+    document.getElementById('loading').style.display    = 'none';
+    document.getElementById('error').style.display      = 'block';
+    document.getElementById('error-detail').textContent = String(err);
+    console.error(err);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
