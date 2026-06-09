@@ -28,7 +28,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Tamil', 'Tamil Sangam MN', sans-serif;
     background: var(--bg);
     color: var(--text);
     font-size: 13px;
@@ -302,6 +302,7 @@
       <button class="btn" onclick="applyFilters()">Filter</button>
       <button class="btn btn-outline" onclick="resetFilters()">Reset</button>
       <button class="btn btn-outline" onclick="downloadCSV()">⬇ CSV</button>
+      <button class="btn btn-outline" id="langBtn" onclick="toggleLang()" title="Switch language">தமிழ் / EN</button>
     </div>
   </header>
 
@@ -325,12 +326,47 @@ const PLANETS    = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Ra
 const P_CLASS    = { Sun:'sun', Moon:'moon', Mercury:'mercury', Venus:'venus', Mars:'mars',
                      Jupiter:'jupiter', Saturn:'saturn', Rahu:'rahu', Ketu:'ketu' };
 
+// ── Tamil translations ────────────────────────────────────────────────────────
+const TA = {
+  planets: {
+    Sun:'சூரியன்', Moon:'சந்திரன்', Mercury:'புதன்', Venus:'சுக்கிரன்',
+    Mars:'செவ்வாய்', Jupiter:'குரு', Saturn:'சனி', Rahu:'ராகு', Ketu:'கேது',
+  },
+  signs: {
+    Ari:'மேஷம்', Tau:'ரிஷபம்', Gem:'மிதுனம்', Can:'கடகம்', Leo:'சிம்மம்',
+    Vir:'கன்னி', Lib:'துலாம்', Sco:'விருச்சிகம்', Sag:'தனுசு',
+    Cap:'மகரம்', Aqu:'கும்பம்', Pis:'மீனம்',
+  },
+  naks: {
+    Ashw:'அசுவினி', Bhar:'பரணி',   Krit:'கிருத்திகை', Rohi:'ரோகிணி',
+    Mrig:'மிருகசீரிஷம்', Ardr:'திருவாதிரை', Puna:'புனர்பூசம்', Push:'பூசம்',
+    Ashl:'ஆயில்யம்', Magh:'மகம்',   PPha:'பூரம்',    UPha:'உத்திரம்',
+    Hast:'அஸ்தம்',  Chit:'சித்திரை', Swat:'சுவாதி', Vish:'விசாகம்',
+    Anur:'அனுஷம்',  Jyes:'கேட்டை',  Mula:'மூலம்',   PAsh:'பூராடம்',
+    UAsh:'உத்திராடம்', Shra:'திருவோணம்', Dhan:'அவிட்டம்', Shat:'சதயம்',
+    PBha:'பூரட்டாதி', UBha:'உத்திரட்டாதி', Reva:'ரேவதி',
+  },
+  ui: {
+    date:'தேதி', open:'திறப்பு', high:'உயர்வு', low:'தாழ்வு',
+    close:'மூடல்', chg:'மாற்றம் %', deg:'பாகை', sign:'ராசி', nak:'நட்சத்திரம்',
+    from:'இருந்து', to:'வரை', filter:'வடிகட்டு', reset:'மீட்டமை',
+    showing:'காட்டுகிறது', of:'இல்', first:'முதல்', latest:'கடைசி',
+  },
+};
+
 // ── State ─────────────────────────────────────────────────────────────────────
 let allRecords   = [];
 let filtered     = [];
 let currentPage  = 1;
 let sortCol      = null;
 let sortDir      = 'desc'; // newest first by default
+let lang         = 'en';
+
+// ── i18n helpers ──────────────────────────────────────────────────────────────
+function t(key) { return lang === 'ta' ? (TA.ui[key] || key) : key; }
+function tPlanet(p) { return lang === 'ta' ? (TA.planets[p] || p) : p; }
+function tSign(s) { return lang === 'ta' ? (TA.signs[s] || s) : s; }
+function tNak(n) { return lang === 'ta' ? (TA.naks[n]  || n) : n; }
 
 // ── Build static table header ─────────────────────────────────────────────────
 function buildHeader() {
@@ -338,15 +374,15 @@ function buildHeader() {
 
   // Row 1: group headers
   let r1 = '<tr>';
-  r1 += `<th rowspan="2" class="sortable td-date" data-col="date">Date</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="open">Open</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="high">High</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="low">Low</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="close">Close</th>`;
-  r1 += `<th rowspan="2" class="sortable td-chg" data-col="chg">Chg %</th>`;
+  r1 += `<th rowspan="2" class="sortable td-date" data-col="date">${t('date')||'Date'}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="open">${t('open')||'Open'}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="high">${t('high')||'High'}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="low">${t('low')||'Low'}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-price" data-col="close">${t('close')||'Close'}</th>`;
+  r1 += `<th rowspan="2" class="sortable td-chg" data-col="chg">${lang==='ta'?TA.ui.chg:'Chg %'}</th>`;
   for (const p of PLANETS) {
     const cls = `hdr-${P_CLASS[p]}`;
-    r1 += `<th colspan="3" class="${cls} group-start">${p}</th>`;
+    r1 += `<th colspan="3" class="${cls} group-start">${tPlanet(p)}</th>`;
   }
   r1 += '</tr>';
 
@@ -354,10 +390,9 @@ function buildHeader() {
   let r2 = '<tr>';
   for (const p of PLANETS) {
     const cls = `sub-${P_CLASS[p]}`;
-    const pc  = P_CLASS[p];
-    r2 += `<th class="${cls} group-start sortable" data-col="${p}_deg">Deg</th>`;
-    r2 += `<th class="${cls} sortable" data-col="${p}_sign">Sign</th>`;
-    r2 += `<th class="${cls} sortable" data-col="${p}_nak">Nak</th>`;
+    r2 += `<th class="${cls} group-start sortable" data-col="${p}_deg">${lang==='ta'?TA.ui.deg:'Deg'}</th>`;
+    r2 += `<th class="${cls} sortable" data-col="${p}_sign">${lang==='ta'?TA.ui.sign:'Sign'}</th>`;
+    r2 += `<th class="${cls} sortable" data-col="${p}_nak">${lang==='ta'?TA.ui.nak:'Nak'}</th>`;
   }
   r2 += '</tr>';
 
@@ -406,8 +441,8 @@ function renderPage() {
       const pc    = P_CLASS[p];
       const first = ` group-start`;
       html += `<td class="td-deg${first}">${info.deg ?? '—'}</td>`;
-      html += `<td class="td-sign p-${pc}">${info.sign ?? '—'}</td>`;
-      html += `<td class="td-nak">${info.nak ?? '—'}${info.pada ? ` P${info.pada}` : ''}</td>`;
+      html += `<td class="td-sign p-${pc}">${tSign(info.sign) ?? '—'}</td>`;
+      html += `<td class="td-nak">${tNak(info.nak) ?? '—'}${info.pada ? ` P${info.pada}` : ''}</td>`;
     }
 
     html += `</tr>`;
@@ -416,13 +451,16 @@ function renderPage() {
   tbody.innerHTML = html;
 
   // Stats bar
+  const lbl = lang === 'ta'
+    ? { showing: 'காட்டுகிறது', of: 'இல்', days: 'வர்த்தக நாட்கள்', first: 'முதல்', latest: 'கடைசி' }
+    : { showing: 'Showing', of: 'of', days: 'trading days', first: 'First', latest: 'Latest' };
   document.getElementById('statsBar').innerHTML =
-    `<span>Showing <strong>${start + 1}–${end}</strong> of <strong>${filtered.length.toLocaleString()}</strong> trading days</span>` +
+    `<span>${lbl.showing} <strong>${start + 1}–${end}</strong> ${lbl.of} <strong>${filtered.length.toLocaleString()}</strong> ${lbl.days}</span>` +
     (filtered.length !== allRecords.length
       ? `<span style="color:#f59e0b;font-weight:600">(filtered from ${allRecords.length.toLocaleString()} total)</span>`
       : '') +
-    `<span>First: <strong>${allRecords.at(0)?.date ?? '—'}</strong></span>` +
-    `<span>Latest: <strong>${allRecords.at(-1)?.date ?? '—'}</strong></span>`;
+    `<span>${lbl.first}: <strong>${allRecords.at(0)?.date ?? '—'}</strong></span>` +
+    `<span>${lbl.latest}: <strong>${allRecords.at(-1)?.date ?? '—'}</strong></span>`;
 
   renderPagination();
 }
@@ -545,6 +583,34 @@ function downloadCSV() {
   a.download = `nifty50_planets_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── Language toggle ───────────────────────────────────────────────────────────
+function toggleLang() {
+  lang = lang === 'en' ? 'ta' : 'en';
+  const btn = document.getElementById('langBtn');
+  btn.textContent = lang === 'ta' ? 'EN / தமிழ்' : 'தமிழ் / EN';
+  btn.style.background = lang === 'ta' ? 'rgba(245,158,11,.35)' : 'transparent';
+
+  // Update control labels
+  const [lFrom, lTo] = document.querySelectorAll('.controls label');
+  if (lFrom) lFrom.textContent = lang === 'ta' ? TA.ui.from : 'From';
+  if (lTo)   lTo.textContent   = lang === 'ta' ? TA.ui.to   : 'To';
+
+  const searchInput = document.getElementById('searchSign');
+  if (searchInput) searchInput.placeholder = lang === 'ta' ? 'ராசி / நட்சத்திரம்…' : 'Sign / Nakshatra…';
+
+  const [filterBtn, resetBtn] = document.querySelectorAll('.controls .btn:not(.btn-outline), .controls .btn.btn-outline');
+  // Re-query by onclick
+  document.querySelectorAll('.controls button').forEach(b => {
+    if (b.id === 'langBtn') return;
+    const oc = b.getAttribute('onclick') || '';
+    if (oc.includes('applyFilters')) b.textContent = lang === 'ta' ? TA.ui.filter : 'Filter';
+    if (oc.includes('resetFilters')) b.textContent = lang === 'ta' ? TA.ui.reset  : 'Reset';
+  });
+
+  buildHeader();
+  renderPage();
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
