@@ -5,17 +5,24 @@ Fetches Nifty 50 OHLC data and calculates tropical planetary longitudes
 plus ayanamsa values for five systems (Lahiri, KP, Raman, Yukteshwar,
 Vakkiyam). Sign/nakshatra derivation happens client-side in index.html.
 
-Data sources (merged):
-  1. nse_data/   — local CSV files (1995–2018, Close only; Open=High=Low=Close)
-  2. Yahoo Finance ^NSEI — automatic download (2007–present, full OHLC)
-  Yahoo Finance takes priority for overlapping dates (has full OHLC).
+Data sources (merged in order, duplicates removed):
+  1. nse_historical.csv   — manually downloaded from NSE India (1996–2007)
+  2. Yahoo Finance ^NSEI  — automatic download (2007–present)
+
+How to get the NSE CSV for 1996–2007:
+  1. Go to https://www.nseindia.com/reports-detail?type=equity_research
+  2. Select Index → NIFTY 50, Date range: 01-01-1996 to 17-09-2007
+  3. Download CSV → save as nse_historical.csv in this folder
+  4. Run: python generate_data.py
+
+Without nse_historical.csv the script still works — data starts from 2007.
 
 Usage:
     pip install -r requirements.txt
     python generate_data.py
 """
 
-import json, math, sys, os, glob
+import json, math, sys, os
 from datetime import datetime
 
 try:
@@ -77,45 +84,52 @@ def calc_record(jd):
 def date_to_jd(d):
     return swe.julday(d.year, d.month, d.day, 3.75)  # 9:15 AM IST = 3.75h UTC
 
-# ── Load NSE CSV files from nse_data/ folder ─────────────────────────────────
+# ── Load NSE CSV (optional, for pre-2007 data) ────────────────────────────────
 
-def load_nse_csvs(folder='nse_data'):
+def load_nse_csv(path):
     """
-    Loads all CSV files from nse_data/.
-    Format (no header): Date, Close, Returns
-    Date format: DD-Mon-YY  (e.g. 03-Apr-95)
-    Only Close is available; Open/High/Low are set equal to Close.
+    NSE historical CSV columns (typical format):
+      Date, Open, High, Low, Close, Shares Traded, Turnover (Rs. Cr)
     """
-    files = sorted(glob.glob(os.path.join(folder, '*.csv')))
-    if not files:
+    try:
+        df = pd.read_csv(path)
+        df.columns = [c.strip() for c in df.columns]
+
+        col_map = {}
+        for c in df.columns:
+            cl = c.lower().strip()
+            if 'date' in cl:               col_map['Date']  = c
+            elif cl == 'open':             col_map['Open']  = c
+            elif cl == 'high':             col_map['High']  = c
+            elif cl == 'low':              col_map['Low']   = c
+            elif cl in ('close','closing'):col_map['Close'] = c
+
+        for k in ('Date','Open','High','Low','Close'):
+            if k not in col_map:
+                raise ValueError(f"Column '{k}' not found. Columns: {list(df.columns)}")
+
+        df = df.rename(columns={v: k for k, v in col_map.items()})
+        df = df[['Date','Open','High','Low','Close']].copy()
+
+        for fmt in ('%d-%b-%Y','%d-%m-%Y','%Y-%m-%d','%m/%d/%Y'):
+            try:
+                df['Date'] = pd.to_datetime(df['Date'], format=fmt)
+                break
+            except Exception:
+                continue
+        else:
+            df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format=True)
+
+        for col in ('Open','High','Low','Close'):
+            df[col] = pd.to_numeric(df[col].astype(str).str.replace(',',''), errors='coerce')
+
+        df = df.dropna(subset=['Close'])
+        df = df.set_index('Date').sort_index()
+        print(f"  NSE CSV: {len(df)} rows ({df.index[0].date()} → {df.index[-1].date()})")
+        return df
+    except Exception as e:
+        print(f"  Warning: could not load {path}: {e}")
         return pd.DataFrame()
-
-    dfs = []
-    for f in files:
-        try:
-            df = pd.read_csv(f, header=None, names=['Date','Close','chg'])
-            df = df[df['chg'] != 'returns']   # drop the label row present in each file
-            dfs.append(df)
-        except Exception as e:
-            print(f"  Warning: could not read {f}: {e}")
-
-    if not dfs:
-        return pd.DataFrame()
-
-    combined = pd.concat(dfs, ignore_index=True)
-    combined['Date']  = pd.to_datetime(combined['Date'], format='%d-%b-%y', dayfirst=True)
-    combined['Close'] = pd.to_numeric(combined['Close'], errors='coerce')
-    combined = combined.dropna(subset=['Close'])
-    combined = combined.drop_duplicates('Date').sort_values('Date').set_index('Date')
-
-    # No OHLC in these files — set Open/High/Low = Close
-    combined['Open'] = combined['Close']
-    combined['High'] = combined['Close']
-    combined['Low']  = combined['Close']
-
-    result = combined[['Open','High','Low','Close']]
-    print(f"  NSE CSVs: {len(result)} rows ({result.index[0].date()} → {result.index[-1].date()})")
-    return result
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
@@ -129,13 +143,17 @@ def main():
     yf_df.index = pd.to_datetime(yf_df.index).tz_localize(None)
     print(f"  Yahoo: {len(yf_df)} rows ({yf_df.index[0].date()} → {yf_df.index[-1].date()})")
 
-    # 2. NSE CSV files from nse_data/
-    print("Loading NSE CSV files from nse_data/...")
-    nse_df = load_nse_csvs('nse_data')
-    if nse_df.empty:
-        print("  (No nse_data/ CSVs found — data starts from 2007)")
+    # 2. NSE CSV (optional)
+    nse_path = 'nse_historical.csv'
+    nse_df = pd.DataFrame()
+    if os.path.exists(nse_path):
+        print(f"Loading {nse_path}...")
+        nse_df = load_nse_csv(nse_path)
+    else:
+        print(f"  (No {nse_path} found — data starts from {yf_df.index[0].date()})")
+        print(f"  To get 1996–2007 data: download from NSE India → save as {nse_path}")
 
-    # 3. Merge — Yahoo Finance takes priority for overlapping dates (full OHLC)
+    # 3. Merge — Yahoo Finance takes priority for overlapping dates
     if not nse_df.empty:
         nse_df.index = pd.to_datetime(nse_df.index).tz_localize(None)
         nse_only = nse_df[~nse_df.index.isin(yf_df.index)]
@@ -143,7 +161,6 @@ def main():
     else:
         combined = yf_df
 
-    # Recompute Change% across full merged series so 1995→1996 transitions are correct
     combined['Change_pct'] = combined['Close'].pct_change() * 100
     print(f"\nTotal trading days: {len(combined)}")
     print(f"Range: {combined.index[0].date()} → {combined.index[-1].date()}")
@@ -186,6 +203,13 @@ def main():
 
     size_mb = os.path.getsize(out) / 1_000_000
     print(f"Done!  {out}  ({size_mb:.1f} MB)")
+    if not os.path.exists(nse_path):
+        print(f"\n{'─'*60}")
+        print("To include 1996–2007 data:")
+        print("  1. Visit https://www.nseindia.com/reports-detail?type=equity_research")
+        print("  2. Select NIFTY 50, date 01-01-1996 to 17-09-2007 → Download")
+        print(f"  3. Save as '{nse_path}' in this folder")
+        print("  4. Re-run: python generate_data.py")
 
 if __name__ == '__main__':
     main()
