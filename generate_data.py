@@ -141,11 +141,11 @@ def main():
     yf_df.index = pd.to_datetime(yf_df.index).tz_localize(None)
     print(f"  Yahoo: {len(yf_df)} rows ({yf_df.index[0].date()} → {yf_df.index[-1].date()})")
 
-    # 2. NSE India — full OHLC from 1994 up to the day before Yahoo starts
+    # 2. NSE India — full OHLC from April 1996 up to the day before Yahoo starts
     yf_start = yf_df.index[0].date()
-    nse_end_year = yf_start.year  # fetch NSE up to and including that year; Yahoo takes over after
-    print(f"\nFetching NSE India OHLC history (1994–{nse_end_year})...")
-    nse_df = fetch_nse_history(start_year=1994, end_year=nse_end_year)
+    nse_end_year = yf_start.year
+    print(f"\nFetching NSE India OHLC history (1996–{nse_end_year})...")
+    nse_df = fetch_nse_history(start_year=1996, end_year=nse_end_year)
 
     # 3. Merge — Yahoo Finance takes priority for overlapping dates (its OHLC is more precise)
     if not nse_df.empty:
@@ -157,6 +157,7 @@ def main():
         print("  NSE fetch failed — using Yahoo Finance only")
         combined = yf_df
 
+    combined = combined[combined.index >= pd.Timestamp('1996-04-22')]
     combined['Change_pct'] = combined['Close'].pct_change() * 100
     print(f"Total trading days: {len(combined)}")
     print(f"Range: {combined.index[0].date()} → {combined.index[-1].date()}")
