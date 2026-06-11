@@ -1,2 +1,4 @@
 yfinance>=0.2.40
 pyswisseph>=2.10.3.2
+nselib>=1.0.0
+pandas>=2.0.0

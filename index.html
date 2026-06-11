@@ -38,12 +38,12 @@
   header {
     background: var(--indigo);
     color: #fff;
-    padding: 12px 20px;
+    padding: 10px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     position: sticky;
     top: 0;
     z-index: 200;
@@ -54,7 +54,7 @@
   .controls {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
   }
   .controls label { font-size: 11px; color: rgba(255,255,255,.7); }
@@ -69,6 +69,15 @@
   }
   .controls input[type=date]::-webkit-calendar-picker-indicator { filter: invert(1); }
 
+  .search-wrap { position: relative; display: flex; align-items: center; }
+  .search-wrap input { padding-right: 22px; }
+  .search-clear {
+    position: absolute; right: 5px;
+    background: none; border: none; color: rgba(255,255,255,.5);
+    cursor: pointer; font-size: 13px; padding: 0; line-height: 1;
+  }
+  .search-clear:hover { color: #fff; }
+
   .btn {
     background: var(--saffron);
     color: var(--indigo);
@@ -78,6 +87,7 @@
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
+    white-space: nowrap;
   }
   .btn:hover { opacity: .85; }
   .btn-outline {
@@ -90,9 +100,9 @@
   .stats-bar {
     background: #fff;
     border-bottom: 1px solid var(--border);
-    padding: 8px 20px;
+    padding: 7px 20px;
     display: flex;
-    gap: 24px;
+    gap: 20px;
     align-items: center;
     flex-wrap: wrap;
     font-size: 12px;
@@ -113,17 +123,15 @@
   }
 
   /* Sticky header rows */
-  thead tr:first-child th { position: sticky; top: 0; z-index: 100; }
-  thead tr:nth-child(2) th { position: sticky; top: 33px; z-index: 99; }
+  thead tr:first-child  th { position: sticky; top: 0;    z-index: 100; }
+  thead tr:nth-child(2) th { position: sticky; top: 32px; z-index: 99;  }
+  thead tr:nth-child(3) th { position: sticky; top: 59px; z-index: 98;  }
 
   /* Sticky first column */
   td:first-child, th:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 50;
-    background: inherit;
+    position: sticky; left: 0; z-index: 50; background: inherit;
   }
-  thead td:first-child, thead th:first-child { z-index: 110; }
+  thead th:first-child { z-index: 110; }
 
   /* ── Header rows ── */
   thead tr:first-child th {
@@ -133,18 +141,23 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .06em;
-    padding: 7px 10px;
+    padding: 6px 10px;
     border-right: 1px solid rgba(255,255,255,.15);
     text-align: center;
   }
   thead tr:nth-child(2) th {
     background: #2d2a6e;
-    color: rgba(255,255,255,.75);
+    color: rgba(255,255,255,.8);
     font-size: 10px;
     font-weight: 600;
-    padding: 5px 8px;
+    padding: 4px 7px;
     border-right: 1px solid rgba(255,255,255,.1);
     text-align: center;
+  }
+  thead tr:nth-child(3) th {
+    background: #111827;
+    padding: 3px 3px;
+    border-right: 1px solid rgba(255,255,255,.08);
   }
 
   /* Planet group header colours */
@@ -157,8 +170,9 @@
   .hdr-saturn  { background: #1e1b4b !important; border-top: 2px solid var(--saffron) !important; }
   .hdr-rahu    { background: #292524 !important; }
   .hdr-ketu    { background: #451a03 !important; }
+  .hdr-panch   { background: #064e3b !important; }
 
-  /* Sub-header colours (slightly lighter) */
+  /* Sub-header colours */
   .sub-sun     { background: #9a3412 !important; }
   .sub-moon    { background: #4c1d95 !important; }
   .sub-mercury { background: #065f46 !important; }
@@ -168,12 +182,30 @@
   .sub-saturn  { background: #312e81 !important; }
   .sub-rahu    { background: #3c3836 !important; }
   .sub-ketu    { background: #5c3317 !important; }
+  .sub-panch   { background: #047857 !important; }
 
   /* Sortable */
   th.sortable { cursor: pointer; user-select: none; }
   th.sortable:hover { opacity: .8; }
   th.sort-asc::after  { content: ' ▲'; font-size: 9px; }
   th.sort-desc::after { content: ' ▼'; font-size: 9px; }
+
+  /* ── Column filters ── */
+  .col-filter {
+    width: 100%;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 3px;
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 4px;
+    outline: none;
+    box-sizing: border-box;
+    min-width: 0;
+  }
+  .col-filter option { background: #1e1b4b; color: #fff; }
+  .col-filter:focus { border-color: var(--saffron); }
+  .col-filter::placeholder { color: rgba(255,255,255,.35); }
 
   /* ── Body rows ── */
   tbody tr { background: #fff; }
@@ -189,60 +221,51 @@
   }
   tbody td:first-child { text-align: left; font-weight: 600; color: var(--indigo); }
 
-  .td-date { min-width: 90px; }
+  .td-date  { min-width: 88px; }
   .td-price { min-width: 72px; }
-  .td-chg { min-width: 64px; font-weight: 600; }
+  .td-chg   { min-width: 64px; font-weight: 600; }
   .td-chg.up   { color: var(--green); }
-  .td-chg.down { color: var(--red); }
+  .td-chg.down { color: var(--red);   }
 
-  .td-deg  { min-width: 54px; font-size: 11px; color: #475569; }
-  .td-sign { min-width: 44px; font-size: 11px; font-weight: 600; }
-  .td-nak  { min-width: 44px; font-size: 11px; color: var(--muted); }
+  .td-panch { min-width: 90px; font-size: 11px; text-align: center; }
+  .td-panch .lord { color: var(--muted); font-size: 10px; }
 
-  /* Planet sign colours in cells */
-  .p-sun     { color: var(--sun); }
-  .p-moon    { color: var(--moon); }
+  .td-deg  { min-width: 52px; font-size: 11px; color: #475569; }
+  .td-sign { min-width: 40px; font-size: 11px; font-weight: 600; }
+  .td-nak  { min-width: 60px; font-size: 11px; color: var(--muted); }
+
+  /* Planet sign colours */
+  .p-sun     { color: var(--sun);     }
+  .p-moon    { color: var(--moon);    }
   .p-mercury { color: var(--mercury); }
-  .p-venus   { color: var(--venus); }
-  .p-mars    { color: var(--mars); }
+  .p-venus   { color: var(--venus);   }
+  .p-mars    { color: var(--mars);    }
   .p-jupiter { color: var(--jupiter); }
-  .p-saturn  { color: var(--saturn); }
-  .p-rahu    { color: var(--rahu); }
-  .p-ketu    { color: var(--ketu); }
+  .p-saturn  { color: var(--saturn);  }
+  .p-rahu    { color: var(--rahu);    }
+  .p-ketu    { color: var(--ketu);    }
 
-  /* Divider between planet groups */
-  .group-start { border-left: 2px solid rgba(0,0,0,.1) !important; }
+  .group-start { border-left: 2px solid rgba(0,0,0,.08) !important; }
 
   /* ── Pagination ── */
   .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 12px 20px;
-    background: #fff;
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; padding: 10px 20px; background: #fff;
+    border-top: 1px solid var(--border); flex-wrap: wrap;
   }
   .pagination button {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 4px 10px;
-    font-size: 12px;
-    cursor: pointer;
-    color: var(--indigo);
-    font-weight: 600;
+    background: #fff; border: 1px solid var(--border); border-radius: 5px;
+    padding: 4px 10px; font-size: 12px; cursor: pointer;
+    color: var(--indigo); font-weight: 600;
   }
-  .pagination button:hover   { background: var(--bg); }
-  .pagination button.active  { background: var(--indigo); color: var(--saffron); border-color: var(--indigo); }
+  .pagination button:hover  { background: var(--bg); }
+  .pagination button.active { background: var(--indigo); color: var(--saffron); border-color: var(--indigo); }
   .pagination button:disabled { opacity: .35; cursor: default; }
-  .pagination .page-info     { font-size: 12px; color: var(--muted); padding: 0 8px; }
+  .pagination .page-info { font-size: 12px; color: var(--muted); padding: 0 8px; }
 
   /* ── Loading overlay ── */
   #loading {
-    position: fixed; inset: 0;
-    background: var(--indigo);
+    position: fixed; inset: 0; background: var(--indigo);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     color: #fff; z-index: 999; gap: 16px;
@@ -258,34 +281,25 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Error ── */
-  #error {
-    display: none;
-    padding: 40px 20px;
-    text-align: center;
-  }
+  #error { display: none; padding: 40px 20px; text-align: center; }
   #error h2 { color: var(--red); margin-bottom: 8px; }
   #error pre { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 12px; text-align: left; display: inline-block; margin-top: 12px; max-width: 600px; white-space: pre-wrap; }
 </style>
 </head>
 <body>
 
-<!-- Loading overlay -->
 <div id="loading">
   <div class="spinner"></div>
   <h2>Nifty 50 · Planetary Positions</h2>
   <p>Loading data…</p>
 </div>
 
-<!-- Error state -->
 <div id="error">
   <h2>Could not load data.json</h2>
-  <p>Make sure <code>data.json</code> is in the same folder as this file.<br>
-     Run <code>python generate_data.py</code> to generate it.</p>
+  <p>Make sure <code>data.json</code> is in the same folder as this file.</p>
   <pre id="error-detail"></pre>
 </div>
 
-<!-- Main app (hidden until data loads) -->
 <div id="app" style="display:none">
 
   <header>
@@ -295,14 +309,16 @@
     </div>
     <div class="controls">
       <label>From</label>
-      <input type="date" id="dateFrom" />
+      <input type="date" id="dateFrom" onchange="applyFilters()" />
       <label>To</label>
-      <input type="date" id="dateTo" />
-      <input type="text" id="searchSign" placeholder="Sign / Nakshatra…" style="width:150px" />
-      <button class="btn" onclick="applyFilters()">Filter</button>
-      <button class="btn btn-outline" onclick="resetFilters()">Reset</button>
-      <button class="btn btn-outline" onclick="downloadCSV()">⬇ CSV</button>
-      <button class="btn btn-outline" id="langBtn" onclick="toggleLang()" title="Switch language">தமிழ் / EN</button>
+      <input type="date" id="dateTo"   onchange="applyFilters()" />
+      <div class="search-wrap">
+        <input type="text" id="searchSign" placeholder="Sign / Nakshatra / Karana…" style="width:190px" oninput="applyFilters()" />
+        <button class="search-clear" onclick="clearSearch()" title="Clear">✕</button>
+      </div>
+      <button class="btn btn-outline" onclick="resetFilters()">Reset All</button>
+      <button class="btn btn-outline" id="dlBtn" onclick="downloadCSV()">⬇ CSV</button>
+      <button class="btn btn-outline" id="langBtn" onclick="toggleLang()">தமிழ் / EN</button>
     </div>
     <div class="controls" style="padding-top:0;gap:4px">
       <span style="font-size:11px;color:rgba(255,255,255,.55);margin-right:2px" id="ayanLabel">Ayanamsa:</span>
@@ -324,14 +340,13 @@
 </div>
 
 <script>
-// ── Config ────────────────────────────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────────────────────
 const PAGE_SIZE = 100;
 
-// Planet keys match data.json 'p' object keys
 const PLANETS = ['Su','Mo','Me','Ve','Ma','Ju','Sa','Ra','Ke'];
-const P_NAME  = { Su:'Sun', Mo:'Moon',    Me:'Mercury', Ve:'Venus',   Ma:'Mars',
+const P_NAME  = { Su:'Sun', Mo:'Moon', Me:'Mercury', Ve:'Venus', Ma:'Mars',
                   Ju:'Jupiter', Sa:'Saturn', Ra:'Rahu', Ke:'Ketu' };
-const P_CLASS = { Su:'sun', Mo:'moon',    Me:'mercury', Ve:'venus',   Ma:'mars',
+const P_CLASS = { Su:'sun', Mo:'moon', Me:'mercury', Ve:'venus', Ma:'mars',
                   Ju:'jupiter', Sa:'saturn', Ra:'rahu', Ke:'ketu' };
 
 const SIGNS = ['Ari','Tau','Gem','Can','Leo','Vir','Lib','Sco','Sag','Cap','Aqu','Pis'];
@@ -339,13 +354,54 @@ const NAKS  = ['Ashw','Bhar','Krit','Rohi','Mrig','Ardr','Puna','Push','Ashl','M
                'PPha','UPha','Hast','Chit','Swat','Vish','Anur','Jyes','Mula','PAsh',
                'UAsh','Shra','Dhan','Shat','PBha','UBha','Reva'];
 
+// ── Panchanga: Karana ─────────────────────────────────────────────────────────
+const KARANA_MOVABLE = ['Bava','Balava','Kaulava','Taitila','Garija','Vanija','Vishti'];
+const KARANA_FIXED   = ['Shakuni','Chatushpada','Naga','Kimstughna'];
+const ALL_KARANAS    = [...KARANA_MOVABLE, ...KARANA_FIXED];
+const KARANA_LORDS   = {
+  Bava:'Sun',  Balava:'Moon',    Kaulava:'Mars',  Taitila:'Mercury',
+  Garija:'Jupiter', Vanija:'Venus', Vishti:'Saturn',
+  Shakuni:'Saturn', Chatushpada:'Jupiter', Naga:'Mercury', Kimstughna:'Moon',
+};
+function karanaName(idx) {
+  if (idx === 0) return 'Kimstughna';
+  if (idx >= 57) return KARANA_FIXED[idx - 57] || 'Kimstughna';
+  return KARANA_MOVABLE[(idx - 1) % 7];
+}
+function getKarana(r) {
+  const ayan  = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
+  const su    = normLon(r.p.Su - ayan);
+  const mo    = normLon(r.p.Mo - ayan);
+  const elong = normLon(mo - su);
+  const idx   = Math.floor(elong / 6);
+  const name  = karanaName(idx);
+  return { name, lord: KARANA_LORDS[name] || '—' };
+}
+
+// ── Panchanga: Yogi ───────────────────────────────────────────────────────────
+// Vimshottari lords for each nakshatra (3 × 9 = 27)
+const NK_LORDS = [
+  'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
+  'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
+  'Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury',
+];
+function getYogi(r) {
+  const ayan   = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
+  const su     = normLon(r.p.Su - ayan);
+  const mo     = normLon(r.p.Mo - ayan);
+  const yogiPt = normLon(su + mo + 93.333); // 93°20'
+  const ni     = Math.min(Math.floor(yogiPt / (360 / 27)), 26);
+  return { nak: NAKS[ni], lord: NK_LORDS[ni] };
+}
+
 // ── Ayanamsa systems ──────────────────────────────────────────────────────────
 const AYANS = [
-  { key:'la', label:'Lahiri',      ta:'லாஹிரி',          subtitle:'Lahiri Sidereal'       },
-  { key:'kp', label:'KP',          ta:'KP',               subtitle:'KP (Krishnamurti)'     },
-  { key:'ra', label:'Raman',       ta:'ராமன்',            subtitle:'B.V. Raman Sidereal'   },
-  { key:'yu', label:'Yukteshwar',  ta:'யுக்தேஷ்வர்',     subtitle:'Sri Yukteshwar'         },
-  { key:'va', label:'Vakkiyam',    ta:'வாக்கியம்',        subtitle:'Vakkiyam (Suryasiddhanta)' },
+  { key:'la', label:'Lahiri',     ta:'லாஹிரி',         subtitle:'Lahiri Sidereal'          },
+  { key:'kp', label:'KP',         ta:'KP',              subtitle:'KP (Krishnamurti)'        },
+  { key:'ra', label:'Raman',      ta:'ராமன்',           subtitle:'B.V. Raman Sidereal'      },
+  { key:'yu', label:'Yukteshwar', ta:'யுக்தேஷ்வர்',    subtitle:'Sri Yukteshwar'           },
+  { key:'pu', label:'Pushya',     ta:'புஷ்ய பக்ஷம்',   subtitle:'True Pushya Paksha'       },
+  { key:'va', label:'Vakkiyam',   ta:'வாக்கியம்',       subtitle:'Vakkiyam (Surya Siddhanta)' },
 ];
 let selectedAyan = 'la';
 
@@ -364,9 +420,9 @@ const TA = {
              UAsh:'உத்திராடம்', Shra:'திருவோணம்', Dhan:'அவிட்டம்', Shat:'சதயம்',
              PBha:'பூரட்டாதி', UBha:'உத்திரட்டாதி', Reva:'ரேவதி' },
   ui:      { date:'தேதி', open:'திறப்பு', high:'உயர்வு', low:'தாழ்வு',
-             close:'மூடல்', chg:'மாற்றம் %', deg:'பாகை', sign:'ராசி', nak:'நட்சத்திரம்',
-             from:'இருந்து', to:'வரை', filter:'வடிகட்டு', reset:'மீட்டமை',
-             ayan:'அயனாம்சம்' },
+             close:'மூடல்', chg:'மாற்றம் %', deg:'பாகை', sign:'ராசி',
+             nak:'நட்சத்திரம்', karana:'கரணம்', yogi:'யோகி',
+             from:'இருந்து', to:'வரை', reset:'மீட்டமை', ayan:'அயனாம்சம்' },
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -376,8 +432,10 @@ let currentPage = 1;
 let sortCol     = null;
 let sortDir     = 'desc';
 let lang        = 'en';
+let generatedDate = '';
+const colFilters  = {};  // keyed by column id
 
-// ── Sidereal computation (client-side) ───────────────────────────────────────
+// ── Sidereal helpers ──────────────────────────────────────────────────────────
 function normLon(lon) { return ((lon % 360) + 360) % 360; }
 
 function lonInfo(tropLon, ayanVal) {
@@ -388,86 +446,149 @@ function lonInfo(tropLon, ayanVal) {
   const m    = Math.floor((w - d) * 60);
   const ni   = Math.floor(lon / (360 / 27));
   const pada = Math.min(Math.floor((lon % (360 / 27)) / (360 / 108)) + 1, 4);
-  return {
-    lon,
-    deg:  `${d}°${String(m).padStart(2,'0')}'`,
-    sign: SIGNS[si]         ?? '—',
-    nak:  NAKS[Math.min(ni, 26)] ?? '—',
-    pada,
-  };
+  return { lon, deg: `${d}°${String(m).padStart(2,'0')}'`,
+           sign: SIGNS[si] ?? '—', nak: NAKS[Math.min(ni,26)] ?? '—', pada };
 }
 
 function getPInfo(r, pk) {
   const tropLon = r.p?.[pk];
   if (tropLon == null) return {};
-  const ayanVal = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
-  return lonInfo(tropLon, ayanVal);
+  return lonInfo(tropLon, r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86);
 }
 
 // ── i18n helpers ──────────────────────────────────────────────────────────────
-function tPlanet(pk) { return lang === 'ta' ? (TA.planets[pk] || P_NAME[pk] || pk) : (P_NAME[pk] || pk); }
-function tSign(s)    { return lang === 'ta' ? (TA.signs[s] || s) : s; }
-function tNak(n)     { return lang === 'ta' ? (TA.naks[n]  || n) : n; }
-function tUI(key, en) { return lang === 'ta' ? (TA.ui[key] || en) : en; }
+function tPlanet(pk) { return lang==='ta' ? (TA.planets[pk]||P_NAME[pk]||pk) : (P_NAME[pk]||pk); }
+function tSign(s)    { return lang==='ta' ? (TA.signs[s]||s) : s; }
+function tNak(n)     { return lang==='ta' ? (TA.naks[n] ||n) : n; }
+function tUI(key,en) { return lang==='ta' ? (TA.ui[key] ||en): en; }
+
+// ── Numeric filter parser ─────────────────────────────────────────────────────
+// Supports: ">1000", "<500", ">=1000", "1000-2000", or plain "1234"
+function matchNum(val, f) {
+  if (!f) return true;
+  f = f.trim();
+  if (!f) return true;
+  if (f.startsWith('>=')) return val >= +f.slice(2);
+  if (f.startsWith('<=')) return val <= +f.slice(2);
+  if (f.startsWith('>'))  return val >  +f.slice(1);
+  if (f.startsWith('<'))  return val <  +f.slice(1);
+  if (f.includes('-')) {
+    const [a,b] = f.split('-').map(Number);
+    return val >= a && val <= b;
+  }
+  return Math.abs(val - +f) < 0.01;
+}
+
+function setColFilter(key, val) {
+  if (val === '' || val == null) delete colFilters[key];
+  else colFilters[key] = val;
+  currentPage = 1;
+  applyFilters();
+}
+
+// ── Filter row cell builders ──────────────────────────────────────────────────
+function mkTextF(key, ph) {
+  return `<input class="col-filter" type="text" placeholder="${ph||'…'}"
+          value="${colFilters[key]||''}"
+          oninput="setColFilter('${key}',this.value)">`;
+}
+function mkNumF(key, ph) {
+  return `<input class="col-filter" type="text" placeholder="${ph||'>0'}"
+          value="${colFilters[key]||''}"
+          title="Use: >X  <X  >=X  X-Y  or exact"
+          oninput="setColFilter('${key}',this.value)">`;
+}
+function mkSelF(key, opts) {
+  const cur = colFilters[key] || '';
+  const o   = opts.map(v=>`<option value="${v}"${v===cur?' selected':''}>${v}</option>`).join('');
+  return `<select class="col-filter" onchange="setColFilter('${key}',this.value)">
+    <option value="">Any</option>${o}</select>`;
+}
 
 // ── Ayanamsa selector ─────────────────────────────────────────────────────────
 function buildAyanBtns() {
   const wrap = document.getElementById('ayanBtns');
   wrap.innerHTML = AYANS.map(a => {
     const active = a.key === selectedAyan;
-    const lbl    = lang === 'ta' ? a.ta : a.label;
+    const lbl    = lang==='ta' ? a.ta : a.label;
     return `<button onclick="selectAyan('${a.key}')"
       style="background:${active?'var(--saffron)':'rgba(255,255,255,.1)'};
-             color:${active?'var(--indigo)':'#fff'};border:1px solid ${active?'var(--saffron)':'rgba(255,255,255,.25)'};
-             border-radius:4px;padding:3px 9px;font-size:11px;font-weight:${active?700:500};cursor:pointer"
+             color:${active?'var(--indigo)':'#fff'};
+             border:1px solid ${active?'var(--saffron)':'rgba(255,255,255,.25)'};
+             border-radius:4px;padding:3px 9px;font-size:11px;
+             font-weight:${active?700:500};cursor:pointer"
     >${lbl}</button>`;
   }).join('');
-  document.getElementById('ayanLabel').textContent =
-    lang === 'ta' ? 'அயனாம்சம்:' : 'Ayanamsa:';
+  document.getElementById('ayanLabel').textContent = lang==='ta' ? 'அயனாம்சம்:' : 'Ayanamsa:';
 }
 
 function selectAyan(key) {
   selectedAyan = key;
-  const a = AYANS.find(x => x.key === key);
+  const a = AYANS.find(x=>x.key===key);
   document.getElementById('ayanSubtitle').textContent = `${a.subtitle} · NSE · Since Inception`;
   buildAyanBtns();
   renderPage();
 }
 
-// ── Table header ──────────────────────────────────────────────────────────────
+// ── Table header (3 rows) ─────────────────────────────────────────────────────
 function buildHeader() {
   const thead = document.getElementById('thead');
 
+  // Row 1 — group labels
   let r1 = '<tr>';
-  r1 += `<th rowspan="2" class="sortable td-date"  data-col="date">${tUI('date','Date')}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="open">${tUI('open','Open')}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="high">${tUI('high','High')}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="low">${tUI('low','Low')}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-price" data-col="close">${tUI('close','Close')}</th>`;
-  r1 += `<th rowspan="2" class="sortable td-chg"   data-col="chg">${tUI('chg','Chg %')}</th>`;
+  r1 += `<th>Date</th>`;
+  r1 += `<th colspan="5">NIFTY 50</th>`;
+  r1 += `<th colspan="2" class="hdr-panch">Panchanga</th>`;
   for (const pk of PLANETS) {
     r1 += `<th colspan="3" class="hdr-${P_CLASS[pk]} group-start">${tPlanet(pk)}</th>`;
   }
   r1 += '</tr>';
 
+  // Row 2 — column names + sort
   let r2 = '<tr>';
+  r2 += `<th class="sortable td-date"  data-col="date">${tUI('date','Date')}</th>`;
+  r2 += `<th class="sortable td-price" data-col="open">${tUI('open','Open')}</th>`;
+  r2 += `<th class="sortable td-price" data-col="high">${tUI('high','High')}</th>`;
+  r2 += `<th class="sortable td-price" data-col="low">${tUI('low','Low')}</th>`;
+  r2 += `<th class="sortable td-price" data-col="close">${tUI('close','Close')}</th>`;
+  r2 += `<th class="sortable td-chg"   data-col="chg">${tUI('chg','Chg %')}</th>`;
+  r2 += `<th class="sortable sub-panch group-start" data-col="karana">${tUI('karana','Karana')}</th>`;
+  r2 += `<th class="sortable sub-panch"             data-col="yogi">${tUI('yogi','Yogi')}</th>`;
   for (const pk of PLANETS) {
-    const sub = `sub-${P_CLASS[pk]}`;
-    r2 += `<th class="${sub} group-start sortable" data-col="${pk}_deg">${tUI('deg','Deg')}</th>`;
-    r2 += `<th class="${sub} sortable"             data-col="${pk}_sign">${tUI('sign','Sign')}</th>`;
-    r2 += `<th class="${sub} sortable"             data-col="${pk}_nak">${tUI('nak','Nak')}</th>`;
+    const s = `sub-${P_CLASS[pk]}`;
+    r2 += `<th class="${s} group-start sortable" data-col="${pk}_deg">${tUI('deg','Deg')}</th>`;
+    r2 += `<th class="${s} sortable"             data-col="${pk}_sign">${tUI('sign','Sign')}</th>`;
+    r2 += `<th class="${s} sortable"             data-col="${pk}_nak">${tUI('nak','Nak')}</th>`;
   }
   r2 += '</tr>';
 
-  thead.innerHTML = r1 + r2;
+  // Row 3 — per-column filters
+  let r3 = '<tr>';
+  r3 += `<th>${mkTextF('date','yyyy-mm')}</th>`;
+  r3 += `<th>${mkNumF('open','e.g. >1000')}</th>`;
+  r3 += `<th>${mkNumF('high')}</th>`;
+  r3 += `<th>${mkNumF('low')}</th>`;
+  r3 += `<th>${mkNumF('close')}</th>`;
+  r3 += `<th>${mkNumF('chg','e.g. >2')}</th>`;
+  r3 += `<th class="group-start">${mkSelF('karana', ALL_KARANAS)}</th>`;
+  r3 += `<th>${mkSelF('yogi_nak', NAKS)}</th>`;
+  for (const pk of PLANETS) {
+    r3 += `<th class="group-start">${mkNumF(pk+'_deg','0-360')}</th>`;
+    r3 += `<th>${mkSelF(pk+'_sign', SIGNS)}</th>`;
+    r3 += `<th>${mkSelF(pk+'_nak', NAKS)}</th>`;
+  }
+  r3 += '</tr>';
+
+  thead.innerHTML = r1 + r2 + r3;
 
   thead.querySelectorAll('.sortable').forEach(th => {
     th.addEventListener('click', () => {
       const col = th.dataset.col;
-      sortDir = (sortCol === col && sortDir === 'desc') ? 'asc' : 'desc';
+      if (!col) return;
+      sortDir = (sortCol===col && sortDir==='desc') ? 'asc' : 'desc';
       sortCol = col;
-      thead.querySelectorAll('.sortable').forEach(t => t.classList.remove('sort-asc','sort-desc'));
-      th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+      thead.querySelectorAll('.sortable').forEach(t=>t.classList.remove('sort-asc','sort-desc'));
+      th.classList.add(sortDir==='asc' ? 'sort-asc' : 'sort-desc');
       applyFilters();
     });
   });
@@ -475,14 +596,16 @@ function buildHeader() {
 
 // ── Render page ───────────────────────────────────────────────────────────────
 function renderPage() {
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const end   = Math.min(start + PAGE_SIZE, filtered.length);
+  const start = (currentPage-1) * PAGE_SIZE;
+  const end   = Math.min(start+PAGE_SIZE, filtered.length);
   const tbody = document.getElementById('tbody');
   let html    = '';
 
   for (const r of filtered.slice(start, end)) {
-    const chgCls = r.chg > 0 ? 'up' : r.chg < 0 ? 'down' : '';
-    const chgStr = r.chg > 0 ? `+${r.chg.toFixed(2)}%` : `${r.chg.toFixed(2)}%`;
+    const chgCls = r.chg>0 ? 'up' : r.chg<0 ? 'down' : '';
+    const chgStr = r.chg>0 ? `+${r.chg.toFixed(2)}%` : `${r.chg.toFixed(2)}%`;
+    const kar    = getKarana(r);
+    const yog    = getYogi(r);
 
     html += '<tr>';
     html += `<td class="td-date">${r.date}</td>`;
@@ -491,6 +614,8 @@ function renderPage() {
     html += `<td class="td-price">${r.low.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-price">${r.close.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-chg ${chgCls}">${chgStr}</td>`;
+    html += `<td class="td-panch group-start">${kar.name} <span class="lord">(${kar.lord})</span></td>`;
+    html += `<td class="td-panch">${tNak(yog.nak)} <span class="lord">(${yog.lord})</span></td>`;
 
     for (const pk of PLANETS) {
       const info = getPInfo(r, pk);
@@ -501,45 +626,47 @@ function renderPage() {
     }
     html += '</tr>';
   }
-
   tbody.innerHTML = html;
 
+  // Update download button with row count
+  const dlBtn = document.getElementById('dlBtn');
+  if (dlBtn) dlBtn.textContent = `⬇ CSV (${filtered.length.toLocaleString()} rows)`;
+
   // Stats bar
-  const lbl = lang === 'ta'
-    ? { showing:'காட்டுகிறது', of:'இல்', days:'வர்த்தக நாட்கள்', first:'முதல்', latest:'கடைசி' }
-    : { showing:'Showing',     of:'of',   days:'trading days',      first:'First',  latest:'Latest' };
+  const lbl = lang==='ta'
+    ? { showing:'காட்டுகிறது', of:'இல்', days:'வர்த்தக நாட்கள்', first:'முதல்', latest:'கடைசி', gen:'உருவாக்கப்பட்டது' }
+    : { showing:'Showing',     of:'of',  days:'trading days',      first:'First',  latest:'Latest', gen:'Data as of' };
 
   document.getElementById('statsBar').innerHTML =
     `<span>${lbl.showing} <strong>${start+1}–${end}</strong> ${lbl.of} <strong>${filtered.length.toLocaleString()}</strong> ${lbl.days}</span>` +
-    (filtered.length !== allRecords.length
+    (filtered.length!==allRecords.length
       ? `<span style="color:#f59e0b;font-weight:600">(filtered from ${allRecords.length.toLocaleString()} total)</span>` : '') +
-    `<span>${lbl.first}: <strong>${allRecords.at(0)?.date ?? '—'}</strong></span>` +
-    `<span>${lbl.latest}: <strong>${allRecords.at(-1)?.date ?? '—'}</strong></span>`;
+    `<span>${lbl.first}: <strong>${allRecords.at(0)?.date??'—'}</strong></span>` +
+    `<span>${lbl.latest}: <strong>${allRecords.at(-1)?.date??'—'}</strong></span>` +
+    (generatedDate ? `<span style="margin-left:auto;color:#94a3b8">${lbl.gen}: <strong>${generatedDate}</strong></span>` : '');
 
   renderPagination();
 }
 
-// ── Pagination ─────────────────────────────────────────────────────────────────
+// ── Pagination ────────────────────────────────────────────────────────────────
 function renderPagination() {
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const totalPages = Math.ceil(filtered.length/PAGE_SIZE);
   const el = document.getElementById('pagination');
-  if (totalPages <= 1) { el.innerHTML = ''; return; }
+  if (totalPages<=1) { el.innerHTML=''; return; }
 
-  let html = '';
-  html += `<button onclick="goPage(1)" ${currentPage===1?'disabled':''}>«</button>`;
+  let html='';
+  html += `<button onclick="goPage(1)"              ${currentPage===1?'disabled':''}>«</button>`;
   html += `<button onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
 
-  const lo = Math.max(1, currentPage - 3);
-  const hi = Math.min(totalPages, currentPage + 3);
-  if (lo > 1) html += `<button onclick="goPage(1)">1</button>${lo > 2 ? '<span style="padding:0 4px;color:#94a3b8">…</span>' : ''}`;
-  for (let p = lo; p <= hi; p++)
-    html += `<button class="${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
-  if (hi < totalPages) html += `${hi < totalPages-1 ? '<span style="padding:0 4px;color:#94a3b8">…</span>' : ''}<button onclick="goPage(${totalPages})">${totalPages}</button>`;
+  const lo=Math.max(1,currentPage-3), hi=Math.min(totalPages,currentPage+3);
+  if (lo>1) html+=`<button onclick="goPage(1)">1</button>${lo>2?'<span style="padding:0 4px;color:#94a3b8">…</span>':''}`;
+  for (let p=lo;p<=hi;p++)
+    html+=`<button class="${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  if (hi<totalPages) html+=`${hi<totalPages-1?'<span style="padding:0 4px;color:#94a3b8">…</span>':''}<button onclick="goPage(${totalPages})">${totalPages}</button>`;
 
   html += `<button onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>`;
-  html += `<button onclick="goPage(${totalPages})" ${currentPage===totalPages?'disabled':''}>»</button>`;
-  html += `<span class="page-info">Page ${currentPage} of ${totalPages} (${PAGE_SIZE} rows/page)</span>`;
-
+  html += `<button onclick="goPage(${totalPages})"    ${currentPage===totalPages?'disabled':''}>»</button>`;
+  html += `<span class="page-info">Page ${currentPage} of ${totalPages} · ${PAGE_SIZE} rows/page</span>`;
   el.innerHTML = html;
 }
 
@@ -556,24 +683,62 @@ function applyFilters() {
   const sigTerm = document.getElementById('searchSign').value.trim().toLowerCase();
 
   filtered = allRecords.filter(r => {
+    // Global date range
     if (from && r.date < from) return false;
     if (to   && r.date > to)   return false;
+
+    // Global text search (sign / nak / karana / yogi)
     if (sigTerm) {
-      const match = PLANETS.some(pk => {
-        const info = getPInfo(r, pk);
-        return (info.sign || '').toLowerCase().includes(sigTerm) ||
-               (info.nak  || '').toLowerCase().includes(sigTerm);
-      });
-      if (!match) return false;
+      const kar = getKarana(r);
+      const yog = getYogi(r);
+      const haystack = [
+        kar.name, kar.lord, yog.nak, yog.lord,
+        ...PLANETS.flatMap(pk => {
+          const i = getPInfo(r, pk);
+          return [i.sign||'', i.nak||''];
+        }),
+      ].join(' ').toLowerCase();
+      if (!haystack.includes(sigTerm)) return false;
     }
+
+    // Per-column: date
+    if (colFilters.date && !r.date.includes(colFilters.date)) return false;
+
+    // Per-column: OHLC + chg
+    for (const col of ['open','high','low','close','chg']) {
+      if (colFilters[col] && !matchNum(r[col], colFilters[col])) return false;
+    }
+
+    // Per-column: karana
+    if (colFilters.karana) {
+      if (getKarana(r).name !== colFilters.karana) return false;
+    }
+
+    // Per-column: yogi nakshatra
+    if (colFilters.yogi_nak) {
+      if (getYogi(r).nak !== colFilters.yogi_nak) return false;
+    }
+
+    // Per-column: planets
+    for (const pk of PLANETS) {
+      const fSign = colFilters[pk+'_sign'];
+      const fNak  = colFilters[pk+'_nak'];
+      const fDeg  = colFilters[pk+'_deg'];
+      if (!fSign && !fNak && !fDeg) continue;
+      const info = getPInfo(r, pk);
+      if (fSign && info.sign !== fSign)                    return false;
+      if (fNak  && info.nak  !== fNak)                     return false;
+      if (fDeg  && !matchNum(info.lon ?? 0, fDeg))         return false;
+    }
+
     return true;
   });
 
   if (sortCol) {
-    filtered.sort((a, b) => {
-      const va = colVal(a, sortCol), vb = colVal(b, sortCol);
-      if (va < vb) return sortDir === 'asc' ? -1 :  1;
-      if (va > vb) return sortDir === 'asc' ?  1 : -1;
+    filtered.sort((a,b) => {
+      const va=colVal(a,sortCol), vb=colVal(b,sortCol);
+      if (va<vb) return sortDir==='asc'?-1:1;
+      if (va>vb) return sortDir==='asc'?1:-1;
       return 0;
     });
   }
@@ -583,46 +748,61 @@ function applyFilters() {
 }
 
 function colVal(r, col) {
-  if (col === 'date')  return r.date;
-  if (col === 'open')  return r.open;
-  if (col === 'high')  return r.high;
-  if (col === 'low')   return r.low;
-  if (col === 'close') return r.close;
-  if (col === 'chg')   return r.chg;
+  if (col==='date')   return r.date;
+  if (col==='open')   return r.open;
+  if (col==='high')   return r.high;
+  if (col==='low')    return r.low;
+  if (col==='close')  return r.close;
+  if (col==='chg')    return r.chg;
+  if (col==='karana') return getKarana(r).name;
+  if (col==='yogi')   return getYogi(r).nak;
   const [pk, field] = col.split('_');
   const info = getPInfo(r, pk);
-  if (field === 'deg')  return info.lon  ?? 0;
-  if (field === 'sign') return info.sign ?? '';
-  if (field === 'nak')  return info.nak  ?? '';
+  if (field==='deg')  return info.lon  ?? 0;
+  if (field==='sign') return info.sign ?? '';
+  if (field==='nak')  return info.nak  ?? '';
   return '';
 }
 
-function resetFilters() {
-  document.getElementById('dateFrom').value   = '';
-  document.getElementById('dateTo').value     = '';
+function clearSearch() {
   document.getElementById('searchSign').value = '';
+  applyFilters();
+}
+
+function resetFilters() {
+  document.getElementById('dateFrom').value   = allRecords.at(0)?.date  || '';
+  document.getElementById('dateTo').value     = allRecords.at(-1)?.date || '';
+  document.getElementById('searchSign').value = '';
+  Object.keys(colFilters).forEach(k => delete colFilters[k]);
   sortCol = null;
-  document.querySelectorAll('.sortable').forEach(t => t.classList.remove('sort-asc','sort-desc'));
+  document.querySelectorAll('.col-filter').forEach(el => {
+    if (el.tagName==='SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  document.querySelectorAll('.sortable').forEach(t=>t.classList.remove('sort-asc','sort-desc'));
   filtered = [...allRecords];
   currentPage = 1;
   renderPage();
 }
 
-// ── CSV download ──────────────────────────────────────────────────────────────
+// ── CSV download (all filtered rows, not just current page) ───────────────────
 function downloadCSV() {
-  const ayanKey = AYANS.find(a => a.key === selectedAyan)?.label || selectedAyan;
-  const cols = ['Date','Open','High','Low','Close','Change%'];
+  const ayanLbl = AYANS.find(a=>a.key===selectedAyan)?.label || selectedAyan;
+  const cols = ['Date','Open','High','Low','Close','Change%','Karana','Karana_Lord','Yogi_Nak','Yogi_Lord'];
   for (const pk of PLANETS) {
     const n = P_NAME[pk];
-    cols.push(`${n}_Deg(${ayanKey})`, `${n}_Sign`, `${n}_Nak`, `${n}_Pada`);
+    cols.push(`${n}_Deg(${ayanLbl})`, `${n}_Sign`, `${n}_Nak`, `${n}_Pada`);
   }
 
   const lines = [cols.join(',')];
   for (const r of filtered) {
-    const row = [r.date, r.open, r.high, r.low, r.close, r.chg];
+    const kar = getKarana(r);
+    const yog = getYogi(r);
+    const row = [r.date, r.open, r.high, r.low, r.close, r.chg,
+                 kar.name, kar.lord, yog.nak, yog.lord];
     for (const pk of PLANETS) {
       const info = getPInfo(r, pk);
-      row.push(`"${info.deg ?? ''}"`, info.sign ?? '', info.nak ?? '', info.pada ?? '');
+      row.push(`"${info.deg??''}"`, info.sign??'', info.nak??'', info.pada??'');
     }
     lines.push(row.join(','));
   }
@@ -630,30 +810,24 @@ function downloadCSV() {
   const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url; a.download = `nifty50_${ayanKey}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.href = url;
+  a.download = `nifty50_${ayanLbl}_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
 // ── Language toggle ───────────────────────────────────────────────────────────
 function toggleLang() {
-  lang = lang === 'en' ? 'ta' : 'en';
+  lang = lang==='en' ? 'ta' : 'en';
   const btn = document.getElementById('langBtn');
-  btn.textContent  = lang === 'ta' ? 'EN / தமிழ்' : 'தமிழ் / EN';
-  btn.style.background = lang === 'ta' ? 'rgba(245,158,11,.35)' : 'transparent';
+  btn.textContent       = lang==='ta' ? 'EN / தமிழ்' : 'தமிழ் / EN';
+  btn.style.background  = lang==='ta' ? 'rgba(245,158,11,.35)' : 'transparent';
 
   const labels = document.querySelectorAll('.controls label');
-  if (labels[0]) labels[0].textContent = lang === 'ta' ? TA.ui.from : 'From';
-  if (labels[1]) labels[1].textContent = lang === 'ta' ? TA.ui.to   : 'To';
-
+  if (labels[0]) labels[0].textContent = lang==='ta' ? TA.ui.from : 'From';
+  if (labels[1]) labels[1].textContent = lang==='ta' ? TA.ui.to   : 'To';
   const si = document.getElementById('searchSign');
-  if (si) si.placeholder = lang === 'ta' ? 'ராசி / நட்சத்திரம்…' : 'Sign / Nakshatra…';
-
-  document.querySelectorAll('.controls button').forEach(b => {
-    const oc = b.getAttribute('onclick') || '';
-    if (oc.includes('applyFilters')) b.textContent = lang === 'ta' ? TA.ui.filter : 'Filter';
-    if (oc.includes('resetFilters')) b.textContent = lang === 'ta' ? TA.ui.reset  : 'Reset';
-  });
+  if (si) si.placeholder = lang==='ta' ? 'ராசி / நட்சத்திரம்…' : 'Sign / Nakshatra / Karana…';
 
   buildAyanBtns();
   buildHeader();
@@ -666,21 +840,22 @@ async function init() {
     const res  = await fetch('data.json');
     if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
     const json = await res.json();
-    allRecords = json.records || [];
-    filtered   = [...allRecords];
-
-    buildAyanBtns();
-    buildHeader();
-    applyFilters();
+    allRecords    = json.records || [];
+    generatedDate = json.generated || '';
+    filtered      = [...allRecords];
 
     if (allRecords.length) {
       document.getElementById('dateFrom').value = allRecords.at(0).date;
       document.getElementById('dateTo').value   = allRecords.at(-1).date;
     }
 
+    buildAyanBtns();
+    buildHeader();
+    applyFilters();
+
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display     = 'block';
-  } catch (err) {
+  } catch(err) {
     document.getElementById('loading').style.display    = 'none';
     document.getElementById('error').style.display      = 'block';
     document.getElementById('error-detail').textContent = String(err);

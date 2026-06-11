@@ -25,6 +25,88 @@ Usage:
 import json, math, sys, os, time
 from datetime import datetime, date
 
+# ── Surya Siddhanta (Vakkiya) Engine ─────────────────────────────────────────
+# Ported from truly-kp/src/engine/vakkiyaEngine.js
+# Source: Surya Siddhanta revolution constants — Burgess translation 1859.
+# Vakyakarana text: T.S. Kuppanna Sastri & K.V. Sarma 1962.
+# Kali epoch: Feb 18 3102 BCE midnight (JDN 588465.5).
+
+_CIVIL_DAYS    = 1577917828   # civil days in a Mahayuga (4,320,000 years)
+_KALI_EPOCH_JD = 588465.5     # Julian Day of Kali epoch
+
+_REV = {
+    'Sun':        4320000,
+    'Moon':      57753336,
+    'Mars':       2296832,
+    'Mercury':   17937060,
+    'Jupiter':    364220,
+    'Venus':      7022376,
+    'Saturn':     146568,
+    'MoonApogee': 488203,
+    'Rahu':       232238,  # retrograde
+}
+
+_APOGEE = {
+    'Sun':      77.33,
+    'Mars':    130.0,
+    'Mercury': 220.0,
+    'Jupiter': 171.0,
+    'Venus':    90.0,
+    'Saturn':  236.0,
+}
+
+_MANDA_EPI = {
+    'Sun':      13.67,
+    'Moon':     31.83,
+    'Mars':     23.33,
+    'Mercury':  28.17,
+    'Jupiter':  18.33,
+    'Venus':    11.67,
+    'Saturn':   18.33,
+}
+
+_SHEEGRA_EPI = {
+    'Mars':    233.33,
+    'Mercury': 133.33,
+    'Jupiter':  70.0,
+    'Venus':   261.67,
+    'Saturn':   39.33,
+}
+
+def _norm(d):
+    return ((d % 360) + 360) % 360
+
+def _mean_lon(ahargana, rev):
+    # Python integers are arbitrary precision — no BigInt needed
+    int_ah  = int(ahargana)
+    frac_ah = ahargana - int_ah
+    int_mod = (int_ah * rev) % _CIVIL_DAYS
+    return _norm(int_mod / _CIVIL_DAYS * 360 + frac_ah * rev / _CIVIL_DAYS * 360)
+
+def _mandaphala(anomaly, epicycle):
+    r = anomaly * math.pi / 180
+    return math.asin(math.sin(r) * epicycle / 360) * 180 / math.pi
+
+def _sheegraphala(anomaly, epicycle):
+    r = anomaly * math.pi / 180
+    return math.atan2(math.sin(r) * epicycle, 360 + math.cos(r) * epicycle) * 180 / math.pi
+
+def _vak_planet(ah, rev, apogee, manda_epi, sheegra_epi, sun_lon):
+    """4-step iterative correction for the five exterior/interior planets."""
+    m  = _mean_lon(ah, rev)
+    L1 = _norm(m  + _sheegraphala(_norm(sun_lon - m),  sheegra_epi) / 2)
+    L2 = _norm(m  + _mandaphala(_norm(L1 - apogee),    manda_epi)   / 2)
+    L3 = _norm(m  + _mandaphala(_norm(L2 - apogee),    manda_epi))
+    return _norm(L3 + _sheegraphala(_norm(sun_lon - L3), sheegra_epi))
+
+def _vak_sun_lon(jd):
+    """Surya Siddhanta Sun longitude (sidereal) for a given Julian Day."""
+    ah  = jd - _KALI_EPOCH_JD
+    m   = _mean_lon(ah, _REV['Sun'])
+    return _norm(m + _mandaphala(_norm(m - _APOGEE['Sun']), _MANDA_EPI['Sun']))
+
+# ─────────────────────────────────────────────────────────────────────────────
+
 try:
     import pandas as pd
     import yfinance as yf
@@ -46,14 +128,14 @@ PLANET_IDS = [
     # Ke = Rahu + 180, computed below
 ]
 
-# Ayanamsa modes. 'va' uses Suryasiddhanta as the closest Swiss Ephem
-# approximation to traditional Tamil Vakkiyam panchangam.
+# Swiss Ephemeris ayanamsa modes. Vakkiyam ('va') is handled separately below.
 AYANAMSA_MODES = [
-    ('la', swe.SIDM_LAHIRI),           # Lahiri / Chitrapaksha (default)
-    ('kp', swe.SIDM_KRISHNAMURTI),     # KP (Krishnamurti Paddhati)
-    ('ra', swe.SIDM_RAMAN),            # B.V. Raman
-    ('yu', swe.SIDM_YUKTESHWAR),       # Sri Yukteshwar
-    ('va', swe.SIDM_SURYASIDDHANTA),   # Vakkiyam (Suryasiddhanta approx.)
+    ('la', swe.SIDM_LAHIRI),       # Lahiri / Chitrapaksha (default)
+    ('kp', swe.SIDM_KRISHNAMURTI), # KP (Krishnamurti Paddhati)
+    ('ra', swe.SIDM_RAMAN),        # B.V. Raman
+    ('yu', swe.SIDM_YUKTESHWAR),   # Sri Yukteshwar
+    ('pu', swe.SIDM_TRUE_PUSHYA),  # True Pushya (Pushya Paksha)
+    # 'va' (Vakkiyam) is computed directly via the Surya Siddhanta engine below
 ]
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -66,19 +148,25 @@ def calc_record(jd):
     # Tropical planet longitudes (no sidereal flag)
     p = {}
     rahu_lon = None
+    trop_sun = None
     for key, pid in PLANET_IDS:
         xx, _ = swe.calc_ut(jd, pid, swe.FLG_SPEED)
         lon = norm(xx[0])
+        if key == 'Su':
+            trop_sun = lon
         if key == 'Ra':
             rahu_lon = lon
         p[key] = round(lon, 4)
     p['Ke'] = round(norm(rahu_lon + 180), 4)
 
-    # Ayanamsa values for each system
+    # Ayanamsa: Lahiri, KP, Raman, Yukteshwar via Swiss Ephemeris
     ayan = {}
     for key, mode in AYANAMSA_MODES:
         swe.set_sid_mode(mode)
         ayan[key] = round(swe.get_ayanamsa_ut(jd), 4)
+
+    # Vakkiyam: authentic Surya Siddhanta engine (tropical Sun − SS Sun)
+    ayan['va'] = round(norm(trop_sun - _vak_sun_lon(jd)), 4)
 
     return p, ayan
 
