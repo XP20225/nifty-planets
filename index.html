@@ -429,6 +429,9 @@ const TA = {
              close:'மூடல்', chg:'மாற்றம் %', deg:'பாகை', sign:'ராசி',
              nak:'நட்சத்திரம்', karana:'கரணம்', yogi:'யோகி',
              from:'இருந்து', to:'வரை', reset:'மீட்டமை', ayan:'அயனாம்சம்' },
+  karanas: { Bava:'பவ', Balava:'பாலவ', Kaulava:'கௌலவ', Taitila:'தைதில',
+             Garija:'கரிஜ', Vanija:'வணிஜ', Vishti:'விஷ்டி',
+             Shakuni:'சகுனி', Chatushpada:'சதுஷ்பாத', Naga:'நாக', Kimstughna:'கிம்ஸ்துக்ன' },
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -504,9 +507,9 @@ function mkNumF(key, ph) {
           title="Use: >X  <X  >=X  X-Y  or exact"
           oninput="setColFilter('${key}',this.value)">`;
 }
-function mkSelF(key, opts) {
+function mkSelF(key, opts, labelFn) {
   const cur = colFilters[key] || '';
-  const o   = opts.map(v=>`<option value="${v}"${v===cur?' selected':''}>${v}</option>`).join('');
+  const o   = opts.map(v=>`<option value="${v}"${v===cur?' selected':''}>${labelFn ? labelFn(v) : v}</option>`).join('');
   return `<select class="col-filter" onchange="setColFilter('${key}',this.value)">
     <option value="">Any</option>${o}</select>`;
 }
@@ -576,12 +579,12 @@ function buildHeader() {
   r3 += `<th>${mkNumF('low')}</th>`;
   r3 += `<th>${mkNumF('close')}</th>`;
   r3 += `<th>${mkNumF('chg','e.g. >2')}</th>`;
-  r3 += `<th class="group-start">${mkSelF('karana', ALL_KARANAS)}</th>`;
-  r3 += `<th>${mkSelF('yogi_nak', NAKS)}</th>`;
+  r3 += `<th class="group-start">${mkSelF('karana', ALL_KARANAS, v => lang==='ta' ? (TA.karanas[v]||v) : v)}</th>`;
+  r3 += `<th>${mkSelF('yogi_nak', NAKS, tNak)}</th>`;
   for (const pk of PLANETS) {
     r3 += `<th class="group-start">${mkNumF(pk+'_deg','0-360')}</th>`;
-    r3 += `<th>${mkSelF(pk+'_sign', SIGNS)}</th>`;
-    r3 += `<th>${mkSelF(pk+'_nak', NAKS)}</th>`;
+    r3 += `<th>${mkSelF(pk+'_sign', SIGNS, tSign)}</th>`;
+    r3 += `<th>${mkSelF(pk+'_nak', NAKS, tNak)}</th>`;
   }
   r3 += '</tr>';
 
