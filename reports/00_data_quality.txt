@@ -1,0 +1,93 @@
+ASTRO QUANT RESEARCH — DATA QUALITY REPORT
+============================================================
+Generated: 2026-06-13
+
+── data.json (Nifty 50 + Planets) ──────────────────────────
+Total records    : 7,452
+Date range       : 1996-04-22 → 2026-06-11
+Duplicate dates  : 0 (NONE)
+
+Missing values per column:
+  open                : 0
+  high                : 0
+  low                 : 0
+  close               : 0
+  chg                 : 0
+  p.Su                : 0
+  p.Mo                : 0
+  p.Me                : 0
+  p.Ve                : 0
+  p.Ma                : 0
+  p.Ju                : 0
+  p.Sa                : 0
+  p.Ra                : 0
+  p.Ke                : 0
+  ayan.la             : 0
+  ayan.kp             : 0
+  ayan.ra             : 0
+  ayan.yu             : 0
+  ayan.pu             : 0
+  ayan.va             : 0
+  → ZERO missing values across all columns
+
+Planetary degree range check (must be 0-360):
+  → ALL planetary degrees within 0-360
+
+── ohlc_banknifty.json (Bank Nifty) ─────────────────────────
+Total records    : 5,177
+Date range       : 2005-06-09 → 2026-06-11
+Duplicate dates  : 0 (NONE)
+Missing values:
+  o: 0
+  h: 0
+  l: 0
+  c: 0
+  g: 0
+
+── Field Definitions ────────────────────────────────────────
+data.json fields:
+  date   : str  YYYY-MM-DD  NSE trading day
+  open   : f64  Nifty 50 open price
+  high   : f64  Nifty 50 daily high
+  low    : f64  Nifty 50 daily low
+  close  : f64  Nifty 50 closing price
+  chg    : f64  % change from prior close
+  p.Su   : f64  Sun tropical longitude (degrees, 0-360) at market open
+  p.Mo   : f64  Moon tropical longitude
+  p.Me   : f64  Mercury tropical longitude
+  p.Ve   : f64  Venus tropical longitude
+  p.Ma   : f64  Mars tropical longitude
+  p.Ju   : f64  Jupiter tropical longitude
+  p.Sa   : f64  Saturn tropical longitude
+  p.Ra   : f64  Rahu (True Node) tropical longitude
+  p.Ke   : f64  Ketu (Ra+180) tropical longitude
+  ayan.la: f64  Lahiri ayanamsa (subtract from tropical for sidereal)
+  ayan.kp: f64  KP ayanamsa
+  ayan.ra: f64  Raman ayanamsa
+  ayan.yu: f64  Yukteshwar ayanamsa
+  ayan.pu: f64  Pushya Paksha ayanamsa
+  ayan.va: f64  Vakkiyam ayanamsa
+  NOTE: sidereal_lon = (tropical_lon - ayanamsa + 360) % 360
+  NOTE: market open time = 10:00 AM IST pre-2010-10-18, else 9:15 AM IST
+
+ohlc_banknifty.json fields (keyed by date string):
+  o: f64  Bank Nifty open
+  h: f64  Bank Nifty high
+  l: f64  Bank Nifty low
+  c: f64  Bank Nifty close
+  g: f64  Bank Nifty % change
+
+── Nakshatra/Karana/Yogi status ─────────────────────────────
+These columns do NOT exist pre-computed in data.json.
+They are computed client-side in index.html from p.Su/p.Mo + ayanamsa.
+For research pipeline: must be derived in Step 1 feature engineering.
+Formulas confirmed from generate_data.py + index.html source code.
+
+── Update frequency ─────────────────────────────────────────
+data.json       : daily, GitHub Actions at 12:30 UTC (6 PM IST) weekdays
+ohlc_banknifty  : same workflow, same frequency
+
+── VERDICT ──────────────────────────────────────────────────
+PASS: Zero missing values, zero out-of-range degrees, zero duplicate dates.
+PASS: All 9 planet columns present for all records.
+NOTE: Nakshatra/Karana/Yogi must be derived — not stored in JSON.

@@ -1,19 +1,19 @@
 # Astro Quant Research System — Live Checklist
-Last updated: 2026-06-13 00:00 IST
-Overall status: 0 of 54 items complete
+Last updated: 2026-06-13 IST
+Overall status: 9 of 54 items complete
 
 ---
 
 ## STEP 0: Repo Understanding
-- [ ] PENDING — List all repo files recursively
-- [ ] PENDING — Find HTML generation code
-- [ ] PENDING — Find market data source
-- [ ] PENDING — Find astrological data computation
-- [ ] PENDING — Read and print full data schema
-- [ ] PENDING — Confirm date ranges for both instruments
-- [ ] PENDING — Confirm all 9 planet degree columns present
-- [ ] PENDING — Confirm Nakshatra, Karana, Yogi columns present
-- [ ] PENDING — Data quality report saved to reports/00_data_quality.txt
+- [x] DONE — 2026-06-13 — All repo files listed recursively (15 files + nse_data/ CSVs)
+- [x] DONE — 2026-06-13 — HTML generation code: index.html (single-file app, client-side rendering)
+- [x] DONE — 2026-06-13 — Market data source: data.json (Nifty50 OHLC + planets), ohlc_banknifty.json (BankNifty OHLC)
+- [x] DONE — 2026-06-13 — Astrological data: computed by generate_data.py via swisseph, tropical longitudes stored; sidereal = tropical - ayanamsa
+- [x] DONE — 2026-06-13 — Full schema printed: date/open/high/low/close/chg/p{Su,Mo,Me,Ve,Ma,Ju,Sa,Ra,Ke}/ayan{la,kp,ra,yu,pu,va}
+- [x] DONE — 2026-06-13 — Date ranges confirmed: Nifty50 1996-04-22→2026-06-11 (7,452 days), BankNifty 2005-06-09→2026-06-11 (5,177 days)
+- [x] DONE — 2026-06-13 — All 9 planet columns confirmed present: Su Mo Me Ve Ma Ju Sa Ra Ke, zero missing
+- [x] DONE — 2026-06-13 — Nakshatra/Karana/Yogi NOT stored in JSON — must be derived in Step 1 from Su/Mo + ayanamsa (formulas confirmed from index.html)
+- [x] DONE — 2026-06-13 — Data quality report saved to reports/00_data_quality.txt — PASS: 0 missing, 0 out-of-range, 0 duplicates
 
 ## STEP 1: Feature Engineering
 - [ ] PENDING — Degree strings parsed to float64
