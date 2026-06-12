@@ -16,11 +16,11 @@ Overall status: 9 of 54 items complete
 - [x] DONE — 2026-06-13 — Data quality report saved to reports/00_data_quality.txt — PASS: 0 missing, 0 out-of-range, 0 duplicates
 
 ## STEP 1: Feature Engineering
-- [ ] PENDING — Degree strings parsed to float64
-- [ ] PENDING — Forward returns verified zero lookahead
-- [ ] PENDING — All Vedic features computed
-- [ ] PENDING — Enriched datasets saved
-- [ ] PENDING — Column and null counts confirmed
+- [x] DONE — 2026-06-13 — Planetary tropical longitudes parsed to float64, sidereal = (tropical - ayan_la + 360) % 360
+- [x] DONE — 2026-06-13 — Forward returns verified zero lookahead: fwd_ret/dir 1/2/3/5/10d all NaN in final N rows — PASS
+- [x] DONE — 2026-06-13 — All Vedic features computed: Tithi, Paksha, Karana, Yogi/Avayogi, Nakshatra+lord+quality, Dasha, Ashtakavarga, Jupiter/Saturn dignity, Moon strength, Gandanta, Eclipse corridor, Graha Yuddha, 15 interaction features
+- [x] DONE — 2026-06-13 — data/nifty_enriched.csv (7452 × 187) and data/banknifty_enriched.csv (5177 × 187) saved
+- [x] DONE — 2026-06-13 — 187 columns confirmed, nulls only in warm-up rows (SMA200 needs 200 rows etc.) — all expected
 
 ## STEP 2: Discovery Loop
 - [ ] PENDING — Unconditional signal scan complete
