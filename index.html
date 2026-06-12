@@ -27,11 +27,15 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html, body { height: 100%; overflow: hidden; }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Tamil', 'Tamil Sangam MN', sans-serif;
     background: var(--bg);
     color: var(--text);
     font-size: 13px;
+    display: flex;
+    flex-direction: column;
   }
 
   /* ── Top bar ── */
@@ -113,7 +117,7 @@
   /* ── Table wrapper ── */
   .table-wrap {
     overflow: auto;
-    max-height: calc(100vh - 120px);
+    flex: 1;
   }
 
   table {
