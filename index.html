@@ -127,10 +127,10 @@
     min-width: 100%;
   }
 
-  /* Sticky header rows */
-  thead tr:first-child  th { position: sticky; top: 0;    z-index: 100; }
-  thead tr:nth-child(2) th { position: sticky; top: 32px; z-index: 99;  }
-  thead tr:nth-child(3) th { position: sticky; top: 59px; z-index: 98;  }
+  /* Sticky header rows (top values set dynamically by JS) */
+  thead tr:first-child  th { position: sticky; top: 0;  z-index: 100; }
+  thead tr:nth-child(2) th { position: sticky; top: 0;  z-index: 99;  }
+  thead tr:nth-child(3) th { position: sticky; top: 0;  z-index: 98;  }
 
   /* Sticky first column */
   td:first-child, th:first-child {
@@ -586,6 +586,15 @@ function buildHeader() {
   r3 += '</tr>';
 
   thead.innerHTML = r1 + r2 + r3;
+
+  // Set sticky top offsets based on actual rendered row heights
+  requestAnimationFrame(() => {
+    let offset = 0;
+    thead.querySelectorAll('tr').forEach(row => {
+      row.querySelectorAll('th').forEach(th => { th.style.top = offset + 'px'; });
+      offset += row.getBoundingClientRect().height;
+    });
+  });
 
   thead.querySelectorAll('.sortable').forEach(th => {
     th.addEventListener('click', () => {
