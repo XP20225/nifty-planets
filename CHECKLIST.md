@@ -23,11 +23,11 @@ Overall status: 9 of 54 items complete
 - [x] DONE — 2026-06-13 — 187 columns confirmed, nulls only in warm-up rows (SMA200 needs 200 rows etc.) — all expected
 
 ## STEP 2: Discovery Loop
-- [ ] PENDING — Unconditional signal scan complete
-- [ ] PENDING — Conditional scan (Bull / Bear / Transitional) complete
-- [ ] PENDING — Extreme day pattern analysis complete
-- [ ] PENDING — Cosmic coherence scores computed
-- [ ] PENDING — Zero lookahead audit passed
+- [x] DONE — 2026-06-13 — Unconditional scan: 4,536 rows, 35 categorical + 19 continuous + 15 binary features × 6 targets — results/discovery/unconditional_scan.csv
+- [x] DONE — 2026-06-13 — Conditional scans: Bull (4,088), Bear (3,952), Transitional (4,098) rows — 3 CSVs saved
+- [x] DONE — 2026-06-13 — Extreme day patterns: 6 categories (top50 up/down, top50 hi/lo-vol, top30 continuation/reversal) — extreme_day_patterns.csv
+- [x] DONE — 2026-06-13 — Coherence scores: 7,452 daily scores, direction rho=-0.026 (p=0.022) vs fwd_dir_3d, magnitude rho=+0.028 (p=0.016) vs vol — coherence_scores.csv
+- [x] DONE — 2026-06-13 — Zero lookahead audit passed in Step 1; all features use only market-open state on signal date
 
 ## STEP 3: Validation Loop
 - [ ] PENDING — Monte Carlo 10,000 shuffles complete for all candidates
