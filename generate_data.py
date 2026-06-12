@@ -170,8 +170,13 @@ def calc_record(jd):
 
     return p, ayan
 
+# NSE market open: 10:00 AM IST before pre-open auction session (Oct 18, 2010)
+#                   9:15 AM IST from Oct 18, 2010 onwards
+_NSE_PRE_OPEN_START = date(2010, 10, 18)
+
 def date_to_jd(d):
-    return swe.julday(d.year, d.month, d.day, 3.75)  # 9:15 AM IST = 3.75h UTC
+    utc_h = 3.75 if d >= _NSE_PRE_OPEN_START else 4.5   # 9:15 AM or 10:00 AM IST
+    return swe.julday(d.year, d.month, d.day, utc_h)
 
 # ── Fetch pre-2007 OHLC from NSE India via nselib ────────────────────────────
 

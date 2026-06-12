@@ -253,6 +253,57 @@
 
   .group-start { border-left: 2px solid rgba(0,0,0,.08) !important; }
 
+  /* ── Planet status badges ── */
+  .badge { display:inline-block; font-size:8px; font-weight:700; padding:1px 3px;
+           border-radius:3px; margin-left:2px; line-height:1.3; vertical-align:middle; }
+  .b-retro  { background:#fee2e2; color:#b91c1c; }
+  .b-comb   { background:#ffedd5; color:#c2410c; }
+  .b-ex     { background:#d1fae5; color:#065f46; }
+  .b-de     { background:#fee2e2; color:#991b1b; }
+  .b-own    { background:#dbeafe; color:#1e40af; }
+  .td-sign  { min-width:52px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .td-aspects { min-width:120px; font-size:10px; color:var(--muted); line-height:1.6; text-align:left; }
+  .asp-item { white-space:nowrap; margin-right:4px; }
+  .asp-☌  { color:#6366f1; } .asp-☍  { color:#dc2626; }
+  .asp-△  { color:#16a34a; } .asp-□  { color:#d97706; } .asp-⚹ { color:#0891b2; }
+  .asp-M⁴ { color:#ef4444; font-weight:700; }
+  .asp-M⁸ { color:#ef4444; font-weight:700; }
+  .asp-J⁵ { color:#f59e0b; font-weight:700; }
+  .asp-J⁹ { color:#f59e0b; font-weight:700; }
+  .asp-S³ { color:#818cf8; font-weight:700; }
+  .asp-S¹⁰{ color:#818cf8; font-weight:700; }
+
+  .b-varg { background:#ede9fe; color:#5b21b6; }
+  .b-gand { background:#fce7f3; color:#9d174d; }
+  .b-ak   { background:#fef3c7; color:#92400e; }
+  .b-war  { background:#fef2f2; color:#7f1d1d; }
+  .b-ecl  { background:#fef9c3; color:#854d0e; }
+  .b-caz  { background:#fde68a; color:#78350f; font-style:italic; }
+  .td-nak .lords { font-size:9px; color:var(--muted); display:block; }
+
+  /* ── Legend modal ── */
+  #legendOverlay {
+    display: none; position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.55); align-items: center; justify-content: center;
+  }
+  #legendOverlay.open { display: flex; }
+  #legendBox {
+    background: #fff; border-radius: 10px; padding: 24px 28px;
+    max-width: 620px; width: 95%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  }
+  #legendBox h2 { font-size: 15px; color: var(--indigo); margin-bottom: 16px; }
+  #legendBox h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+                  color: var(--muted); margin: 14px 0 6px; }
+  .legend-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px;
+                 align-items: start; font-size: 12px; }
+  .legend-sym { font-weight: 700; white-space: nowrap; }
+  .legend-desc { color: #374151; }
+  #legendBox .close-btn {
+    float: right; background: none; border: none; font-size: 18px;
+    cursor: pointer; color: var(--muted); margin-top: -4px;
+  }
+
   /* ── Pagination ── */
   .pagination {
     display: flex; align-items: center; justify-content: center;
@@ -306,6 +357,78 @@
   <pre id="error-detail"></pre>
 </div>
 
+<div id="legendOverlay" onclick="if(event.target===this)toggleLegend()">
+  <div id="legendBox">
+    <button class="close-btn" onclick="toggleLegend()">✕</button>
+    <h2>Symbol Legend</h2>
+
+    <h3>Planet Status Badges</h3>
+    <div class="legend-grid">
+      <span class="legend-sym"><span class="badge b-retro">℞</span></span><span class="legend-desc">Retrograde — planet moving backward against the zodiac</span>
+      <span class="legend-sym"><span class="badge b-comb">☀</span></span><span class="legend-desc">Combust — within combustion orb of Sun, weakened (Mercury: 14° direct / 12° retrograde; Venus: 10° direct / 16° retrograde)</span>
+      <span class="legend-sym"><span class="badge b-caz">⊙</span></span><span class="legend-desc">Cazimi — within 1° of Sun's centre; "in the heart of the Sun", extremely powerful (opposite of combust)</span>
+      <span class="legend-sym"><span class="badge b-ecl">☽E</span></span><span class="legend-desc">Eclipse zone — Rahu or Ketu within 18° of Sun; solar eclipse conditions possible (not combustion)</span>
+      <span class="legend-sym"><span class="badge b-ex">Ex</span></span><span class="legend-desc">Exalted — planet in its sign of maximum strength</span>
+      <span class="legend-sym"><span class="badge b-de">De</span></span><span class="legend-desc">Debilitated — planet in its sign of minimum strength</span>
+      <span class="legend-sym"><span class="badge b-own">⌂</span></span><span class="legend-desc">Own sign — planet in a sign it rules</span>
+      <span class="legend-sym"><span class="badge b-varg">V</span></span><span class="legend-desc">Vargottama — same sign in both Rashi (D1) and Navamsha (D9), very strong</span>
+      <span class="legend-sym"><span class="badge b-gand">G</span></span><span class="legend-desc">Gandanta — within 3°20' of a water-fire sign junction (Pis/Ari, Can/Leo, Sco/Sag), sensitive degree</span>
+      <span class="legend-sym"><span class="badge b-ak">AK</span></span><span class="legend-desc">Atmakaraka — planet with highest degree in its sign; represents the soul's primary drive</span>
+      <span class="legend-sym"><span class="badge b-war">⚔</span></span><span class="legend-desc">Graha Yuddha (Planetary War) — two planets within 1° of each other in the same sign (Me, Ve, Ma, Ju, Sa only)</span>
+    </div>
+
+    <h3>Western Aspects</h3>
+    <div class="legend-grid">
+      <span class="legend-sym asp-☌">☌ Conjunction</span><span class="legend-desc">0° (±8°) — planets fused, intensified energy</span>
+      <span class="legend-sym asp-⚹">⚹ Sextile</span><span class="legend-desc">60° (±6°) — harmonious, opportunistic</span>
+      <span class="legend-sym asp-□">□ Square</span><span class="legend-desc">90° (±7°) — tension, challenge, action</span>
+      <span class="legend-sym asp-△">△ Trine</span><span class="legend-desc">120° (±8°) — harmony, flow, ease</span>
+      <span class="legend-sym asp-☍">☍ Opposition</span><span class="legend-desc">180° (±8°) — polarity, awareness, conflict</span>
+    </div>
+
+    <h3>Vedic Special Aspects (directional — all planets also aspect the 7th via ☍)</h3>
+    <div class="legend-grid">
+      <span class="legend-sym asp-M⁴">M⁴</span><span class="legend-desc">Mars 4th aspect — 90° forward (±5°)</span>
+      <span class="legend-sym asp-M⁸">M⁸</span><span class="legend-desc">Mars 8th aspect — 210° forward (±5°)</span>
+      <span class="legend-sym asp-J⁵">J⁵</span><span class="legend-desc">Jupiter 5th aspect — 120° forward (±5°)</span>
+      <span class="legend-sym asp-J⁹">J⁹</span><span class="legend-desc">Jupiter 9th aspect — 240° forward (±5°)</span>
+      <span class="legend-sym asp-S³">S³</span><span class="legend-desc">Saturn 3rd aspect — 60° forward (±5°)</span>
+      <span class="legend-sym asp-S¹⁰">S¹⁰</span><span class="legend-desc">Saturn 10th aspect — 270° forward (±5°)</span>
+    </div>
+
+    <h3>Nakshatra Cell (small text below)</h3>
+    <div class="legend-grid">
+      <span class="legend-sym">SL</span><span class="legend-desc">Sign Lord — the ruler of the planet's current rashi (zodiac sign)</span>
+      <span class="legend-sym">NL</span><span class="legend-desc">Nakshatra Lord — the Vimshottari dasha ruler of the planet's nakshatra</span>
+    </div>
+
+    <h3>Paksha</h3>
+    <div class="legend-grid">
+      <span class="legend-sym">Shukla / வளர் பிறை</span><span class="legend-desc">Waxing Moon (New Moon → Full Moon, Tithi 1–15)</span>
+      <span class="legend-sym">Krishna / தேய் பிறை</span><span class="legend-desc">Waning Moon (Full Moon → New Moon, Tithi 16–30)</span>
+    </div>
+
+    <h3>Combustion Orbs (degrees from Sun) — Rahu/Ketu excluded, shown as ☽E instead</h3>
+    <div class="legend-grid">
+      <span class="legend-sym">Moon</span><span class="legend-desc">12°</span>
+      <span class="legend-sym">Mercury</span><span class="legend-desc">14° when direct · 12° when retrograde</span>
+      <span class="legend-sym">Venus</span><span class="legend-desc">10° when direct · 16° when retrograde</span>
+      <span class="legend-sym">Mars</span><span class="legend-desc">17°</span>
+      <span class="legend-sym">Jupiter</span><span class="legend-desc">11°</span>
+      <span class="legend-sym">Saturn</span><span class="legend-desc">15°</span>
+    </div>
+
+    <h3>Panchanga</h3>
+    <div class="legend-grid">
+      <span class="legend-sym">Vara</span><span class="legend-desc">Weekday lord (Sun→Su, Mon→Mo, Tue→Ma, Wed→Me, Thu→Ju, Fri→Ve, Sat→Sa)</span>
+      <span class="legend-sym">Tithi</span><span class="legend-desc">Lunar day (1–30); Purnima = Full Moon, Amavasya = New Moon</span>
+      <span class="legend-sym">Paksha</span><span class="legend-desc">Lunar fortnight — Shukla (waxing) or Krishna (waning)</span>
+      <span class="legend-sym">Karana</span><span class="legend-desc">Half-tithi (6° Moon-Sun arc); 7 movable + 4 fixed types</span>
+      <span class="legend-sym">Yogi</span><span class="legend-desc">Yogi nakshatra = nakshatra at Sun+Moon+93°20'; shows auspicious energy</span>
+    </div>
+  </div>
+</div>
+
 <div id="app" style="display:none">
 
   <header>
@@ -325,6 +448,7 @@
       <button class="btn btn-outline" onclick="resetFilters()">Reset All</button>
       <button class="btn btn-outline" id="dlBtn" onclick="downloadCSV()">⬇ CSV</button>
       <button class="btn btn-outline" id="langBtn" onclick="toggleLang()">தமிழ் / EN</button>
+      <button class="btn btn-outline" onclick="toggleLegend()" title="Symbol legend">? Legend</button>
     </div>
     <div class="controls" style="padding-top:0;gap:12px">
       <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
@@ -365,6 +489,51 @@ const SIGNS = ['Ari','Tau','Gem','Can','Leo','Vir','Lib','Sco','Sag','Cap','Aqu'
 const NAKS  = ['Ashw','Bhar','Krit','Rohi','Mrig','Ardr','Puna','Push','Ashl','Magh',
                'PPha','UPha','Hast','Chit','Swat','Vish','Anur','Jyes','Mula','PAsh',
                'UAsh','Shra','Dhan','Shat','PBha','UBha','Reva'];
+
+// ── Combustion orbs (degrees from Sun) — Ra/Ke excluded (eclipse, not combustion)
+// Mercury: 14° direct, 12° retrograde  |  Venus: 10° direct, 16° retrograde (BPHS)
+const COMBUST_ORB = { Mo:12, Me:14, Ve:10, Ma:17, Ju:11, Sa:15 };
+
+// ── Planetary dignity (sidereal sign indices 0=Ari … 11=Pis) ─────────────────
+const DIGNITY = {
+  Su: { exalt:0,  debil:6,  own:[4]     },
+  Mo: { exalt:1,  debil:7,  own:[3]     },
+  Me: { exalt:5,  debil:11, own:[2,5]   },
+  Ve: { exalt:11, debil:5,  own:[1,6]   },
+  Ma: { exalt:9,  debil:3,  own:[0,7]   },
+  Ju: { exalt:3,  debil:9,  own:[8,11]  },
+  Sa: { exalt:6,  debil:0,  own:[9,10]  },
+  Ra: { exalt:1,  debil:7,  own:[10]    },  // BPHS: exalt Taurus, debil Scorpio, own Aquarius
+  Ke: { exalt:7,  debil:1,  own:[8]     },  // BPHS: exalt Scorpio, debil Taurus, own Sagittarius
+};
+
+// ── Aspects: Western + Vedic special ──────────────────────────────────────────
+const ASPECT_DEFS = [
+  { sym:'☌', deg:0,   orb:8 },
+  { sym:'⚹', deg:60,  orb:6 },
+  { sym:'□', deg:90,  orb:7 },
+  { sym:'△', deg:120, orb:8 },
+  { sym:'☍', deg:180, orb:8 },
+];
+// Vedic special aspects — directional (forward from source planet)
+// All planets: 7th (180°) already covered by ☍
+// Mars: 4th (90°) + 8th (210°)
+// Jupiter: 5th (120°) + 9th (240°)
+// Saturn: 3rd (60°) + 10th (270°)
+const VEDIC_SPECIAL = [
+  { src:'Ma', sym:'M⁴',  deg:90,  orb:5 },
+  { src:'Ma', sym:'M⁸',  deg:210, orb:5 },
+  { src:'Ju', sym:'J⁵',  deg:120, orb:5 },
+  { src:'Ju', sym:'J⁹',  deg:240, orb:5 },
+  { src:'Sa', sym:'S³',  deg:60,  orb:5 },
+  { src:'Sa', sym:'S¹⁰', deg:270, orb:5 },
+];
+
+// ── Sign lords (Ari→Ma, Tau→Ve, Gem→Me, Can→Mo, Leo→Su, Vir→Me, Lib→Ve, Sco→Ma, Sag→Ju, Cap→Sa, Aqu→Sa, Pis→Ju)
+const SIGN_LORDS = ['Ma','Ve','Me','Mo','Su','Me','Ve','Ma','Ju','Sa','Sa','Ju'];
+
+// ── Vara (weekday) lords ──────────────────────────────────────────────────────
+const VARA_LORD = { Sun:'Su', Mon:'Mo', Tue:'Ma', Wed:'Me', Thu:'Ju', Fri:'Ve', Sat:'Sa' };
 
 const TITHI_NAMES = ['Pratipada','Dvitiya','Tritiya','Chaturthi','Panchami',
   'Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dvadashi',
@@ -430,6 +599,169 @@ function tVara(d)     { return lang==='ta' ? (TA.vara[d]      || d)    : d;    }
 
 function getDay(r) {
   return DAYS[new Date(r.date + 'T00:00:00').getDay()];
+}
+
+// ── Retrograde (precomputed from consecutive longitude diffs) ─────────────────
+let retroMap = {};
+function precomputeRetrograde() {
+  if (!allRecords.length) return;
+  const init = {};
+  for (const pk of PLANETS) init[pk] = (pk === 'Ra' || pk === 'Ke');
+  retroMap[allRecords[0].date] = init;
+
+  for (let i = 1; i < allRecords.length; i++) {
+    const prev = allRecords[i-1], curr = allRecords[i];
+    const s = {};
+    for (const pk of PLANETS) {
+      if (pk === 'Ra' || pk === 'Ke') { s[pk] = true; continue; }
+      if (pk === 'Mo') { s[pk] = false; continue; }
+      const pl = prev.p?.[pk], cl = curr.p?.[pk];
+      if (pl == null || cl == null) { s[pk] = false; continue; }
+      let d = cl - pl;
+      if (d > 180) d -= 360;
+      if (d < -180) d += 360;
+      s[pk] = d < 0;
+    }
+    retroMap[curr.date] = s;
+  }
+}
+
+function isRetro(r, pk) { return retroMap[r.date]?.[pk] ?? false; }
+
+// ── Combustion ────────────────────────────────────────────────────────────────
+// Cazimi (within 1°) is NOT combust — it's the heart of the Sun, extremely powerful.
+// Mercury orb: 14° direct, 12° retrograde. Venus orb: 10° direct, 16° retrograde.
+function isCombust(r, pk) {
+  let orb = COMBUST_ORB[pk];
+  if (!orb) return false;
+  if (pk === 'Me' && isRetro(r, pk)) orb = 12;
+  if (pk === 'Ve' && isRetro(r, pk)) orb = 16;
+  const su = r.p?.Su, pl = r.p?.[pk];
+  if (su == null || pl == null) return false;
+  let d = Math.abs(pl - su) % 360;
+  if (d > 180) d = 360 - d;
+  if (d < 1) return false; // Cazimi — not combust
+  return d < orb;
+}
+
+function isCazimi(r, pk) {
+  if (!COMBUST_ORB[pk]) return false;
+  const su = r.p?.Su, pl = r.p?.[pk];
+  if (su == null || pl == null) return false;
+  let d = Math.abs(pl - su) % 360;
+  if (d > 180) d = 360 - d;
+  return d < 1; // within 1° of Sun's centre
+}
+
+// ── Eclipse zone (Ra/Ke near Sun — NOT combustion) ────────────────────────────
+function isEclipseZone(r, pk) {
+  if (pk !== 'Ra' && pk !== 'Ke') return false;
+  const su = r.p?.Su, pl = r.p?.[pk];
+  if (su == null || pl == null) return false;
+  let d = Math.abs(pl - su) % 360;
+  if (d > 180) d = 360 - d;
+  return d < 18; // solar eclipse limit ~18°
+}
+
+// ── Dignity ───────────────────────────────────────────────────────────────────
+function getPlanetDignity(r, pk, ayanVal) {
+  const dig = DIGNITY[pk];
+  if (!dig) return null;
+  const trop = r.p?.[pk];
+  if (trop == null) return null;
+  const sid = ((trop - ayanVal) % 360 + 360) % 360;
+  const si  = Math.floor(sid / 30);
+  if (si === dig.exalt) return 'Ex';
+  if (si === dig.debil) return 'De';
+  if (dig.own.includes(si)) return 'Own';
+  return null;
+}
+
+// ── Aspects ───────────────────────────────────────────────────────────────────
+function getAspects(r) {
+  const out = [];
+  for (let i = 0; i < PLANETS.length; i++) {
+    for (let j = i + 1; j < PLANETS.length; j++) {
+      const p1 = PLANETS[i], p2 = PLANETS[j];
+      const l1 = r.p?.[p1], l2 = r.p?.[p2];
+      if (l1 == null || l2 == null) continue;
+
+      // Western aspects (symmetric)
+      let diff = Math.abs(l1 - l2) % 360;
+      if (diff > 180) diff = 360 - diff;
+      for (const a of ASPECT_DEFS) {
+        if (Math.abs(diff - a.deg) <= a.orb) { out.push({ p1, p2, sym: a.sym }); break; }
+      }
+
+      // Vedic special aspects (directional: forward angle from source to target)
+      for (const [src, tgt, srcLon, tgtLon] of [[p1, p2, l1, l2],[p2, p1, l2, l1]]) {
+        for (const vs of VEDIC_SPECIAL) {
+          if (vs.src !== src) continue;
+          const fwd = ((tgtLon - srcLon) % 360 + 360) % 360;
+          if (Math.abs(fwd - vs.deg) <= vs.orb) {
+            out.push({ p1: src, p2: tgt, sym: vs.sym });
+          }
+        }
+      }
+    }
+  }
+  return out;
+}
+
+// ── Gandanta — within 3°20' (3.33°) of water→fire sign junctions ────────────
+// Junctions: Pis/Ari (356.67–3.33), Can/Leo (116.67–123.33), Sco/Sag (236.67–243.33)
+function isGandanta(sidLon) {
+  const l = sidLon;
+  return l >= 356.67 || l <= 3.33 || (l >= 116.67 && l <= 123.33) || (l >= 236.67 && l <= 243.33);
+}
+
+// ── Vargottama — same sign in Rashi (D1) and Navamsha (D9) ───────────────────
+function getNavamshaSign(sidLon) {
+  const si = Math.floor(sidLon / 30);
+  const navNo = Math.floor((sidLon % 30) / (30 / 9));
+  const starts = [0, 9, 6, 3, 0, 9, 6, 3, 0, 9, 6, 3]; // Fire/Earth/Air/Water
+  return (starts[si] + navNo) % 12;
+}
+function isVargottama(sidLon) {
+  return Math.floor(sidLon / 30) === getNavamshaSign(sidLon);
+}
+
+// ── Atmakaraka — planet with highest degree within its sign ──────────────────
+function getAtmakaraka(r, ayanVal) {
+  let maxDeg = -1, ak = null;
+  for (const pk of ['Su','Mo','Me','Ve','Ma','Ju','Sa']) {
+    const trop = r.p?.[pk];
+    if (trop == null) continue;
+    const sid = ((trop - ayanVal) % 360 + 360) % 360;
+    const degInSign = sid % 30;
+    if (degInSign > maxDeg) { maxDeg = degInSign; ak = pk; }
+  }
+  return ak;
+}
+
+// ── Graha Yuddha — planets within 1° AND in same sidereal sign ───────────────
+function getGrahaYuddha(r) {
+  const ps = ['Me','Ve','Ma','Ju','Sa'];
+  const war = new Set();
+  const ayan = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
+  for (let i = 0; i < ps.length; i++) {
+    for (let j = i + 1; j < ps.length; j++) {
+      const l1 = r.p?.[ps[i]], l2 = r.p?.[ps[j]];
+      if (l1 == null || l2 == null) continue;
+      const s1 = Math.floor(((l1 - ayan) % 360 + 360) % 360 / 30);
+      const s2 = Math.floor(((l2 - ayan) % 360 + 360) % 360 / 30);
+      if (s1 !== s2) continue; // must be in same sign
+      let d = Math.abs(l1 - l2) % 360;
+      if (d > 180) d = 360 - d;
+      if (d <= 1) { war.add(ps[i]); war.add(ps[j]); }
+    }
+  }
+  return war;
+}
+
+// ── Legend toggle ─────────────────────────────────────────────────────────────
+function toggleLegend() {
+  document.getElementById('legendOverlay').classList.toggle('open');
 }
 
 // ── Ayanamsa systems ──────────────────────────────────────────────────────────
@@ -632,7 +964,7 @@ function buildHeader() {
   let r1 = '<tr>';
   r1 += `<th>Date</th>`;
   r1 += `<th colspan="5">${PRODUCTS.find(p=>p.key===selectedProduct)?.label ?? 'Index'}</th>`;
-  r1 += `<th colspan="5" class="hdr-panch">Panchanga</th>`;
+  r1 += `<th colspan="6" class="hdr-panch">Panchanga</th>`;
   for (const pk of PLANETS) {
     r1 += `<th colspan="3" class="hdr-${P_CLASS[pk]} group-start">${tPlanet(pk)}</th>`;
   }
@@ -651,6 +983,7 @@ function buildHeader() {
   r2 += `<th class="sortable sub-panch"             data-col="paksha">${tUI('paksha','Paksha')}</th>`;
   r2 += `<th class="sortable sub-panch"             data-col="karana">${tUI('karana','Karana')}</th>`;
   r2 += `<th class="sortable sub-panch"             data-col="yogi">${tUI('yogi','Yogi')}</th>`;
+  r2 += `<th class="sub-panch">Aspects</th>`;
   for (const pk of PLANETS) {
     const s = `sub-${P_CLASS[pk]}`;
     r2 += `<th class="${s} group-start sortable" data-col="${pk}_deg">${tUI('deg','Deg')}</th>`;
@@ -672,6 +1005,7 @@ function buildHeader() {
   r3 += `<th>${mkSelF('paksha', ['Shukla','Krishna'],     tPaksha)}</th>`;
   r3 += `<th>${mkSelF('karana', ALL_KARANAS, v => lang==='ta' ? (TA.karanas[v]||v) : v)}</th>`;
   r3 += `<th>${mkSelF('yogi_nak', NAKS, tNak)}</th>`;
+  r3 += `<th></th>`;
   for (const pk of PLANETS) {
     r3 += `<th class="group-start">${mkNumF(pk+'_deg','0-360')}</th>`;
     r3 += `<th>${mkSelF(pk+'_sign', SIGNS, tSign)}</th>`;
@@ -726,18 +1060,49 @@ function renderPage() {
     html += `<td class="td-price">${ohlc.low.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-price">${ohlc.close.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-chg ${chgCls}">${chgStr}</td>`;
-    html += `<td class="td-panch group-start">${tVara(day)}</td>`;
+    const varaLord = VARA_LORD[day] ?? '';
+    html += `<td class="td-panch group-start">${tVara(day)}<span class="lord"> (${tPlanet(varaLord)})</span></td>`;
     html += `<td class="td-panch">${tTithi(tit.name)} <span class="lord">(${tit.num})</span></td>`;
     html += `<td class="td-panch">${tPaksha(tit.paksha)}</td>`;
     html += `<td class="td-panch">${kar.name} <span class="lord">(${kar.lord})</span></td>`;
     html += `<td class="td-panch">${tNak(yog.nak)} <span class="lord">(${yog.lord})</span></td>`;
 
+    // Aspects cell
+    const asps = getAspects(r);
+    const aspHtml = asps.map(a =>
+      `<span class="asp-item asp-${a.sym}">${a.p1}${a.sym}${a.p2}</span>`
+    ).join(' ');
+    html += `<td class="td-aspects">${aspHtml}</td>`;
+
+    const ayan  = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
+    const akPk  = getAtmakaraka(r, ayan);
+    const warPk = getGrahaYuddha(r);
     for (const pk of PLANETS) {
-      const info = getPInfo(r, pk);
-      const pc   = P_CLASS[pk];
-      html += `<td class="td-deg group-start">${info.deg ?? '—'}</td>`;
-      html += `<td class="td-sign p-${pc}">${tSign(info.sign ?? '—')}</td>`;
-      html += `<td class="td-nak">${tNak(info.nak ?? '—')}${info.pada ? ` P${info.pada}` : ''}</td>`;
+      const info   = getPInfo(r, pk);
+      const pc     = P_CLASS[pk];
+      const sidLon = info.lon ?? 0;
+      const si     = Math.floor(sidLon / 30);
+
+      const retro  = isRetro(r, pk)              ? '<span class="badge b-retro">℞</span>'  : '';
+      const comb   = isCombust(r, pk)             ? '<span class="badge b-comb">☀</span>'   : '';
+      const caz    = isCazimi(r, pk)              ? '<span class="badge b-caz">⊙</span>'    : '';
+      const ecl    = isEclipseZone(r, pk)         ? '<span class="badge b-ecl">☽E</span>'   : '';
+      const dig    = getPlanetDignity(r, pk, ayan);
+      const digBdg = dig === 'Ex'  ? '<span class="badge b-ex">Ex</span>'
+                   : dig === 'De'  ? '<span class="badge b-de">De</span>'
+                   : dig === 'Own' ? '<span class="badge b-own">⌂</span>' : '';
+      const varg   = isVargottama(sidLon)         ? '<span class="badge b-varg">V</span>'   : '';
+      const gand   = isGandanta(sidLon)           ? '<span class="badge b-gand">G</span>'   : '';
+      const akBdg  = pk === akPk                  ? '<span class="badge b-ak">AK</span>'    : '';
+      const warBdg = warPk.has(pk)               ? '<span class="badge b-war">⚔</span>'   : '';
+
+      const signLord = SIGN_LORDS[si] ?? '—';
+      const nakIdx   = Math.min(Math.floor(sidLon / (360/27)), 26);
+      const nakLord  = NK_LORDS[nakIdx] ?? '—';
+
+      html += `<td class="td-deg group-start">${info.deg ?? '—'}${akBdg}${warBdg}</td>`;
+      html += `<td class="td-sign p-${pc}">${tSign(info.sign ?? '—')}${retro}${comb}${caz}${ecl}${digBdg}${varg}${gand}</td>`;
+      html += `<td class="td-nak">${tNak(info.nak ?? '—')}${info.pada ? ` P${info.pada}` : ''}<span class="lords">SL:${signLord} NL:${nakLord}</span></td>`;
     }
     html += '</tr>';
   }
@@ -985,6 +1350,7 @@ async function init() {
       document.getElementById('dateTo').value   = allRecords.at(-1).date;
     }
 
+    precomputeRetrograde();
     buildProductBtns();
     buildAyanBtns();
     buildHeader();
