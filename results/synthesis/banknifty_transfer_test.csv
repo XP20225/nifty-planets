@@ -1,0 +1,6 @@
+index,banknifty,nifty_baseline
+metric,value,value
+win_rate,0.6568,0.8363
+sharpe,3.1634,5.8879
+total_trades,1145,1484
+cum_ret_pct,15910210.2,64595760570.27
