@@ -1,4 +1,4 @@
-name: Update Nifty 50 Data
+name: Update Nifty Data
 
 on:
   schedule:
@@ -25,13 +25,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Generate data.json
+      - name: Generate data.json (Nifty 50)
         run: python generate_data.py
+
+      - name: Update ohlc_banknifty.json (Bank Nifty)
+        run: python fetch_ohlc.py BANKNIFTY
 
       - name: Commit and push updated data
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json
+          git add data.json ohlc_banknifty.json
           git diff --staged --quiet && echo "No changes to commit" || \
             git commit -m "Data update $(date -u +'%Y-%m-%d')" && git push

@@ -326,9 +326,15 @@
       <button class="btn btn-outline" id="dlBtn" onclick="downloadCSV()">⬇ CSV</button>
       <button class="btn btn-outline" id="langBtn" onclick="toggleLang()">தமிழ் / EN</button>
     </div>
-    <div class="controls" style="padding-top:0;gap:4px">
-      <span style="font-size:11px;color:rgba(255,255,255,.55);margin-right:2px" id="ayanLabel">Ayanamsa:</span>
-      <div id="ayanBtns" style="display:flex;gap:3px;flex-wrap:wrap"></div>
+    <div class="controls" style="padding-top:0;gap:12px">
+      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+        <span style="font-size:11px;color:rgba(255,255,255,.55);margin-right:2px">Index:</span>
+        <div id="productBtns" style="display:flex;gap:3px;flex-wrap:wrap"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+        <span style="font-size:11px;color:rgba(255,255,255,.55);margin-right:2px" id="ayanLabel">Ayanamsa:</span>
+        <div id="ayanBtns" style="display:flex;gap:3px;flex-wrap:wrap"></div>
+      </div>
     </div>
   </header>
 
@@ -434,8 +440,16 @@ const TA = {
              Shakuni:'சகுனி', Chatushpada:'சதுஷ்பாத', Naga:'நாக', Kimstughna:'கிம்ஸ்துக்ன' },
 };
 
+// ── Products ──────────────────────────────────────────────────────────────────
+const PRODUCTS = [
+  { key: 'NIFTY50',   label: 'Nifty 50',   file: null },
+  { key: 'BANKNIFTY', label: 'Bank Nifty',  file: 'ohlc_banknifty.json' },
+];
+
 // ── State ─────────────────────────────────────────────────────────────────────
-let allRecords  = [];
+let allRecords      = [];   // base records from data.json (includes planets)
+let ohlcOverlay     = {};   // { BANKNIFTY: { '2024-01-01': {o,h,l,c,g}, … }, … }
+let selectedProduct = 'NIFTY50';
 let filtered    = [];
 let currentPage = 1;
 let sortCol     = null;
@@ -512,6 +526,41 @@ function mkSelF(key, opts, labelFn) {
   const o   = opts.map(v=>`<option value="${v}"${v===cur?' selected':''}>${labelFn ? labelFn(v) : v}</option>`).join('');
   return `<select class="col-filter" onchange="setColFilter('${key}',this.value)">
     <option value="">Any</option>${o}</select>`;
+}
+
+// ── OHLC helper ───────────────────────────────────────────────────────────────
+function getOHLC(r) {
+  if (selectedProduct === 'NIFTY50') return r;
+  const ov = ohlcOverlay[selectedProduct]?.[r.date];
+  if (!ov) return null;
+  return { open: ov.o, high: ov.h, low: ov.l, close: ov.c, chg: ov.g };
+}
+
+// Returns records for current product (filters out dates with no OHLC)
+function activeRecords() {
+  if (selectedProduct === 'NIFTY50') return allRecords;
+  const map = ohlcOverlay[selectedProduct] || {};
+  return allRecords.filter(r => map[r.date]);
+}
+
+// ── Product selector ──────────────────────────────────────────────────────────
+function buildProductBtns() {
+  document.getElementById('productBtns').innerHTML = PRODUCTS.map(p => {
+    const active = p.key === selectedProduct;
+    return `<button onclick="selectProduct('${p.key}')"
+      style="background:${active?'var(--saffron)':'rgba(255,255,255,.1)'};
+             color:${active?'var(--indigo)':'#fff'};
+             border:1px solid ${active?'var(--saffron)':'rgba(255,255,255,.25)'};
+             border-radius:4px;padding:3px 9px;font-size:11px;
+             font-weight:${active?700:500};cursor:pointer"
+    >${p.label}</button>`;
+  }).join('');
+}
+
+function selectProduct(key) {
+  selectedProduct = key;
+  buildProductBtns();
+  applyFilters();
 }
 
 // ── Ayanamsa selector ─────────────────────────────────────────────────────────
@@ -620,17 +669,18 @@ function renderPage() {
   let html    = '';
 
   for (const r of filtered.slice(start, end)) {
-    const chgCls = r.chg>0 ? 'up' : r.chg<0 ? 'down' : '';
-    const chgStr = r.chg>0 ? `+${r.chg.toFixed(2)}%` : `${r.chg.toFixed(2)}%`;
+    const ohlc   = getOHLC(r);
+    const chgCls = ohlc.chg>0 ? 'up' : ohlc.chg<0 ? 'down' : '';
+    const chgStr = ohlc.chg>0 ? `+${ohlc.chg.toFixed(2)}%` : `${ohlc.chg.toFixed(2)}%`;
     const kar    = getKarana(r);
     const yog    = getYogi(r);
 
     html += '<tr>';
     html += `<td class="td-date">${r.date}</td>`;
-    html += `<td class="td-price">${r.open.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
-    html += `<td class="td-price">${r.high.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
-    html += `<td class="td-price">${r.low.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
-    html += `<td class="td-price">${r.close.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+    html += `<td class="td-price">${ohlc.open.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+    html += `<td class="td-price">${ohlc.high.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+    html += `<td class="td-price">${ohlc.low.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
+    html += `<td class="td-price">${ohlc.close.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-chg ${chgCls}">${chgStr}</td>`;
     html += `<td class="td-panch group-start">${kar.name} <span class="lord">(${kar.lord})</span></td>`;
     html += `<td class="td-panch">${tNak(yog.nak)} <span class="lord">(${yog.lord})</span></td>`;
@@ -700,7 +750,8 @@ function applyFilters() {
   const to      = document.getElementById('dateTo').value;
   const sigTerm = document.getElementById('searchSign').value.trim().toLowerCase();
 
-  filtered = allRecords.filter(r => {
+  filtered = activeRecords().filter(r => {
+    const ohlc = getOHLC(r);
     // Global date range
     if (from && r.date < from) return false;
     if (to   && r.date > to)   return false;
@@ -724,7 +775,7 @@ function applyFilters() {
 
     // Per-column: OHLC + chg
     for (const col of ['open','high','low','close','chg']) {
-      if (colFilters[col] && !matchNum(r[col], colFilters[col])) return false;
+      if (colFilters[col] && !matchNum(ohlc[col], colFilters[col])) return false;
     }
 
     // Per-column: karana
@@ -767,11 +818,12 @@ function applyFilters() {
 
 function colVal(r, col) {
   if (col==='date')   return r.date;
-  if (col==='open')   return r.open;
-  if (col==='high')   return r.high;
-  if (col==='low')    return r.low;
-  if (col==='close')  return r.close;
-  if (col==='chg')    return r.chg;
+  const ohlc = getOHLC(r);
+  if (col==='open')   return ohlc.open;
+  if (col==='high')   return ohlc.high;
+  if (col==='low')    return ohlc.low;
+  if (col==='close')  return ohlc.close;
+  if (col==='chg')    return ohlc.chg;
   if (col==='karana') return getKarana(r).name;
   if (col==='yogi')   return getYogi(r).nak;
   const [pk, field] = col.split('_');
@@ -855,18 +907,30 @@ function toggleLang() {
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 async function init() {
   try {
-    const res  = await fetch('data.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status} – ${res.statusText}`);
-    const json = await res.json();
-    allRecords    = json.records || [];
-    generatedDate = json.generated || '';
+    // Load base data and all OHLC overlays in parallel
+    const fetches = [fetch('data.json'),
+      ...PRODUCTS.filter(p=>p.file).map(p=>fetch(p.file))];
+    const responses = await Promise.all(fetches);
+    for (const r of responses) {
+      if (!r.ok) throw new Error(`HTTP ${r.status} – ${r.statusText} (${r.url})`);
+    }
+    const [baseJson, ...ohlcJsons] = await Promise.all(responses.map(r=>r.json()));
+
+    allRecords    = baseJson.records || [];
+    generatedDate = baseJson.generated || '';
     filtered      = [...allRecords];
+
+    // Index each overlay by date for O(1) lookup
+    PRODUCTS.filter(p=>p.file).forEach((p, i) => {
+      ohlcOverlay[p.key] = ohlcJsons[i].records || {};
+    });
 
     if (allRecords.length) {
       document.getElementById('dateFrom').value = allRecords.at(0).date;
       document.getElementById('dateTo').value   = allRecords.at(-1).date;
     }
 
+    buildProductBtns();
     buildAyanBtns();
     buildHeader();
     applyFilters();
