@@ -366,6 +366,14 @@ const NAKS  = ['Ashw','Bhar','Krit','Rohi','Mrig','Ardr','Puna','Push','Ashl','M
                'PPha','UPha','Hast','Chit','Swat','Vish','Anur','Jyes','Mula','PAsh',
                'UAsh','Shra','Dhan','Shat','PBha','UBha','Reva'];
 
+const TITHI_NAMES = ['Pratipada','Dvitiya','Tritiya','Chaturthi','Panchami',
+  'Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dvadashi',
+  'Trayodashi','Chaturdashi','Purnima'];
+const ALL_TITHIS  = [...TITHI_NAMES.slice(0,14), 'Purnima', ...TITHI_NAMES.slice(0,14), 'Amavasya'];
+
+const DAYS     = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAYS_ALL = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
 // ── Panchanga: Karana ─────────────────────────────────────────────────────────
 const KARANA_MOVABLE = ['Bava','Balava','Kaulava','Taitila','Garija','Vanija','Vishti'];
 const KARANA_FIXED   = ['Shakuni','Chatushpada','Naga','Kimstughna'];
@@ -406,6 +414,24 @@ function getYogi(r) {
   return { nak: NAKS[ni], lord: NK_LORDS[ni] };
 }
 
+function getTithi(r) {
+  const su = r.p?.Su, mo = r.p?.Mo;
+  if (su == null || mo == null) return { num: 0, name: '—', paksha: '—' };
+  const diff = ((mo - su) % 360 + 360) % 360;
+  const idx  = Math.floor(diff / 12); // 0–29
+  const paksha = idx < 15 ? 'Shukla' : 'Krishna';
+  const name   = idx === 29 ? 'Amavasya' : TITHI_NAMES[idx % 15];
+  return { num: idx + 1, name, paksha };
+}
+
+function tTithi(name) { return lang==='ta' ? (TA.tithis[name] || name) : name; }
+function tPaksha(p)   { return lang==='ta' ? (TA.paksha[p]   || p)    : p;    }
+function tVara(d)     { return lang==='ta' ? (TA.vara[d]      || d)    : d;    }
+
+function getDay(r) {
+  return DAYS[new Date(r.date + 'T00:00:00').getDay()];
+}
+
 // ── Ayanamsa systems ──────────────────────────────────────────────────────────
 const AYANS = [
   { key:'la', label:'Lahiri',     ta:'லாஹிரி',         subtitle:'Lahiri Sidereal'          },
@@ -434,7 +460,17 @@ const TA = {
   ui:      { date:'தேதி', open:'திறப்பு', high:'உயர்வு', low:'தாழ்வு',
              close:'மூடல்', chg:'மாற்றம் %', deg:'பாகை', sign:'ராசி',
              nak:'நட்சத்திரம்', karana:'கரணம்', yogi:'யோகி',
+             vara:'வாரம்', tithi:'திதி', paksha:'பக்ஷம்',
              from:'இருந்து', to:'வரை', reset:'மீட்டமை', ayan:'அயனாம்சம்' },
+  tithis:  { Pratipada:'பிரதமை', Dvitiya:'துவிதியை', Tritiya:'திருதியை',
+             Chaturthi:'சதுர்த்தி', Panchami:'பஞ்சமி', Shashthi:'ஷஷ்டி',
+             Saptami:'சப்தமி', Ashtami:'அஷ்டமி', Navami:'நவமி',
+             Dashami:'தசமி', Ekadashi:'ஏகாதசி', Dvadashi:'துவாதசி',
+             Trayodashi:'திரயோதசி', Chaturdashi:'சதுர்தசி',
+             Purnima:'பௌர்ணமி', Amavasya:'அமாவாசை' },
+  paksha:  { Shukla:'வளர் பிறை', Krishna:'தேய் பிறை' },
+  vara:    { Sun:'ஞாயிறு', Mon:'திங்கள்', Tue:'செவ்வாய்', Wed:'புதன்',
+             Thu:'வியாழன்', Fri:'வெள்ளி', Sat:'சனி' },
   karanas: { Bava:'பவ', Balava:'பாலவ', Kaulava:'கௌலவ', Taitila:'தைதில',
              Garija:'கரிஜ', Vanija:'வணிஜ', Vishti:'விஷ்டி',
              Shakuni:'சகுனி', Chatushpada:'சதுஷ்பாத', Naga:'நாக', Kimstughna:'கிம்ஸ்துக்ன' },
@@ -595,8 +631,8 @@ function buildHeader() {
   // Row 1 — group labels
   let r1 = '<tr>';
   r1 += `<th>Date</th>`;
-  r1 += `<th colspan="5">NIFTY 50</th>`;
-  r1 += `<th colspan="2" class="hdr-panch">Panchanga</th>`;
+  r1 += `<th colspan="5">${PRODUCTS.find(p=>p.key===selectedProduct)?.label ?? 'Index'}</th>`;
+  r1 += `<th colspan="5" class="hdr-panch">Panchanga</th>`;
   for (const pk of PLANETS) {
     r1 += `<th colspan="3" class="hdr-${P_CLASS[pk]} group-start">${tPlanet(pk)}</th>`;
   }
@@ -610,7 +646,10 @@ function buildHeader() {
   r2 += `<th class="sortable td-price" data-col="low">${tUI('low','Low')}</th>`;
   r2 += `<th class="sortable td-price" data-col="close">${tUI('close','Close')}</th>`;
   r2 += `<th class="sortable td-chg"   data-col="chg">${tUI('chg','Chg %')}</th>`;
-  r2 += `<th class="sortable sub-panch group-start" data-col="karana">${tUI('karana','Karana')}</th>`;
+  r2 += `<th class="sortable sub-panch group-start" data-col="vara">${tUI('vara','Day')}</th>`;
+  r2 += `<th class="sortable sub-panch"             data-col="tithi">${tUI('tithi','Tithi')}</th>`;
+  r2 += `<th class="sortable sub-panch"             data-col="paksha">${tUI('paksha','Paksha')}</th>`;
+  r2 += `<th class="sortable sub-panch"             data-col="karana">${tUI('karana','Karana')}</th>`;
   r2 += `<th class="sortable sub-panch"             data-col="yogi">${tUI('yogi','Yogi')}</th>`;
   for (const pk of PLANETS) {
     const s = `sub-${P_CLASS[pk]}`;
@@ -628,7 +667,10 @@ function buildHeader() {
   r3 += `<th>${mkNumF('low')}</th>`;
   r3 += `<th>${mkNumF('close')}</th>`;
   r3 += `<th>${mkNumF('chg','e.g. >2')}</th>`;
-  r3 += `<th class="group-start">${mkSelF('karana', ALL_KARANAS, v => lang==='ta' ? (TA.karanas[v]||v) : v)}</th>`;
+  r3 += `<th class="group-start">${mkSelF('vara',   DAYS_ALL, tVara)}</th>`;
+  r3 += `<th>${mkSelF('tithi',  [...new Set(ALL_TITHIS)], tTithi)}</th>`;
+  r3 += `<th>${mkSelF('paksha', ['Shukla','Krishna'],     tPaksha)}</th>`;
+  r3 += `<th>${mkSelF('karana', ALL_KARANAS, v => lang==='ta' ? (TA.karanas[v]||v) : v)}</th>`;
   r3 += `<th>${mkSelF('yogi_nak', NAKS, tNak)}</th>`;
   for (const pk of PLANETS) {
     r3 += `<th class="group-start">${mkNumF(pk+'_deg','0-360')}</th>`;
@@ -674,6 +716,8 @@ function renderPage() {
     const chgStr = ohlc.chg>0 ? `+${ohlc.chg.toFixed(2)}%` : `${ohlc.chg.toFixed(2)}%`;
     const kar    = getKarana(r);
     const yog    = getYogi(r);
+    const tit    = getTithi(r);
+    const day    = getDay(r);
 
     html += '<tr>';
     html += `<td class="td-date">${r.date}</td>`;
@@ -682,7 +726,10 @@ function renderPage() {
     html += `<td class="td-price">${ohlc.low.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-price">${ohlc.close.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>`;
     html += `<td class="td-chg ${chgCls}">${chgStr}</td>`;
-    html += `<td class="td-panch group-start">${kar.name} <span class="lord">(${kar.lord})</span></td>`;
+    html += `<td class="td-panch group-start">${tVara(day)}</td>`;
+    html += `<td class="td-panch">${tTithi(tit.name)} <span class="lord">(${tit.num})</span></td>`;
+    html += `<td class="td-panch">${tPaksha(tit.paksha)}</td>`;
+    html += `<td class="td-panch">${kar.name} <span class="lord">(${kar.lord})</span></td>`;
     html += `<td class="td-panch">${tNak(yog.nak)} <span class="lord">(${yog.lord})</span></td>`;
 
     for (const pk of PLANETS) {
@@ -778,6 +825,11 @@ function applyFilters() {
       if (colFilters[col] && !matchNum(ohlc[col], colFilters[col])) return false;
     }
 
+    // Per-column: vara / tithi / paksha
+    if (colFilters.vara   && getDay(r)            !== colFilters.vara)   return false;
+    if (colFilters.tithi  && getTithi(r).name     !== colFilters.tithi)  return false;
+    if (colFilters.paksha && getTithi(r).paksha   !== colFilters.paksha) return false;
+
     // Per-column: karana
     if (colFilters.karana) {
       if (getKarana(r).name !== colFilters.karana) return false;
@@ -824,6 +876,9 @@ function colVal(r, col) {
   if (col==='low')    return ohlc.low;
   if (col==='close')  return ohlc.close;
   if (col==='chg')    return ohlc.chg;
+  if (col==='vara')   return getDay(r);
+  if (col==='tithi')  return getTithi(r).num;
+  if (col==='paksha') return getTithi(r).paksha;
   if (col==='karana') return getKarana(r).name;
   if (col==='yogi')   return getYogi(r).nak;
   const [pk, field] = col.split('_');
