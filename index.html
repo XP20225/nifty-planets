@@ -118,6 +118,7 @@
   .table-wrap {
     overflow: auto;
     flex: 1;
+    min-height: 0;
   }
 
   table {
@@ -191,8 +192,9 @@
   /* Sortable */
   th.sortable { cursor: pointer; user-select: none; }
   th.sortable:hover { opacity: .8; }
-  th.sort-asc::after  { content: ' ▲'; font-size: 9px; }
-  th.sort-desc::after { content: ' ▼'; font-size: 9px; }
+  th.sortable::after              { content: ' ↕'; font-size: 9px; opacity: .4; }
+  th.sort-asc::after  { content: ' ▲'; font-size: 9px; opacity: 1; }
+  th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; }
 
   /* ── Column filters ── */
   .col-filter {
