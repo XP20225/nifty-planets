@@ -1,6 +1,6 @@
 # Astro Quant Research System — Live Checklist
 Last updated: 2026-06-13 IST
-Overall status: 9 of 54 items complete
+Overall status: 21 of 54 items complete
 
 ---
 
@@ -30,13 +30,13 @@ Overall status: 9 of 54 items complete
 - [x] DONE — 2026-06-13 — Zero lookahead audit passed in Step 1; all features use only market-open state on signal date
 
 ## STEP 3: Validation Loop
-- [ ] PENDING — Monte Carlo 10,000 shuffles complete for all candidates
-- [ ] PENDING — Benjamini-Hochberg FDR correction applied
-- [ ] PENDING — Temporal stability across rolling 5-year windows tested
-- [ ] PENDING — Regime robustness classification complete
-- [ ] PENDING — Bootstrap 99% confidence intervals computed
-- [ ] PENDING — Accuracy-selectivity surface table saved
-- [ ] PENDING — Empirical optimal threshold identified
+- [x] DONE — 2026-06-13 — Monte Carlo 10,000 shuffles: 19 candidates → 4 survived p<0.005 — results/validation/monte_carlo_results.csv
+- [x] DONE — 2026-06-13 — Benjamini-Hochberg FDR at 1% applied: 4 survivors — results/validation/fdr_survivors.csv
+- [x] DONE — 2026-06-13 — Temporal stability across rolling 5-year windows: all 4 stable (≥0.70) — results/validation/temporal_stability.csv
+- [x] DONE — 2026-06-13 — Regime robustness: all 4 classified UNIVERSAL (log_ret, ju_dignity, range_pct, combust_Mo) — results/validation/regime_robustness.csv
+- [x] DONE — 2026-06-13 — Bootstrap 99% CIs computed (5,000 resamples): all 4 directionally certain — results/validation/bootstrap_ci.csv
+- [x] DONE — 2026-06-13 — Accuracy-selectivity surface table saved — results/validation/accuracy_selectivity_surface.csv
+- [x] DONE — 2026-06-13 — Empirical optimal threshold: 3+ signals active → 62.3% 3d win rate, 95% CI ≥58.1%, 499 days (6.7% freq), Sharpe 3.11
 
 ## STEP 4: Synthesis Loop
 - [ ] PENDING — ML Model A (Volatility) trained and saved

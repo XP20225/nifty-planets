@@ -1,0 +1,5 @@
+feature,feature_type,overall_direction,n_windows,consistent_windows,stability_score,stable
+log_ret,continuous,0.0489414897614888,27,26,0.9629629629629629,True
+ju_dignity,continuous,-0.04472513389133123,27,21,0.7777777777777778,True
+range_pct,continuous,0.03938464793635733,27,22,0.8148148148148148,True
+combust_Mo,binary,0.004847193795388894,27,27,1.0,True
