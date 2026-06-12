@@ -32,6 +32,9 @@
     background: var(--bg);
     color: var(--text);
     font-size: 13px;
+  }
+
+  #app {
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -857,7 +860,7 @@ async function init() {
     applyFilters();
 
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display     = 'block';
+    document.getElementById('app').style.display     = 'flex';
   } catch(err) {
     document.getElementById('loading').style.display    = 'none';
     document.getElementById('error').style.display      = 'block';
