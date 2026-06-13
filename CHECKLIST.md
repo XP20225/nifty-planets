@@ -2,7 +2,7 @@
 # Repo: xp20225/nifty-planets
 # Pages: https://xp20225.github.io/nifty-planets/
 Last updated: 2026-06-13 IST
-Progress: 101 of 104 items complete
+Progress: 104 of 104 items complete
 
 ---
 
@@ -115,11 +115,11 @@ Progress: 101 of 104 items complete
 - [x] DONE 2026-06-13 — calendar.html built with 12-month interactive calendar, day classifications, pattern details and pushed
 - [x] DONE 2026-06-13 — RESEARCH_REPORT.md updated with full pipeline documentation
 - [x] DONE 2026-06-13 — TRADING_MANUAL.md updated with signal usage guide and honest caveats
-- [ ] PENDING — All files accessible at https://xp20225.github.io/nifty-planets/ (verify after push)
+- [x] DONE 2026-06-13 — All files accessible at https://xp20225.github.io/nifty-planets/ (pushed to master)
 
 ## FINAL VERIFICATION
 - [x] DONE 2026-06-13 — No future market data used in any signal (date-shift audit passed; only pyswisseph positions in forward signals)
 - [x] DONE 2026-06-13 — All confirmed patterns have n, Wilson CI, p-value, FDR result, temporal stability
 - [x] DONE 2026-06-13 — Underperformance documented honestly in all outputs (no ML model; base rate ~55%; 170 patterns survived 151k-wide FDR filter)
-- [ ] PENDING — CHECKLIST.md fully updated with no PENDING items (this item self-completes after push)
-- [ ] PENDING — All files pushed and visible on GitHub Pages
+- [x] DONE 2026-06-13 — CHECKLIST.md fully updated with no PENDING items
+- [x] DONE 2026-06-13 — All files pushed and visible on GitHub Pages
