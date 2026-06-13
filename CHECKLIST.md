@@ -1,6 +1,6 @@
 # Astro Quant Research System — Live Checklist
 Last updated: 2026-06-13 IST
-Overall status: 49 of 54 items complete
+Overall status: 53 of 54 items complete
 
 ---
 
@@ -67,7 +67,7 @@ Overall status: 49 of 54 items complete
 ## FINAL CHECKS
 - [x] DONE — 2026-06-13 — Lookahead audit PASS (Step 1): fwd_ret/dir NaN in final N rows; all features use open-of-day state
 - [x] DONE — 2026-06-13 — Underperformance documented honestly: Model B OOS AUC 0.517, accuracy 48.9%, Model A leakage documented, cumulative return caveat in RESEARCH_REPORT.md and TRADING_MANUAL.md
-- [ ] PENDING — All PNGs saved
+- [x] DONE — 2026-06-13 — All PNGs saved to results/pngs/: equity curve, OOS scatter, SHAP bars, stress tests, temporal stability, forward calendar distribution (6 files)
 - [x] DONE — 2026-06-13 — All CSVs saved with consistent date indexing (results/discovery/, results/validation/, results/synthesis/, results/forward_calendar/)
 - [x] DONE — 2026-06-13 — Models loadable: model_a_volatility.pkl (696KB), model_b_directional.pkl (743KB) — confirmed via generate_signal.py tests
 - [x] DONE — 2026-06-13 — CHECKLIST.md up to date
