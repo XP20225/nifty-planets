@@ -1,2 +1,2 @@
-label,total_trades,win_rate,mean_ret_pct,cum_ret_pct,ann_ret_pct,max_drawdown,sharpe,calmar,bh_return_pct,mc_cum_ret_p5,mc_cum_ret_p50,mc_cum_ret_p95,mc_sharpe_p5,mc_sharpe_p50,mc_sharpe_p95
-AstroQuant-Nifty,1484,0.8363,1.3995,64595760570.27,96.57,-0.1436,5.8879,6.7233,2070.57,-31.43,179.42,1063.56,0.0252,0.3695,0.7248
+n_trades,win_rate,mean_ret_per_trade,sharpe,max_drawdown,threshold,note
+7449,0.5398,0.00099,0.36,-0.9532,50,Pure astrological signals only — no market data in signal

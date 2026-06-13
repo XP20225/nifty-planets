@@ -1,0 +1,10 @@
+cycle_name,period_td,acf_value,acf_significant,fft_power_ratio,phase_anova_f,phase_anova_p,evidence
+Moon synodic(td),21.1,0.0027,False,0.38,1.179,0.316228,NO
+Moon monthly,29.5,-0.0236,True,2.48,2.02,0.108762,YES
+Mercury retro(td),83.0,-0.0127,False,0.59,1.426,0.233103,NO
+Mercury synodic,116.0,0.0069,False,0.97,1.886,0.129545,NO
+Venus synodic(td),161.0,0.0121,False,3.27,2.152,0.091538,YES
+Mars synodic(td),557.0,-0.0023,False,0.27,2.081,0.100412,NO
+Jupiter sign(td),22.0,-0.0083,False,1.59,2.347,0.070733,NO
+Saturn sign(td),630.0,0.0009,False,0.93,0.451,0.716944,NO
+Rahu sign(td),390.0,-0.026,True,1.26,1.374,0.248784,YES

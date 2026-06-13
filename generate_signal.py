@@ -1,198 +1,239 @@
+#!/usr/bin/env python3
 """
-Daily Signal Generator — Astro Quant Research System
-Usage:  python generate_signal.py [YYYY-MM-DD]
-        (defaults to today if no date given)
+AstroQuant Signal Generator v2
+Usage: python generate_signal.py [YYYY-MM-DD]
+If no date given, uses today.
 
-For historical dates (in nifty_enriched.csv): reads stored features + models.
-For future dates (in forward_calendar.csv): reads pre-computed planetary estimates.
-Prints a one-line classification and full signal breakdown.
-Runs in under 10 seconds.
+Outputs:
+  - Complete Panchanga for the date
+  - All planetary dignities, speeds, states
+  - All active confirmed patterns (Wilson LB, n, p-value)
+  - Active veto conditions
+  - Composite score
+  - TRADE BULL / TRADE BEAR / WATCH / NO TRADE decision
+  - Next 30 days upcoming pattern windows
 """
-
-import sys
-import json
-import warnings
-from pathlib import Path
-
-import numpy as np
+import sys, os, json, math
+from datetime import date, timedelta
 import pandas as pd
-import joblib
 
-warnings.filterwarnings("ignore")
+REPO = os.path.dirname(os.path.abspath(__file__))
 
-BASE          = Path("/Users/vasanthakumaranpalanisamy/Nifty Planets")
-DATA_DIR      = BASE / "data"
-RESULTS_DIR   = BASE / "results" / "synthesis"
-MODELS_DIR    = BASE / "models"
+# ── Import helpers from astro_engine (no side effects) ───────────────
+sys.path.insert(0, REPO)
+from astro_engine import (
+    compute_day_features, get_planets_swisseph, wilson_lower,
+    PLANETS, NAK_NAMES, YOGA_NAMES, DASHA_NATURE
+)
 
-FEATURES = [
-    "log_ret", "ju_dignity", "range_pct", "combust_Mo",
-    "tithi_num", "paksha", "karana", "moon_nak_num", "moon_nak_quality",
-    "sa_dignity", "moon_strength", "mahadasha", "antardasha",
-    "sarvashtakavarga", "combust_Me", "combust_Ve", "combust_Ma",
-    "combust_Ju", "combust_Sa", "gandanta_Su", "gandanta_Mo",
-    "eclipse_corridor", "graha_yuddha", "dow", "month",
-]
+def load_confirmed():
+    path = f"{REPO}/results/validation/confirmed_patterns.csv"
+    if not os.path.exists(path):
+        print("ERROR: confirmed_patterns.csv not found. Run new_step3.py first.")
+        return pd.DataFrame()
+    return pd.read_csv(path, low_memory=False)
 
-RANGE_PCT_MEDIAN_TRAIN = 0.0142  # from step 4 training set
+def eval_pattern(feat_dict, features_str, condition_str):
+    """Check if pattern matches given feature dict."""
+    features = features_str.split('|')
+    conditions = condition_str.split('||') if '||' in str(condition_str) else [str(condition_str)]
+    if len(features) != len(conditions): return False
+    for f, v in zip(features, conditions):
+        f = f.strip(); v = v.strip()
+        fval = str(feat_dict.get(f, ''))
+        if fval != v: return False
+    return True
 
+def generate_signal(target_date=None):
+    if target_date is None:
+        target_date = date.today()
+    elif isinstance(target_date, str):
+        target_date = date.fromisoformat(target_date)
 
-def classification_label(score: float) -> str:
-    if score >= 75:
-        return "PRIME_TRADE"
-    elif score >= 60:
-        return "HIGH_VOL"
-    elif score >= 45:
-        return "WATCH"
-    elif score >= 30:
-        return "NEUTRAL"
-    return "AVOID"
+    print(f"\n{'='*60}")
+    print(f"  AstroQuant Signal — {target_date.strftime('%A, %B %d %Y')}")
+    print(f"{'='*60}")
 
+    # Get planetary positions
+    try:
+        positions = get_planets_swisseph(target_date)
+    except Exception as e:
+        print(f"ERROR computing positions: {e}")
+        return
 
-def load_models():
-    model_a = joblib.load(MODELS_DIR / "model_a_volatility.pkl")
-    model_b = joblib.load(MODELS_DIR / "model_b_directional.pkl")
-    return model_a, model_b
+    # Compute features
+    feat = compute_day_features(target_date, positions)
 
+    # Add _str versions for binary features
+    for col in ['gajakesari','papakartari','comb_Mo','comb_Me','comb_Ve',
+                'retro_Me','retro_Ju','gand_Mo','sade_sati','ju_asp_mo','sa_asp_mo','graha_yuddha']:
+        feat[col+'_str'] = col + '=' + str(feat.get(col, 0))
 
-def signal_for_historical(target_date: pd.Timestamp):
-    """Read row from enriched CSV, run models, print signal."""
-    df = pd.read_csv(DATA_DIR / "nifty_enriched.csv", parse_dates=["date"])
-    row_mask = df["date"] == target_date
-    if not row_mask.any():
-        return None, "Date not found in historical data (nifty_enriched.csv)."
+    # ── PANCHANGA ──────────────────────────────────────────────────────
+    vara_full = {'Mo':'Monday (Moon)','Ma':'Tuesday (Mars)','Me':'Wednesday (Mercury)',
+                 'Ju':'Thursday (Jupiter)','Ve':'Friday (Venus)','Sa':'Saturday (Saturn)','Su':'Sunday (Sun)'}
+    print(f"\n  PANCHANGA")
+    print(f"  ─────────────────────────────────────────")
+    print(f"  Vara:      {vara_full.get(feat['vara_lord'], feat['vara_lord'])}")
+    print(f"  Tithi:     {feat['tithi_num']} ({feat['paksha']}) — {feat['tithi_quality']}")
+    print(f"  Nakshatra: {feat['nak_mo_name']}")
+    print(f"  Yoga:      {feat['yoga_name']} — {feat['yoga_quality'].upper()}")
+    print(f"  Karana:    {feat['karana']} ({feat['karana_quality']})")
+    print(f"  Hora@9:15: {feat['hora_at_open']}")
+    print(f"  Choghadiya:{feat['choghadiya']} ({feat['choghadiya_quality'].upper()})")
 
-    # Encode categoricals on full column (must match step4 approach)
-    cat_cols = ["paksha", "moon_nak_quality", "karana", "mahadasha", "antardasha"]
-    for col in cat_cols:
-        if col in df.columns:
-            df[col] = pd.Categorical(df[col]).codes
+    # ── PLANETARY STATES ───────────────────────────────────────────────
+    print(f"\n  PLANETARY STATES (Sidereal Lahiri)")
+    print(f"  ─────────────────────────────────────────")
+    print(f"  {'Planet':<10} {'Sign':>12} {'Degree':>8} {'Dignity':<14} {'Retro':>5} {'Comb':>5}")
+    planet_names = {'Su':'Sun','Mo':'Moon','Me':'Mercury','Ve':'Venus','Ma':'Mars',
+                    'Ju':'Jupiter','Sa':'Saturn','Ra':'Rahu','Ke':'Ketu'}
+    sign_names_full = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
+    for p in PLANETS:
+        lon = feat[f'sid_{p}']
+        sg  = feat[f'sign_{p}']
+        dg  = lon % 30
+        dig = feat[f'dig_{p}']
+        retro = '♺' if feat.get(f'retro_{p}',0) else ''
+        comb  = '🔥' if feat.get(f'comb_{p}',0) else ''
+        sgn   = sign_names_full[sg-1] if 1<=sg<=12 else str(sg)
+        print(f"  {planet_names[p]:<10} {sgn:>12}  {dg:>5.1f}°  {dig:<14} {retro:>5} {comb:>5}")
 
-    row = df[row_mask].iloc[0]
-    X = pd.DataFrame([row])[FEATURES].fillna(0)
+    # ── DASHA ──────────────────────────────────────────────────────────
+    print(f"\n  DASHA STATE")
+    print(f"  ─────────────────────────────────────────")
+    print(f"  Mahadasha:  {feat['mahadasha']} ({DASHA_NATURE.get(feat['mahadasha'],'?')})")
+    print(f"  Antardasha: {feat['antardasha']}")
+    print(f"  Dasha Lord Dignity: {feat['dasha_lord_dig']}")
+    print(f"  Sade Sati: {'ACTIVE — ' + feat['sade_sati_phase'].upper() if feat.get('sade_sati') else 'No'}")
+    print(f"  Ashtama Shani: {'ACTIVE' if feat.get('ashtama_shani') else 'No'}")
 
-    model_a, model_b = load_models()
-    prob_up  = model_b.predict_proba(X)[0, 1]
-    prob_vol = model_a.predict_proba(X)[0, 1]
+    # ── SPECIAL CONDITIONS ─────────────────────────────────────────────
+    specials = []
+    if feat.get('gajakesari'):    specials.append("GAJAKESARI YOGA (Jupiter-Moon angular)")
+    if feat.get('kemadruma'):     specials.append("KEMADRUMA YOGA (Moon isolated)")
+    if feat.get('papakartari'):   specials.append("PAPAKARTARI (malefics hem Moon)")
+    if feat.get('graha_yuddha'):  specials.append("GRAHA YUDDHA (planetary war)")
+    if feat.get('gand_Mo'):       specials.append("GANDANTA MOON (water-fire junction)")
+    if feat.get('sandhi_mo'):     specials.append("SANDHI MOON (last degree of sign)")
+    if feat.get('panchaka'):      specials.append("PANCHAKA PERIOD (naks 23-27)")
+    if feat.get('retro_Me'):      specials.append("MERCURY RETROGRADE")
+    if feat.get('retro_Ju'):      specials.append("JUPITER RETROGRADE")
+    if feat.get('retro_Sa'):      specials.append("SATURN RETROGRADE")
+    if feat.get('sade_sati'):     specials.append(f"SADE SATI ({feat.get('sade_sati_phase','').upper()})")
+    if feat.get('ashtama_shani'): specials.append("ASHTAMA SHANI")
+    print(f"\n  SPECIAL CONDITIONS")
+    print(f"  ─────────────────────────────────────────")
+    for s in (specials or ['None active']):
+        print(f"  • {s}")
 
-    s1 = int(row["log_ret"] > 0)
-    s2 = int(row["ju_dignity"] > 0)
-    s3 = int(row["range_pct"] > RANGE_PCT_MEDIAN_TRAIN)
-    s4 = int(row["combust_Mo"] == 1)
-    signal_count = s1 + s2 + s3 + s4
+    # ── PATTERN MATCHING ───────────────────────────────────────────────
+    confirmed = load_confirmed()
+    if len(confirmed) == 0:
+        print("\n  No confirmed patterns available.")
+        return
 
-    composite = round((prob_up * 0.6 + signal_count / 4 * 0.4) * 100, 1)
-    composite = float(np.clip(composite, 0, 100))
-    label = classification_label(composite)
+    BASE_BULL = 0.551
+    active_bull = []; active_bear = []
+    for _, pat in confirmed.iterrows():
+        if eval_pattern(feat, pat['features'], pat['condition']):
+            wlb = pat.get('wlb_train', 0.5)
+            is_bull = pat.get('signal_dir','BULL') == 'BULL' or wlb > BASE_BULL
+            entry = {
+                'features': pat['features'], 'condition': pat['condition'],
+                'outcome': pat.get('outcome','?'), 'wlb': wlb,
+                'n_train': pat.get('n_train',0), 'p': pat.get('p_value',1),
+                'wr_oos': pat.get('wr_oos',0), 'n_oos': pat.get('n_oos',0),
+            }
+            if is_bull: active_bull.append(entry)
+            else: active_bear.append(entry)
 
-    return composite, label, {
-        "source":        "historical",
-        "prob_up":       round(prob_up, 4),
-        "prob_vol":      round(prob_vol, 4),
-        "signal_count":  signal_count,
-        "s1_log_ret_pos":   s1,
-        "s2_ju_dignity_pos":s2,
-        "s3_range_above_med":s3,
-        "s4_moon_combust":  s4,
-        "log_ret":       round(float(row["log_ret"]), 6) if not pd.isna(row["log_ret"]) else None,
-        "range_pct":     round(float(row["range_pct"]), 6) if not pd.isna(row["range_pct"]) else None,
-        "ju_dignity":    int(row["ju_dignity"]) if not pd.isna(row["ju_dignity"]) else None,
-        "combust_Mo":    int(row["combust_Mo"]) if not pd.isna(row["combust_Mo"]) else None,
-        "tithi":         int(row["tithi_num"]) if not pd.isna(row["tithi_num"]) else None,
-        "moon_nakshatra":int(row["moon_nak_num"]) if not pd.isna(row["moon_nak_num"]) else None,
-    }
+    print(f"\n  ACTIVE CONFIRMED PATTERNS")
+    print(f"  ─────────────────────────────────────────")
+    if active_bull:
+        print(f"  BULL patterns ({len(active_bull)}):")
+        for p in active_bull:
+            print(f"    ✓ {p['features']} = {p['condition']}")
+            print(f"      WilsonLB={p['wlb']:.3f}  n={p['n_train']}  p={p['p']:.4f}  OOS_wr={p['wr_oos']:.3f}(n={p['n_oos']})")
+    else:
+        print("  BULL patterns: none active")
+    if active_bear:
+        print(f"  BEAR patterns ({len(active_bear)}):")
+        for p in active_bear:
+            print(f"    ✗ {p['features']} = {p['condition']}")
+            print(f"      WilsonLB={p['wlb']:.3f}  n={p['n_train']}  p={p['p']:.4f}  OOS_wr={p['wr_oos']:.3f}(n={p['n_oos']})")
+    else:
+        print("  BEAR patterns: none active")
 
+    # ── COMPOSITE SCORE ─────────────────────────────────────────────────
+    bull_score = sum(max(0, p['wlb'] - BASE_BULL) for p in active_bull)
+    bear_score = sum(max(0, BASE_BULL - p['wlb']) for p in active_bear)
+    net = bull_score - bear_score
+    norm_score = 50 + net * 100
 
-def signal_for_future(target_date: pd.Timestamp):
-    """Look up pre-computed forward calendar row."""
-    cal = pd.read_csv(RESULTS_DIR / "forward_calendar.csv", parse_dates=["date"])
-    row = cal[cal["date"] == target_date]
-    if row.empty:
-        return None, "Date not found in forward_calendar.csv (may be a holiday or weekend)."
+    print(f"\n  COMPOSITE SCORE")
+    print(f"  ─────────────────────────────────────────")
+    print(f"  Bull component:  +{bull_score:.4f}")
+    print(f"  Bear component:  -{bear_score:.4f}")
+    print(f"  Net:              {net:+.4f}")
+    print(f"  Score (0-100):   {norm_score:.1f}  (50 = neutral)")
 
-    row = row.iloc[0]
-    composite = float(row["composite_score"])
-    label = classification_label(composite)
+    # ── DECISION ──────────────────────────────────────────────────────
+    n_bull = len(active_bull); n_bear = len(active_bear)
+    print(f"\n  TRADE DECISION")
+    print(f"  ─────────────────────────────────────────")
+    if n_bull >= 3 and n_bear == 0:
+        decision = "TRADE BULL"
+        print(f"  ⬆️  {decision}")
+        print(f"  Instrument: Nifty 50 (long / call)")
+        print(f"  Entry: Next open (9:15 AM IST)")
+        print(f"  Stop:  -1.5 ATR from entry")
+        print(f"  Target: +2.5 ATR from entry")
+        print(f"  Hold:  max 3 trading days")
+    elif n_bear >= 3 and n_bull == 0:
+        decision = "TRADE BEAR"
+        print(f"  ⬇️  {decision}")
+        print(f"  Instrument: Nifty 50 (short / put)")
+        print(f"  Entry: Next open (9:15 AM IST)")
+        print(f"  Stop:  +1.5 ATR from entry")
+        print(f"  Target: -2.5 ATR from entry")
+        print(f"  Hold:  max 3 trading days")
+    elif n_bull >= 1 or n_bear >= 1:
+        decision = "WATCH"
+        print(f"  👁  {decision} — insufficient confluence ({n_bull} bull, {n_bear} bear active)")
+    else:
+        decision = "NO TRADE"
+        print(f"  ○  {decision} — no confirmed patterns active today")
 
-    return composite, label, {
-        "source":               "forward_calendar (planetary estimates only)",
-        "signal_count":         int(row["signal_count"]),
-        "s1_log_ret_pos":       "N/A (future)",
-        "s2_ju_dignity_pos":    int(row["ju_dignity_est"] > 0),
-        "s3_range_above_med":   "N/A (future)",
-        "s4_moon_combust":      int(row["moon_combust_est"]),
-        "ju_dignity_est":       int(row["ju_dignity_est"]),
-        "moon_combust_est":     int(row["moon_combust_est"]),
-        "campaign_window":      bool(row["campaign_window"]),
-        "dead_zone":            bool(row["dead_zone"]),
-        "note":                 "prob_up fixed at 0.55; market signals unavailable for future dates",
-    }
-
-
-def print_signal(target_date: pd.Timestamp, composite, label, details: dict):
-    divider = "─" * 60
-    print(divider)
-    print(f"  ASTRO QUANT SIGNAL — {target_date.date()}")
-    print(divider)
-    print(f"  Composite Score : {composite:.1f} / 100")
-    print(f"  Classification  : {label}")
-    print(divider)
-    print("  Signal breakdown:")
-    for k, v in details.items():
-        if k == "source":
-            continue
-        if isinstance(v, float):
-            print(f"    {k:<28}: {v:.4f}")
+    # ── NEXT 30 DAYS ──────────────────────────────────────────────────
+    cal_path = f"{REPO}/results/forward_calendar/planetary_calendar_1yr.csv"
+    if os.path.exists(cal_path):
+        cal = pd.read_csv(cal_path)
+        cal['date'] = pd.to_datetime(cal['date'])
+        future = cal[cal['date'] > pd.Timestamp(target_date)]
+        prime = future[future['classification'].isin(['PRIME_TRADE_BULL','PRIME_TRADE_BEAR'])].head(10)
+        if len(prime) > 0:
+            print(f"\n  UPCOMING PRIME TRADE WINDOWS")
+            print(f"  ─────────────────────────────────────────")
+            for _, r in prime.iterrows():
+                icon = "⬆️" if r['classification']=='PRIME_TRADE_BULL' else "⬇️"
+                nak  = str(r.get('nak_mo_name','?'))[:12]
+                ju   = str(r.get('dig_Ju','?'))
+                pak  = str(r.get('paksha','?'))[:1]
+                print(f"  {icon} {str(r['date'])[:10]}  {r['classification']:<20} nak={nak:<12} ju={ju} pak={pak}")
         else:
-            print(f"    {k:<28}: {v}")
-    print(f"  Source: {details.get('source', '')}")
-    print(divider)
+            watch = future[future['classification'].str.startswith('WATCH')].head(5)
+            if len(watch) > 0:
+                print(f"\n  Next WATCH days (no PRIME_TRADE in upcoming window):")
+                for _, r in watch.iterrows():
+                    print(f"  👁  {str(r['date'])[:10]}  {r['classification']}")
 
-    # Trading guidance
-    if label == "PRIME_TRADE":
-        print("  ACTION: Strong bullish setup — consider long entry (3-day hold)")
-    elif label == "HIGH_VOL":
-        print("  ACTION: Elevated opportunity — monitor for long entry")
-    elif label == "WATCH":
-        print("  ACTION: Marginal setup — watch but stay cautious")
-    elif label == "NEUTRAL":
-        print("  ACTION: No signal — stay flat or hold existing positions")
-    else:
-        print("  ACTION: AVOID — unfavorable astrological conditions")
+    print(f"\n{'='*60}\n")
+    return decision, norm_score, active_bull, active_bear
 
-    if details.get("dead_zone"):
-        print("  WARNING: Dead zone — extended low-signal period")
-    if details.get("campaign_window"):
-        print("  NOTE: Campaign window — part of sustained high-signal cluster")
-    print(divider)
-
-
-def main():
+if __name__ == '__main__':
     if len(sys.argv) > 1:
-        try:
-            target_date = pd.Timestamp(sys.argv[1])
-        except Exception:
-            print(f"Error: invalid date '{sys.argv[1]}'. Use YYYY-MM-DD.")
-            sys.exit(1)
+        target = sys.argv[1]
     else:
-        target_date = pd.Timestamp.now().normalize()
-
-    today = pd.Timestamp.now().normalize()
-
-    print(f"\nGenerating signal for {target_date.date()} ...")
-
-    if target_date <= today:
-        result = signal_for_historical(target_date)
-    else:
-        result = signal_for_future(target_date)
-
-    if result[0] is None:
-        print(f"Error: {result[1]}")
-        sys.exit(1)
-
-    composite, label, details = result
-    print_signal(target_date, composite, label, details)
-
-
-if __name__ == "__main__":
-    main()
+        target = str(date.today())
+    generate_signal(target)
