@@ -1,6 +1,6 @@
 # Astro Quant Research System — Live Checklist
 Last updated: 2026-06-13 IST
-Overall status: 53 of 54 items complete
+Overall status: 54 of 54 items complete — PIPELINE COMPLETE
 
 ---
 
@@ -62,7 +62,7 @@ Overall status: 53 of 54 items complete
 - [x] DONE — 2026-06-13 — report.html built: FDR table, SHAP bars, backtest KPIs, stress tests, OOS scatter, BankNifty, caveats
 - [x] DONE — 2026-06-13 — RESEARCH_REPORT.md built: full pipeline documentation with all results and limitations
 - [x] DONE — 2026-06-13 — TRADING_MANUAL.md built: signal usage guide, classification thresholds, trade rules, caveats
-- [ ] PENDING — All files pushed and accessible on GitHub Pages
+- [x] DONE — 2026-06-13 — All files pushed to https://github.com/XP20225/nifty-planets (master)
 
 ## FINAL CHECKS
 - [x] DONE — 2026-06-13 — Lookahead audit PASS (Step 1): fwd_ret/dir NaN in final N rows; all features use open-of-day state
