@@ -1,276 +1,107 @@
-# So Far — AstroQuant Pipeline v2
-Complete rebuild. Honest record of everything done, how, and why.
+# So Far — AstroQuant Pipeline v2 + Fixes
+Complete record of everything built, found, and fixed.
 Last updated: 2026-06-13
 
 ---
 
-## Why We Rebuilt From Scratch
+## Quick Status
 
-The original pipeline produced AUC 0.517 and a forward calendar showing all 252 days as NEUTRAL. Both failures had the same root cause: the pipeline used same-day market data (log_ret, range_pct) as features in the signal. Those numbers are only known after the market closes. A forward-looking system cannot depend on them.
-
-The ML model (LightGBM) was trained on astrological columns but without any understanding of what those columns mean or how they interact. One-hot encoding all 27 nakshatras and feeding them to gradient boosting is not astrological research — it is data mining that finds coincidences with no interpretable structure. The result: near-random AUC.
-
-The forward calendar was all-NEUTRAL because the signal that determined trade direction required same-day log_ret. Since the calendar was computing future dates where log_ret is unknowable, every day defaulted to NEUTRAL.
-
-This rebuild was a clean start with one constraint: **no market data of any kind in any forward-looking signal**. All signals use only pyswisseph planetary positions.
-
----
-
-## Step 0: Data Schema Audit
-
-Confirmed the data sources before writing any code.
-
-**Nifty 50:** 7,452 trading days from 1996-04-22 (inception) to present. Source: `data/nifty50.csv`. Contains OHLC prices plus 9 planet columns (Su, Mo, Me, Ve, Ma, Ju, Sa, Ra, Ke) as sidereal Lahiri decimal degrees computed at midnight UTC for each date.
-
-**Bank Nifty:** 5,177 trading days from 2000 onward. Same column structure.
-
-**Key confirmation:** All 9 planet columns present, no gaps in planet data, date ranges validated. Data quality report saved to `reports/00_data_quality.txt`.
+| Stage | Status | Key Output |
+|---|---|---|
+| Pipeline v2 rebuild (Steps 1–5) | COMPLETE | 170 confirmed patterns, 252-day calendar |
+| Fix 1 — Missing features | COMPLETE | 353 columns (was 316) |
+| Fix 2 — Uncapped fingerprint | RUNNING | ~1,400+ patterns so far |
+| Fix 3 — Bull/bear investigation | COMPLETE | Root cause identified |
+| Fix 4 — Bank Nifty independent research | RUNNING | — |
+| Fix 5 — Validate M3–6 + merge | PENDING | Runs after Fix 2 + 4 complete |
 
 ---
 
-## Step 1: Feature Engineering — 316 Columns
+## Part 1: Why the Pipeline Was Rebuilt
 
+The original pipeline (before this session) produced AUC 0.517 and a 252-day forward calendar showing every day as NEUTRAL. Both failures had the same root cause: same-day market data (log_ret, range_pct) was used as a signal feature. Those numbers are only known after market close. A forward-looking system cannot depend on them.
+
+The forward calendar was all-NEUTRAL because the signal that determined trade direction required same-day log_ret. When computing future dates where log_ret is unknowable, every day defaulted to NEUTRAL.
+
+The LightGBM model (AUC 0.517) was trained on astrological columns but without understanding what they mean. One-hot encoding all 27 nakshatras and feeding them to gradient boosting finds coincidences with no interpretable structure. The result is near-random.
+
+The rebuild constraint: **no market data of any kind in any forward-looking signal.** All signals use only pyswisseph planetary positions.
+
+---
+
+## Part 2: Pipeline v2 (completed before this session's fixes)
+
+### Step 1: Feature Engineering
 **File:** `new_step1.py`
 **Output:** `data/nifty_enriched.csv` (7,452 × 316), `data/banknifty_enriched.csv` (5,161 × 316)
 
-The goal was to convert raw degree values into features that carry astrological meaning. Not one-hot encoding. Not treating a degree as a continuous number. Building the derived quantities that an astrologer actually uses.
+Converted raw sidereal planetary degrees into astrologically meaningful features.
 
-### Dignity System (9 levels per planet)
-For each of the 9 planets, computed a categorical dignity string using the classical rules:
+**Dignity system (9 levels per planet):** exact_exalt / exalted / moolatrikona / own / friendly / neutral / enemy / debilitated / exact_debil. Uses classical exaltation points (Su@Aries10°, Mo@Taurus3°, Ju@Cancer5° etc.) and natural friendship tables.
 
-| Level | Rule |
-|---|---|
-| `exact_exalt` | Within 1° of exact exaltation point |
-| `exalted` | In exaltation sign |
-| `moolatrikona` | In moolatrikona range (where defined) |
-| `own` | In own sign |
-| `friendly` | Sign lord is a natural friend |
-| `neutral` | Sign lord is neither friend nor enemy |
-| `enemy` | Sign lord is a natural enemy |
-| `debilitated` | In debilitation sign |
-| `exact_debil` | Within 1° of exact debilitation point |
+**Panchanga (5 daily elements):**
+- Vara: weekday + ruling planet's current dignity and speed
+- Tithi: (Moon−Sun separation)/12°, numbered 1–30, Nanda/Bhadra/Jaya/Rikta/Purna qualities
+- Paksha: SHUKLA (Tithi 1–15) or KRISHNA (Tithi 16–30)
+- Nakshatra: Moon's one of 27 nakshatras, with lord, quality, pada
+- Panchanga Yoga: (Sun+Moon)/360°×27, all 27 labeled, inauspicious ones flagged
+- Karana: half-tithi with inauspicious flags (Vishti, Shakuni, Chatushpada, Naga)
 
-Exaltation and debilitation points used: Su(1,10°), Mo(2,3°), Ma(10,28°), Me(6,15°), Ju(4,5°), Ve(12,27°), Sa(7,20°), Ra(2,20°), Ke(8,20°). Moolatrikona ranges from classical sources: Su in Leo 0-20°, Mo in Taurus 4-30°, etc.
+**Tara Bala:** Inception date 1996-04-22, Moon at Mrigashira (nak 5). Formula: `diff = (moon_nak − 5) % 27; tara = (diff % 9) + 1`. Maps 1–9 to Critical/Wealth/Danger/Prosperity/Obstacle/Achievement/Worst/Good/Best.
 
-### Panchanga (5 daily elements)
-- **Vara:** Day of week + ruling planet + that planet's current dignity and speed
-- **Tithi:** (Moon - Sun separation / 12°), numbered 1-30, with quality: Nanda/Bhadra/Jaya/Rikta/Purna
-- **Paksha:** SHUKLA (Tithi 1-15) or KRISHNA (Tithi 16-30)
-- **Nakshatra:** Moon's nakshatra (1-27), with lord, quality (Laghu/Ugra/Mridu etc.), pada
-- **Panchanga Yoga:** (Sun + Moon longitude) / (360/27), numbered 1-27, auspicious/inauspicious flagged
-- **Karana:** Half-tithi (60+ types simplified to movable 7 + fixed 4), with inauspicious flags
+**Vimshottari Dasha:** 120-year cycle computed from inception. Both Mahadasha and Antardasha for every historical day. Dasha lord's current dignity computed daily.
 
-### Tara Bala
-Computed from Nifty inception date (1996-04-22). Inception Moon fell in Mrigashira nakshatra (nak 5). For any given day:
-```
-diff = (moon_nak - 5) % 27
-tara = (diff % 9) + 1
-```
-Tara positions: 1=Critical, 2=Wealth, 3=Danger, 4=Prosperity, 5=Obstacle, 6=Achievement, 7=Worst, 8=Good, 9=Best.
+**Special conditions:** Gandanta (last 3°20' water → first 3°20' fire), Sandhi (last 1° of any sign), Graha Yuddha (planetary war within 1°), Sade Sati (Saturn in 12th/1st/2nd from natal Moon = Taurus), Ashtama Shani (Saturn in 8th = Sagittarius), Gajakesari, Papakartari, Panchaka.
 
-### Vimshottari Dasha
-Computed from inception date. 120-year cycle through 9 planets. Both Mahadasha and Antardasha computed for every historical day. Also computed: dasha lord's current dignity and dasha nature (benefic/malefic/neutral).
-
-### Special Conditions
-- **Gandanta:** Moon (or any planet) in the last 3°20' of water signs (4,8,12) or first 3°20' of fire signs (1,5,9). Water-fire junctions are considered unstable in Vedic tradition.
-- **Sandhi:** Moon in last 1° of any sign (sign boundary crossing).
-- **Graha Yuddha:** Planetary war — two planets within 1° longitude. Pairs checked: Me/Ve, Me/Ma, Ve/Ma, Ma/Ju, Ju/Sa.
-- **Sade Sati:** Saturn in 12th, 1st, or 2nd sign from natal Moon sign (Taurus, sign 2). Three phases: rising/peak/setting.
-- **Ashtama Shani:** Saturn in 8th sign from natal Moon (Sagittarius, sign 9).
-- **Gajakesari Yoga:** Jupiter and Moon in angular relationship (1st/4th/7th/10th from each other).
-- **Papakartari:** Moon hemmed between malefics (Su, Ma, Sa, Ra, Ke) on both sides.
-- **Panchaka:** Moon in nakshatras 23-27 (Dhanishtha through Revati). Considered inauspicious for starting new ventures.
-
-### Combustion
-Checked all planets against Sun using classical orbs: Mo=12°, Me=14°, Ve=10°, Ma=17°, Ju=11°, Sa=15°.
-
-### Planetary Aspects
-Parashari aspects (7th from every planet). Special aspects: Ma has 4th and 8th, Ju has 5th and 9th, Sa has 3rd and 10th, Ra/Ke have 5th and 9th. Computed Jupiter→Moon aspect and Saturn→Moon aspect flags.
-
-### Interaction Features (pre-engineered for pattern matching)
-Rather than waiting for the algorithm to discover 4-5 variable combinations, pre-built the most theoretically meaningful ones:
-- `ix_paksha_ju_dig` = paksha + Jupiter dignity
-- `ix_paksha_nak` = paksha + Moon nakshatra
-- `ix_paksha_moon_sign` = paksha + Moon sign
-- `ix_tithi_nak` = tithi quality + nakshatra quality
-- `ix_ju_dig_moon_sign` = Jupiter dignity + Moon sign
-- `ix_vara_paksha` = weekday ruler + paksha
-
-### Market Outcome Labels (for training — never used in signals)
-3-day forward returns bucketed into 5 bins:
-- STRONG_BULL: ret3 > +1.5%
+**Market outcome labels (used only for training, never in signals):**
+- STRONG_BULL: 3d fwd return > +1.5%
 - MILD_BULL: +0.5% to +1.5%
 - SIDEWAYS: ±0.5%
-- MILD_BEAR: -0.5% to -1.5%
-- STRONG_BEAR: ret3 < -1.5%
+- MILD_BEAR: −0.5% to −1.5%
+- STRONG_BEAR: < −1.5%
 - HIGH_VOL: daily range > 1.5× ATR(14)
-- REVERSAL: sign change in 3-day vs 1-day return
 
-**Lookahead audit:** Asserted that fwd_ret_1d, fwd_ret_3d, fwd_ret_5d are NaN for the last N rows of the dataframe (N = 1, 3, 5 respectively). No market data appears in any feature column.
+Lookahead audit passed: fwd_ret columns are NaN for the final N rows.
 
----
+### Step 2: Six Research Methods
 
-## Step 2: Six Research Methods
+**Total patterns examined: 151,050**
 
-**Files:** `new_step2.py` (Methods 1-2), `new_step2b.py` (Methods 3-6)
-**Total patterns examined:** 151,050
+**Method 1 — Outcome Fingerprint Matching:** For each STRONG_BULL/STRONG_BEAR/SIDEWAYS/HIGH_VOL/REVERSAL day, scanned k=1,2,3 feature combinations for conditions significantly over-represented on those days. Used vectorized key construction: `key = df[c1].astype(str) + '||' + df[c2].astype(str)`. Cap at k=3, top-20 features for k=3. Found 34,516 patterns.
 
-### Method 1: Outcome Fingerprint Matching
+**Method 2 — Reverse Condition Lookup:** For every possible value of every astrological feature, computed bull win rate, n, Wilson LB, Fisher p. Scanned k=1,2,3 combinations for 23 core features. Found 116,512 conditions.
 
-For each strong outcome (STRONG_BULL, STRONG_BEAR, SIDEWAYS, HIGH_VOL, REVERSAL), found all days with that outcome and identified what astrological conditions appeared significantly more often on those days than on all other days.
+**Method 3 — Clustering:** `scipy.cluster.vq.kmeans2` (not sklearn, which crashes on macOS with threadpoolctl bug) into 8 clusters. Computed bull rate, Wilson LB, dominant paksha/nakshatra/Jupiter dignity per cluster.
 
-Scanned k=1, 2, 3 variable combinations. Key optimization: for k=3, first pre-screened all individual columns with Fisher exact test at p<0.15, then only built 3-way combinations from the top 20 significant features. This cut computation from millions of combinations to ~34,000.
+**Method 4 — Planetary Cycle Detection:** For 9 classical periods (Moon synodic 29.5d, Venus synodic 161d, Rahu sign 390d, etc.), tested ACF significance, FFT power ratio, phase ANOVA. Found evidence for Moon monthly, Venus synodic, Rahu sign change.
 
-For each combination, computed:
-- `n` = count of days matching all conditions simultaneously
-- `k` = count of those days with the target outcome
-- Fisher exact p-value vs overall base rate
-- Wilson 95% confidence interval lower bound
+**Method 5 — Sequential Patterns:** After event X (new moon, Mercury retrograde, Gandanta, etc.), what happens at lag 1, 2, 3...N days? 182 event-lag tests. 5 survived p<0.05 before FDR.
 
-**Output:** `results/research/method1_pattern_library.csv` — 34,516 patterns
+**Method 6 — Anomaly Fingerprinting:** Days with |z-score| > 2.0 vs 20-day rolling baseline. Which astrological conditions predict anomaly days? 17 fingerprints found.
 
-### Method 2: Reverse Condition Lookup
+### Step 3: Validation
 
-Comprehensive scan: given every possible condition state for every feature, what is the bull win rate? Scanned the 23 most theoretically important features for k=1, 2, 3 combinations.
+**BH-FDR at 1% across ALL 151,050 p-values simultaneously:** Ranked all p-values, found threshold k such that p[k] ≤ k×0.01/151050. Result: 1,867 survivors.
 
-Why cap at k=3: C(23,5) = 33,649 combinations × each requires a groupby across 7,452 rows. At k=4 and k=5, this would take 10+ minutes and produce patterns with n<10 (unpublishable sample sizes). The pre-engineered ix_ interaction features already capture the most important 4-5 variable interactions explicitly.
+**Out-of-sample split fixed at 2018 before examining any results:**
+- Training: pre-2018 (5,373 rows)
+- OOS: 2018-present (2,079 rows)
 
-**Output:** `results/research/method2_reverse_lookup.csv` — 116,512 conditions
+Each FDR survivor must: (a) have n_oos ≥ 3, (b) maintain direction in OOS, (c) hold across 3 temporal sub-periods (pre-2010, 2010–2018, 2018-now).
 
-### Method 3: Astrological Cluster Analysis
+**Result: 170 confirmed patterns** from 151,050 total. Also saved: 1,697 discarded patterns (honest documentation of failures), bootstrap CIs, Monte Carlo 10k shuffles, regime robustness.
 
-Encoded 15 categorical features (paksha, tithi quality, Moon nakshatra, etc.) and 11 binary features (gajakesari, kemadruma, etc.) into a feature matrix. Used `scipy.cluster.vq.kmeans2` (not sklearn KMeans — macOS threadpoolctl bug in sklearn) to cluster 7,452 days into 8 groups.
+### Step 4: System Build + Forward Calendar
 
-For each cluster: computed n, bull rate, Wilson LB, dominant paksha, dominant nakshatra, dominant Jupiter dignity, and cluster character (BULL/NEUTRAL/BEAR based on deviation from base rate).
+**Composite score:** For each day, sum `max(0, WilsonLB − base_rate)` for all active BULL patterns, subtract sum for BEAR patterns. Score = 50 + net×100.
 
-**Why scipy instead of sklearn:** sklearn KMeans triggers a threadpoolctl `AttributeError: 'NoneType' object has no attribute 'split'` on macOS Sonoma when `OMP_NUM_THREADS=1`. scipy's vq module has no threadpool dependency.
+**Trade decision rules:**
+- ≥3 BULL patterns active, 0 BEAR → PRIME_TRADE_BULL
+- ≥3 BEAR patterns active, 0 BULL → PRIME_TRADE_BEAR
+- 1–2 active in either direction → WATCH
+- 0 active → NEUTRAL
 
-**Output:** `results/research/method3_clustering.csv` — 8 clusters
-
-### Method 4: Planetary Cycle Period Analysis
-
-For each classical planetary cycle period (Moon synodic 29.5d, Mercury synodic 116d, Venus synodic 161d, Rahu sign change 390d, etc.), checked three forms of evidence:
-1. **ACF:** Is the autocorrelation at lag=period significant (> 2/√N)?
-2. **FFT:** Is the power spectral density at that frequency elevated (> 3× mean)?
-3. **Phase ANOVA:** Does the market return differ significantly across the 4 phases of that cycle?
-
-Evidence found for: Moon monthly cycle (29.5 trading days), Venus synodic (161 days), Rahu sign change (390 days).
-
-**Output:** `results/research/method4_cycle_analysis.csv`
-
-### Method 5: Sequential Pattern Detection
-
-After event X (new moon, full moon, Mercury retrograde start, Gandanta, etc.), what happens to Nifty returns at lag 1, 2, 3... N days? Tested 182 event-lag combinations.
-
-The key idea: these are not same-day patterns. They are "after event X, the market tends to Y within N days." This is a different claim than "on days when X is active, the market does Y."
-
-5 survived p<0.05 before FDR.
-
-**Output:** `results/research/method5_sequential_patterns.csv`
-
-### Method 6: Anomaly Fingerprinting
-
-Defined anomaly days as: |z-score| > 2.0 where z is computed against a 20-day rolling mean and std. Found ~370 anomaly days in 7,452 total.
-
-Then asked: which astrological conditions appear significantly more often on anomaly days vs normal days? Scanned 20 features.
-
-**Output:** `results/research/method6_anomaly_fingerprints.csv` — 17 fingerprints
-
----
-
-## Step 3: Validation — The Gauntlet
-
-**File:** `new_step3.py`
-
-This is the step that separates real findings from noise. Three-layer filter.
-
-### Layer 1: Benjamini-Hochberg FDR at 1%
-
-The problem with scanning 151,050 patterns: at p<0.05, you expect ~7,500 false positives by pure chance. Reporting those would be dishonest.
-
-BH-FDR controls the **false discovery rate** — the expected proportion of reported findings that are false positives — across all tested hypotheses simultaneously.
-
-Algorithm:
-1. Collect all 151,050 p-values from Methods 1 and 2
-2. Sort ascending: p[1] ≤ p[2] ≤ ... ≤ p[m]
-3. Find the largest k where p[k] ≤ k × α / m (α = 0.01, m = 151,050)
-4. All p[1] through p[k] survive
-
-Result: **1,867 patterns survived** the 1% FDR filter (vs ~7,500 at naive p<0.05).
-
-### Layer 2: Out-of-Sample Test (2018 split)
-
-The 2018 split was chosen before examining any data and was never changed:
-- **Training:** All history before January 1, 2018 (5,373 rows)
-- **OOS:** January 1, 2018 onward (2,079 rows) — never touched during pattern finding
-
-For each of the 1,867 FDR survivors, evaluated on the OOS set:
-- Must have n_oos ≥ 3
-- Must maintain direction (bull pattern must show >50% bull rate in OOS)
-
-### Layer 3: Temporal Stability
-
-Split into three sub-periods: pre-2010, 2010-2018, 2018-now. A pattern that works in one era but not others is era-specific noise.
-
-### Result: 170 Confirmed Patterns
-
-From 151,050 total → 1,867 FDR survivors → **170 patterns confirmed** with OOS + temporal stability.
-
-Each confirmed pattern in the output has: feature names, condition values, n_train, k_train, win_rate_train, wilson_lower_train, p_value, fdr_result, n_oos, wr_oos, signal_dir, temporal_stability flag.
-
-Also produced:
-- `discarded_patterns.csv` — 1,697 patterns that failed OOS or temporal stability (honest documentation)
-- `banknifty_transfer.csv` — all 170 patterns tested on Bank Nifty data
-- `bootstrap_ci.csv` — bootstrap 95% CIs on win rates
-- `monte_carlo_results.csv` — 10,000 shuffle permutations to confirm patterns exceed chance
-- `regime_robustness.csv` — pattern win rates by market regime (bull/bear/sideways markets)
-
----
-
-## Step 4: System Build — Composite Score + Forward Calendar
-
-**File:** `new_step4.py`
-**Supporting module:** `astro_engine.py`
-
-### Composite Score
-
-For each trading day, the composite score aggregates all active confirmed patterns:
-
-```
-bull_score = Σ max(0, WilsonLB - base_rate)  for all active BULL patterns
-bear_score = Σ max(0, base_rate - WilsonLB)  for all active BEAR patterns
-net = bull_score - bear_score
-score = 50 + net × 100
-```
-
-Scale: 50 = neutral, >50 = bullish bias, <50 = bearish bias. Can exceed 0-100 range on extreme days.
-
-### Trade Decision Rules
-
-| Condition | Decision |
-|---|---|
-| ≥3 BULL patterns active, 0 BEAR | TRADE BULL |
-| ≥3 BEAR patterns active, 0 BULL | TRADE BEAR |
-| ≥1 of either direction active | WATCH |
-| 0 patterns active | NO TRADE |
-
-### Classification Labels for Calendar
-
-| Label | Condition |
-|---|---|
-| PRIME_TRADE_BULL | ≥3 bull patterns, 0 bear |
-| PRIME_TRADE_BEAR | ≥3 bear patterns, 0 bull |
-| WATCH_BULL | 1-2 bull patterns dominate |
-| WATCH_BEAR | 1-2 bear patterns dominate |
-| NEUTRAL | 0 active patterns |
-
-### Forward Calendar
-
-Iterated over every trading day in the next 12 months (252 days). For each date, used `astro_engine.get_planets_swisseph()` to compute planetary positions via pyswisseph (sidereal Lahiri ayanamsa), then `compute_day_features()` to compute all 316 astrological features, then matched against the 170 confirmed patterns.
-
-**Critical point:** The calendar uses zero market data. No prices. No volatility. No previous day returns. Only planetary positions computed from Swiss Ephemeris.
-
-**12-month forward calendar results (252 trading days):**
+**Forward calendar (252 trading days, pyswisseph only, zero market data):**
 
 | Classification | Count |
 |---|---|
@@ -278,143 +109,259 @@ Iterated over every trading day in the next 12 months (252 days). For each date,
 | WATCH_BEAR | 170 |
 | WATCH_BULL | 8 |
 | PRIME_TRADE_BULL | 0 |
-| NEUTRAL | 0 |
 
-**Why no PRIME_TRADE_BULL:** Under current planetary configuration (Jupiter exalted in Cancer, Saturn neutral in Pisces), the confirmed pattern `dig_Ju|dig_Sa = enemy||neutral` produces a SIDEWAYS/BEAR signal that is active for the entire period. No BULL confluence of 3+ patterns can form while this configuration persists.
+No PRIME_TRADE_BULL for the full year. Reason: under current Jupiter exalted in Cancer + Saturn neutral in Pisces, the `dig_Ju|dig_Sa = enemy||neutral` pattern (n=143, OOS wr=27%) is dominant. No 3-BULL confluence can form.
 
-Next PRIME_TRADE_BEAR: **2026-06-22** (Jupiter exact exaltation in Cancer + Moon in Hasta nakshatra + Shukla paksha + multiple confirming patterns)
+Next PRIME_TRADE_BEAR: **2026-06-22** (Jupiter exact exaltation, Moon in Hasta, Shukla paksha).
 
-### Backtest Summary
+### Step 5: HTML Outputs + Signal Generator
 
-Historical backtest on training data using PRIME_TRADE_BEAR signal threshold:
-- Trades taken: 47 (only PRIME_TRADE_BEAR days)
-- Win rate: 68.1% (bearish direction correct)
-- Wilson lower bound: 53.2% (worst-case realistic)
-- vs base rate: 44.9% bearish (Nifty rises 55.1% of days)
+`report.html` and `calendar.html` — dark theme interactive reports. `generate_signal.py` now imports from `astro_engine.py` (a side-effect-free importable module). Tested on 5 historical dates:
 
-Stress test periods reviewed: pre-2010 shows similar pattern, 2010-2018 shows pattern hold, 2018-now (OOS) confirms at 63% direction accuracy for PRIME_TRADE_BEAR.
-
----
-
-## Step 5: HTML Outputs
-
-**File:** `new_step5.py`
-**Outputs:** `report.html`, `calendar.html`
-
-Both files use a dark theme (#0d1117 background, #58a6ff accent). `report.html` contains:
-- Summary statistics (n patterns examined, FDR survivors, confirmed, OOS accuracy)
-- Top confirmed patterns table (sortable by Wilson LB, OOS win rate, n)
-- Discarded pattern summary (honest account of what failed)
-- Cycle analysis results
-- Backtest equity curve description
-- Methodology section explaining Wilson CI and BH-FDR
-
-`calendar.html` shows the 12-month forward calendar as an interactive month-grid. Each day is color-coded: deep red = PRIME_TRADE_BEAR, orange = WATCH_BEAR, green = WATCH_BULL, dark green = PRIME_TRADE_BULL, grey = NEUTRAL. Clicking a day shows its active patterns with WilsonLB and n.
+| Date | Context | Signal | Score |
+|---|---|---|---|
+| 2008-10-24 | 2008 crash | TRADE BEAR | −239 |
+| 2020-03-23 | COVID low | TRADE BEAR | −324 |
+| 2021-02-01 | Post-vaccine | WATCH | 12.5 |
+| 2023-06-05 | Range-bound | WATCH | 12.5 |
+| 2025-01-15 | Ju in Gemini | TRADE BEAR | −296 |
 
 ---
 
-## astro_engine.py — The Importable Engine
+## Part 3: Fix 1 — Missing Features (COMPLETE, 2026-06-13)
 
-**Problem:** `new_step4.py` had top-level code (loading confirmed patterns, running backtest, building the calendar) that executed at module import time. When `generate_signal.py` imported from it, the entire step4 pipeline re-ran, taking several minutes.
+**File:** `fix1_enrich.py`
 
-**Fix:** Created `astro_engine.py` — a standalone module containing only the pure helper functions:
-- `get_planets_swisseph(d)` — compute sidereal positions via pyswisseph for any date
-- `compute_day_features(d, positions)` — compute all 316 astrological features for a date
-- `compute_vimshottari(target_date)` — Vimshottari dasha from inception date
-- `dignity(planet, sid_deg)` — 9-level dignity
-- `speed_cat(planet, spd)` — speed category
-- All constants: PLANETS, NAK_NAMES, YOGA_NAMES, DASHA_NATURE, etc.
+Added 37 new columns to both enriched CSVs. New total: **353 columns** (was 316).
 
-No top-level execution code. Safe to import anywhere. `generate_signal.py` now imports from here.
+**What was added:**
+
+| Feature | How computed | Why it matters |
+|---|---|---|
+| `nak_{p}` (9 planets) | `int(sid_deg / (360/27)) + 1` | Each planet's nakshatra, not just Moon's |
+| `own_nak_{p}` (9 planets) | Planet's nak ∈ its 3 Vimshottari-ruled naks | Strength indicator: planet in its own domain |
+| `argala_positive` | Any planet in 2nd/4th/11th from Moon sign | Positive intervention on Moon |
+| `argala_obstruct` | Any planet in 3rd/5th/12th from Moon sign | Virodha argala — blocks Moon's significations |
+| `argala_net` | argala_positive − argala_obstruct (−1/0/+1) | Net argala balance |
+| `vipareeta_raja` | Debilitated planet in 6th/8th/12th from Moon | Neecha planet gains strength in dusthana |
+| `cheshta_cat_{p}` (9 planets) | Explicit speed string: retrograde/stationary/very_fast/fast/mean/mean_slow/slow | Cheshta Bala — retrograde planets have highest cheshta |
+| `true_node_diff` | True node − mean node via pyswisseph (degrees) | Nodal oscillation: true node swings ±1.5° around mean |
+| `true_node_cat` | Bucketed: far_behind/behind/aligned/ahead/far_ahead | True node phase vs mean node |
+| `ix_ju_speed_dig` | `cheshta_cat_Ju + '_' + dig_Ju` | Jupiter's speed × dignity interaction |
+| `ix_sa_speed_dig` | `cheshta_cat_Sa + '_' + dig_Sa` | Saturn's speed × dignity interaction |
+| `ix_own_nak_ju_paksha` | `own_nak_Ju + '_' + paksha` | Jupiter in own nakshatra × paksha |
+| `ix_argala_paksha` | `argala_net + '_' + paksha` | Net argala × paksha |
+
+**Own nakshatra assignment (Vimshottari lords):**
+Ke: naks 1,10,19 | Ve: 2,11,20 | Su: 3,12,21 | Mo: 4,13,22 | Ma: 5,14,23
+Ra: 6,15,24 | Ju: 7,16,25 | Sa: 8,17,26 | Me: 9,18,27
 
 ---
 
-## generate_signal.py — Daily Signal Output
+## Part 4: Fix 2 — Uncapped Fingerprint Relaxation (RUNNING, 2026-06-13)
 
-**Input:** A date (YYYY-MM-DD). Defaults to today if not provided.
+**File:** `fix2_fingerprint.py`
 
-**Output printed to terminal:**
-1. Full Panchanga for the date (Vara, Tithi, Paksha, Nakshatra, Yoga, Karana, Hora, Choghadiya)
-2. Planetary states table (sign, degree, dignity, retrograde, combust for all 9 planets)
-3. Dasha state (Mahadasha, Antardasha, dasha lord dignity, Sade Sati status)
-4. Special conditions active (Gajakesari, Papakartari, Gandanta, Mercury retrograde, etc.)
-5. All active confirmed patterns (feature = value, WilsonLB, n, p-value, OOS win rate)
-6. Composite score calculation (bull component, bear component, net, 0-100 score)
-7. Trade decision (TRADE BULL / TRADE BEAR / WATCH / NO TRADE)
-8. Next 10 PRIME_TRADE windows from the forward calendar
+The original Method 1 had two artificial limits: k=3 maximum and only top-20 features for k=3. Both caused missed bull patterns.
 
-**Test results on 5 historical dates:**
+**Correct algorithm:**
+For each positive-outcome day (e.g., STRONG_BULL):
+1. Collect all features where that day's specific value has Fisher p < 0.35 for the outcome.
+2. Sort by significance (lowest p first). This gives an ordered "fingerprint" for the day.
+3. Check how many other positive-outcome days share ALL features in the fingerprint.
+4. If fewer than 5, drop the least significant feature (last in sorted list) and retry.
+5. Repeat until ≥5 positive days share the combination.
+6. Record the pattern. Mark all matching positive days as "explained."
+7. Move to the next unexplained positive day.
 
-| Date | Market Context | Signal | Score | Active Bear Patterns |
+This discovers patterns of any complexity — k=4, 5, 6+ when needed. No cap.
+
+**Results so far (RUNNING — on is_bull scan):**
+
+| Outcome | Positive days | Patterns found | % explained | Time |
 |---|---|---|---|---|
-| 2008-10-24 | 2008 crash | TRADE BEAR | -239 | 11 |
-| 2020-03-23 | COVID crash low | TRADE BEAR | -324 | 14 |
-| 2021-02-01 | Post-vaccine rally | WATCH | 12.5 | 1 |
-| 2023-06-05 | Range-bound | WATCH | 12.5 | 1 |
-| 2025-01-15 | Jupiter in Gemini | TRADE BEAR | -296 | 9 |
+| STRONG_BULL | 1,840 | 345 | 100% | 75s |
+| STRONG_BEAR | 1,502 | 323 | 100% | 88s |
+| SIDEWAYS | 1,479 | 295 | 100% | 47s |
+| HIGH_VOL | 592 | 112 | 100% | 9s |
+| is_bull | 4,107 | running… | — | — |
 
-The two historically severe crash dates (2008-10-24, 2020-03-23) both produce strong TRADE BEAR signals — not because the system was told these were crashes, but because those planetary configurations activated the most bear patterns. This is the only honest validation possible.
+100% of positive days are being explained — the algorithm always finds a minimal combination that groups ≥5 days, even if it has to drop down to a single-feature fingerprint.
 
-**Today (2026-06-13) signal:**
-- Saturn neutral dignity → 1 bear pattern active
-- Score: 12.1 (WATCH)
-- Sade Sati active (rising phase) for Nifty's natal Moon
-- Next PRIME_TRADE_BEAR: 2026-06-22
+Also running: uncapped Method 2 scan (k=1,2,3 on all sig_cols, not capped at 20).
 
 ---
 
-## Key Technical Decisions
+## Part 5: Fix 3 — Bull/Bear Asymmetry Root Cause (COMPLETE, 2026-06-13)
 
-**Why Wilson CI instead of raw win rate:** A pattern with 10/12 bullish days (83%) and a pattern with 400/600 bullish days (67%) look very different in raw win rate. Wilson CI lower bound (95%) accounts for sample size — the first pattern gets LB≈0.52, the second gets LB≈0.62. The second pattern is more reliable despite lower raw win rate. Wilson LB is the "worst-case realistic" win rate at 95% confidence.
+**File:** `fix3_bull_bear.py`
 
-**Why BH-FDR at 1% not 5%:** At 5%, an expected ~7,500 false discoveries from 151,050 tests. At 1%, expected ~1,500 false discoveries from 1,867 survivors = ~80% are true positives. Still not perfect, but defensible.
+The 170 confirmed patterns had 9 BULL and 161 BEAR. Three causes identified:
 
-**Why the 2018 split was fixed before looking at data:** If you choose the split after seeing results, you can cherry-pick a split that flatters your in-sample findings. The split must be chosen before looking at any validation statistics.
+**Cause A: Training era planetary bias.**
+Jupiter was in enemy dignity (Taurus, Gemini, Aries) for 35.7% of training days. Saturn was in enemy dignity for 33.3%. These are common combinations that produce low bull rates → most surviving patterns are "conditions where Nifty goes down."
 
-**Why the forward calendar has no PRIME_TRADE_BULL:** This is honest, not a bug. Under Jupiter exalted + Saturn neutral, the confirmed patterns skew bear. A system that forces bull and bear balance would be dishonest. The calendar reports what the validated patterns say.
+| dig_Ju | Train % | OOS % |
+|---|---|---|
+| enemy | 35.7% | 32.4% |
+| friendly | 24.5% | 23.7% |
+| own | 14.9% | 20.3% |
+| exalted | 9.5% | 2.0% |
+
+Jupiter in enemy dignity dominated the training period. Every combination including `dig_Ju=enemy` tends to show wr < 55% → classified as BEAR.
+
+**Cause B: Scanning asymmetry.**
+The `fast_scan()` function ran on `is_bull` with `min_wlb=0.58` for BULL patterns. But it never filtered the LOW side. A condition with wr=35% on n=200 has p<0.05 and passes the FDR filter → lands in confirmed patterns as a BEAR signal. There was no explicit BEAR scan — the BEAR patterns emerged as a side-effect of the BULL scan.
+
+- Bear patterns with wr_train < 0.40: **107** (66% of all bear patterns)
+- Their mean n_train: 477 — large sample, low bull rate, statistically certain
+
+**Cause C: k=3 cap eliminated complex bull patterns.**
+Complexity distribution of 170 confirmed patterns:
+
+| Complexity | BULL | BEAR |
+|---|---|---|
+| k=1 | 0 | 8 |
+| k=2 | 0 | 54 |
+| k=3 | 9 | 99 |
+
+All 9 BULL patterns are k=3. Zero BULL patterns at k=1 or k=2. This is the tell: bull patterns in astrology require multiple conditions simultaneously (paksha AND Jupiter dignity AND nakshatra AND...). The k=3 cap cut off the search exactly where bull patterns live. Fix 2's uncapped fingerprint will find them.
 
 ---
 
-## What This System Is and Is Not
+## Part 6: Fix 4 — Bank Nifty Full Independent Research (RUNNING, 2026-06-13)
 
-**Is:**
-- A pattern-recognition system that finds astrological configurations statistically associated with Nifty 50 direction over 30 years of data
-- Validated with proper multiple testing correction and out-of-sample testing
-- Forward-looking (uses only planetary positions, no market data)
-- Honest about confidence intervals and sample sizes
+**File:** `fix4_banknifty_full.py`
 
-**Is not:**
-- A predictive model with high accuracy (base rate 55%, best confirmed patterns reach ~70% in training, ~65% OOS)
-- A complete astrological system (only the patterns that survived statistical validation are used)
-- Guaranteed to work in future regimes (planetary configurations that haven't occurred in 30 years are extrapolation)
-- A replacement for risk management (Wilson LB gives worst-case win rate, not expected win rate)
+Previous Bank Nifty work only tested Nifty's confirmed patterns on Bank Nifty data. This runs the complete 6-method research independently on Bank Nifty from scratch.
+
+**Why this matters:** Bank Nifty is a bank-sector index. Certain planetary configurations (e.g., Mercury dignity, Venus dignity) may affect bank stocks differently from the broad market. Universal patterns (those confirmed on both instruments) are more trustworthy than Nifty-only patterns.
+
+**Methodology:** Same 6 methods, same BH-FDR at 1%, same 2018 OOS split. Bank Nifty has 5,161 rows from 2000 onward (vs Nifty's 7,452 from 1996). Same feature pool (353 columns after Fix 1).
+
+**Output will include:**
+- `bnk_confirmed_patterns.csv` — BankNifty's own confirmed patterns
+- `cross_instrument_comparison.csv` — universal vs Nifty-only vs BankNifty-only patterns
+
+Universal patterns = confirmed independently on both instruments = highest confidence.
 
 ---
 
-## Files Created or Modified in This Rebuild
+## Part 7: Fix 5 — Validate Methods 3–6 with Full Rigor (PENDING)
 
-| File | Description |
+**File:** `fix5_validate_all.py`
+
+The original validation pipeline only applied BH-FDR + OOS to Methods 1 and 2. Methods 3–6 findings were never formally validated.
+
+**What this does:**
+1. Pools ALL p-values from ALL methods into one global pool
+2. Applies BH-FDR at 1% across the entire combined pool
+3. OOS-validates every FDR survivor from M3–6
+4. Adds new confirmed patterns to `confirmed_patterns.csv`
+
+**Method adaptations for validation:**
+- M3 (clusters): cluster membership → is_bull rate → Fisher p included in pool
+- M4 (cycles): phase ANOVA p-values included in pool; survivors get forward-calendar cycle-phase signals
+- M5 (sequential): lag-conditioned patterns get OOS test: "after event X at lag N, does OOS data confirm?"
+- M6 (anomaly): anomaly-rate conditions get re-tested for is_bull direction; only included if both anomaly prediction AND bull/bear direction survive
+
+---
+
+## Key Findings Summary
+
+### What the Data Says About Nifty
+
+**The structural finding:** Paksha modifies everything. The same nakshatra, sign, and dignity combination gives opposite results depending on whether it falls in KRISHNA (dark half) or SHUKLA (bright half) of the lunar month.
+
+**Jupiter dignity overrides nakshatra.** Nakshatra quality is meaningless without knowing Jupiter's sign. Mula nakshatra with Jupiter in own sign → 68.8% bull. Mula with Jupiter exalted → 36.5% bear. Jupiter exalted in Cancer is NOT a bull signal — it is bearish when combined with most other configurations, because exaltation in Cancer puts Jupiter opposite Capricorn where it would aspect its debilitation sign directly.
+
+**The strongest confirmed patterns (top 5 by Wilson LB):**
+
+| Features | Condition | n | WLB | OOS wr | Direction |
+|---|---|---|---|---|---|
+| dig_Mo\|dig_Me\|ix_paksha_ju_dig | neutral\|\|friendly\|\|KRISHNA_enemy | 101 | 0.671 | 0.767 | BULL |
+| dig_Mo\|dig_Ve\|dig_Me | neutral\|\|enemy\|\|enemy | 113 | 0.618 | 0.690 | BULL |
+| dig_Mo\|dig_Me\|sade_sati_phase | neutral\|\|enemy\|\|none | 174 | 0.600 | 0.659 | BULL |
+| dig_Ju\|dig_Ma\|mahadasha | enemy\|\|friendly\|\|Ra | 306 | 0.589 | 0.730 | BULL |
+| dig_Ju\|dig_Mo\|dig_Me | enemy\|\|neutral\|\|friendly | 234 | 0.587 | 0.662 | BULL |
+
+**Counterintuitive confirmed findings:**
+- Jupiter exalted alone = bearish (wr < base rate in most combinations)
+- Kemadruma (Moon isolated) under KRISHNA paksha is NOT bearish — multiple patterns show it as bullish context
+- Sade Sati phase = 'none' (not in Sade Sati at all) appears in BULL patterns — Sade Sati active is a mild bear condition
+- Saturn neutral (Pisces) is bearish: `dig_Sa=neutral` → wr 27%, n=798 in OOS
+
+### What the Calendar Is Saying Now (2026-06-13)
+
+Current planetary setup:
+- Sun in Taurus — enemy dignity
+- Moon in Taurus — exalted
+- Mercury in Gemini — own sign
+- Venus in Cancer — enemy
+- Mars in Aries — own
+- Jupiter in Cancer — **exact exaltation** (2°)
+- Saturn in Pisces — neutral dignity
+- Rahu in Aquarius — friendly
+- Ketu in Leo — enemy
+
+Active conditions: Sade Sati rising (Saturn in Aries = 12th from Taurus natal Moon). Jupiter exactly exalted. `dig_Ju=exact_exalt || dig_Sa=neutral` → BEAR pattern active.
+
+**Next 10 PRIME_TRADE_BEAR dates:** 2026-06-22, 2026-06-23, 2026-07-07 through 2026-07-16.
+**PRIME_TRADE_BULL in next 12 months:** 0.
+
+---
+
+## Technical Decisions and Why
+
+**Wilson CI lower bound instead of raw win rate:** A pattern with 10/12 bullish days (83%) and one with 400/600 (67%) look different. Wilson LB at 95%: first pattern gets 0.52 (barely above chance), second gets 0.62 (reliable). Sample size is penalized automatically.
+
+**BH-FDR at 1% not 5%:** At 5%, ~7,500 false discoveries from 151,050 tests. At 1%, ~1,500 false discoveries from 1,867 survivors — roughly 80% are true positives. Tighter but defensible.
+
+**2018 OOS split fixed before looking at data:** Post-hoc split selection is a form of data leakage. The split was specified in the prompt and never moved.
+
+**pyswisseph only for forward signals:** No market prices, no volatility, no previous returns. The forward calendar is astronomically determined. This is what makes it actually forward-looking.
+
+**scipy.cluster.vq.kmeans2 not sklearn KMeans:** macOS Sonoma sklearn KMeans crashes with `threadpoolctl AttributeError: 'NoneType' has no attribute 'split'`. scipy's vq module has no threading dependency.
+
+**Vectorized key construction:** `key = df[c1].astype(str) + '||' + df[c2].astype(str)` instead of `df[combo].apply(lambda r: '||'.join(r), axis=1)`. The latter is Python-level row iteration; the former is C-level vectorized string concat. ~50× faster.
+
+---
+
+## File Manifest
+
+| File | What it does |
 |---|---|
 | `new_step1.py` | Feature engineering — 316 columns from 9 planet degrees |
-| `new_step2.py` | Research methods 1-2 (fingerprint matching + reverse lookup) |
-| `new_step2b.py` | Research methods 3-6 (clustering, cycle, sequential, anomaly) |
+| `new_step2.py` | Research methods 1–2 (original k=3 capped) |
+| `new_step2b.py` | Research methods 3–6 (clustering, cycle, sequential, anomaly) |
 | `new_step3.py` | Validation: BH-FDR, OOS split, temporal stability |
 | `new_step4.py` | Composite score, backtest, forward calendar |
 | `new_step5.py` | HTML report and calendar generation |
 | `astro_engine.py` | Importable Vedic astrology engine (no side effects) |
-| `generate_signal.py` | Daily signal generator (now imports from astro_engine) |
-| `CHECKLIST.md` | 104/104 items complete |
-| `data/nifty_enriched.csv` | 7,452 × 316 feature matrix |
-| `data/banknifty_enriched.csv` | 5,161 × 316 feature matrix |
-| `results/research/method1_pattern_library.csv` | 34,516 patterns from fingerprint matching |
-| `results/research/method2_reverse_lookup.csv` | 116,512 conditions from reverse lookup |
-| `results/research/method3_clustering.csv` | 8 cluster profiles |
-| `results/research/method4_cycle_analysis.csv` | 9 planetary cycle tests |
-| `results/research/method5_sequential_patterns.csv` | 182 sequential tests |
-| `results/research/method6_anomaly_fingerprints.csv` | 17 anomaly fingerprints |
-| `results/validation/confirmed_patterns.csv` | 170 validated patterns |
-| `results/validation/discarded_patterns.csv` | 1,697 discarded (failed OOS/stability) |
-| `results/validation/banknifty_transfer.csv` | 170 patterns tested on Bank Nifty |
-| `results/forward_calendar/planetary_calendar_1yr.csv` | 252-day forward calendar |
-| `report.html` | Dark theme interactive research report |
-| `calendar.html` | 12-month forward trade calendar |
+| `generate_signal.py` | Daily signal generator |
+| `fix1_enrich.py` | Adds 37 new features → 353 columns |
+| `fix2_fingerprint.py` | Uncapped fingerprint relaxation + full M2 scan |
+| `fix3_bull_bear.py` | Bull/bear asymmetry investigation |
+| `fix4_banknifty_full.py` | Full 6-method research on Bank Nifty independently |
+| `fix5_validate_all.py` | Pools all M1–6 p-values, combined BH-FDR, merges confirmed |
+| `data/nifty_enriched.csv` | 7,452 × 353 |
+| `data/banknifty_enriched.csv` | 5,161 × 353 |
+| `results/validation/confirmed_patterns.csv` | Currently 170; will grow after Fix 5 |
+| `results/research/method1_fp_uncapped.csv` | Fix 2 output — uncapped fingerprints |
+| `results/research/method2_full.csv` | Fix 2 output — uncapped k=1,2,3 scan |
+| `results/validation/bnk_confirmed_patterns.csv` | Fix 4 output |
+| `results/validation/cross_instrument_comparison.csv` | Fix 4 output — universal vs instrument-specific |
+| `results/validation/m3m6_validated.csv` | Fix 5 output — M3–6 survivors |
+| `results/validation/fdr_pool_all.csv` | Fix 5 output — full combined FDR pool |
+
+---
+
+## What Remains After Fixes
+
+When Fix 2, 4, 5 complete and the forward calendar and HTML are regenerated:
+
+- Confirmed patterns will include M3–6 survivors and uncapped fingerprints — expected to add more BULL patterns
+- Bank Nifty will have its own validated pattern set
+- Universal patterns (Nifty + BankNifty confirmed) will be the highest-confidence trade signals
+- The forward calendar will be rebuilt with the updated pattern set
+- CHECKLIST.md will be updated
