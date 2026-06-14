@@ -1,2 +1,2 @@
 n_trades,win_rate,mean_ret_per_trade,sharpe,max_drawdown,threshold,note
-7449,0.5442,0.00155,0.57,-0.9044,50,Pure astrological signals only — no market data in signal
+7449,0.5445,0.00156,0.57,-0.9044,50,Pure astrological signals only — no market data in signal

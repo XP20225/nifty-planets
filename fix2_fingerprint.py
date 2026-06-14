@@ -44,42 +44,42 @@ for c in outcome_cols:
 N = len(df_clean)
 print(f"  Clean rows: {N}")
 
-CAT_FEATURES = [c for c in [
-    'paksha','tithi_quality','moon_phase','nak_mo_name','nak_mo_qual',
-    'yoga_quality','karana_quality','vara_lord','vara_dig',
-    'dig_Ju','dig_Sa','dig_Mo','dig_Ma','dig_Ve','dig_Me','dig_Su',
-    'dig_Ra','dig_Ke',
-    'elem_Mo','mod_Mo','tara_quality','tara_name','mahadasha','antardasha',
-    'sade_sati_phase','nakl_dig','nakl_spd','choghadiya_quality','hora_at_open',
-    'ix_paksha_ju_dig','ix_paksha_nak','ix_paksha_moon_sign',
-    'ix_tithi_nak','ix_ju_dig_moon_sign','ix_vara_paksha',
-    'ix_ju_speed_dig','ix_sa_speed_dig','ix_own_nak_ju_paksha','ix_argala_paksha',
-    'true_node_cat','cheshta_cat_Ju','cheshta_cat_Sa','cheshta_cat_Mo',
-    'cheshta_cat_Me','cheshta_cat_Ve',
-    'atmakaraka','amatyakaraka','graha_yuddha_pair',
-] if c in df_clean.columns]
+# ── Auto-discover all astrological feature columns ────────────────────────────
+# Exclude: market data, outcome flags, forward returns, raw identifiers
+EXCLUDE_PREFIXES = ('open','high','low','close','volume','fwd_','ret_',
+                    'is_','log_','range_','atr','date','sid_','sign_',
+                    'nak_Su','nak_Mo','nak_Ma','nak_Me','nak_Ju','nak_Ve',
+                    'nak_Sa','nak_Ra','nak_Ke','prior_ret')
+EXCLUDE_EXACT = {'index','oc','signal','outcome_3d'}
 
-BIN_FEATURES = [c for c in [
-    'gajakesari','kemadruma','papakartari','shubhakartari',
-    'chandra_mangala','sakata','neecha_bhanga','argala_positive',
-    'argala_obstruct','vipareeta_raja',
-    'parivartana_any','graha_yuddha',
-    'comb_Mo','comb_Me','comb_Ve','comb_Ma','comb_Ju',
-    'retro_Me','retro_Ju','retro_Sa','retro_Ma','retro_Ve',
-    'gand_Mo','gand_any','sandhi_mo','nak_transition','panchaka',
-    'sade_sati','ashtama_shani','ju_asp_mo','sa_asp_mo','ma_asp_mo',
-    'own_nak_Ju','own_nak_Mo','own_nak_Sa','own_nak_Me','own_nak_Ve',
-    'own_nak_Ma','own_nak_Su',
-    'digbala_Ju','digbala_Sa','digbala_Mo',
-] if c in df_clean.columns]
+# Categorical features: string dtype OR numeric with cardinality > 2
+# Binary features: numeric 0/1 columns (converted to "col=0"/"col=1" strings)
+CAT_FEATURES = []
+BIN_FEATURES = []
 
+for col in df_clean.columns:
+    if col.startswith(EXCLUDE_PREFIXES) or col in EXCLUDE_EXACT:
+        continue
+    s = df_clean[col]
+    if s.dtype == object:
+        CAT_FEATURES.append(col)
+    else:
+        vals = set(s.dropna().unique())
+        if vals <= {0, 1, 0.0, 1.0}:
+            BIN_FEATURES.append(col)    # pure binary → stringify with prefix
+        elif len(vals) <= 15:
+            CAT_FEATURES.append(col)    # small-cardinality numeric → treat as cat
+        # else: skip high-cardinality numeric (raw degrees etc.)
+
+# Convert binary columns to string form for pattern matching
 for col in BIN_FEATURES:
-    if (col + '_s') not in df_clean.columns:
-        df_clean[col + '_s'] = col + '=' + df_clean[col].astype(str)
+    sname = col + '_s'
+    if sname not in df_clean.columns:
+        df_clean[sname] = col + '=' + df_clean[col].astype(str)
 
 BIN_STR_FEAT = [c + '_s' for c in BIN_FEATURES if (c + '_s') in df_clean.columns]
 ALL_FEAT = CAT_FEATURES + BIN_STR_FEAT
-print(f"  Feature pool: {len(ALL_FEAT)} columns")
+print(f"  Feature pool: {len(ALL_FEAT)} columns  ({len(CAT_FEATURES)} cat + {len(BIN_FEATURES)} bin)")
 
 
 def fingerprint_relaxation(df_clean, outcome_col, all_feat, min_n=MIN_N, screen_p=SCREEN_P):

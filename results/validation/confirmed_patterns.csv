@@ -333,3 +333,4 @@ dig_Sa|elem_Mo,neutral||F,SIDEWAYS,,method1,BULL,156,90,0.5769,0.4985,,0.0001282
 paksha|dig_Sa,SHUKLA||neutral,SIDEWAYS,,method1,BEAR,315,161,0.5111,0.4561,,7.2e-06,387,203,0.5245,0.4748,True,0.4813,0.6081,0.5245,True,False
 dig_Ju|elem_Mo,own||W,unknown,,method2,BEAR,207,86,0.4155,0.3505,,4.769e-05,108,52,0.4815,0.3895,True,0.3904,0.4754,0.4815,True,False
 dig_Ju|mod_Mo,own||D,unknown,,method2,BEAR,270,113,0.4185,0.3612,,9.007e-05,145,77,0.531,0.4501,True,0.396,0.4853,0.531,True,False
+dig_Ju|dig_Ma|dig_Ve,own||neutral||neutral,STRONG_BEAR,,method1,BEAR,60,18,0.3,0.199,,0.00013013,34,14,0.4118,0.2637,True,0.3019,0.2857,0.4118,True,False
