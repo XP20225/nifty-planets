@@ -1,0 +1,9 @@
+cluster,n,bull_rate,wilson_lower,p_value,character,top_paksha,top_nak,top_ju
+0,609,0.5271,0.4874,0.488569,NEUTRAL,KRISHNA,Ardra,enemy
+1,403,0.5658,0.517,0.298383,NEUTRAL,SHUKLA,Jyeshtha,enemy
+2,205,0.5902,0.5219,0.153072,NEUTRAL,SHUKLA,PurvaAshadha,own
+3,681,0.5551,0.5175,0.433152,NEUTRAL,KRISHNA,Rohini,enemy
+4,294,0.517,0.46,0.399712,NEUTRAL,KRISHNA,UttaraPhalguni,enemy
+5,256,0.4805,0.42,0.053453,BEAR,KRISHNA,PurvaPhalguni,enemy
+6,1552,0.5341,0.5093,0.542473,NEUTRAL,KRISHNA,Revati,enemy
+7,1161,0.5504,0.5217,0.461965,NEUTRAL,KRISHNA,Dhanishtha,own

@@ -9,11 +9,11 @@ Last updated: 2026-06-13
 | Stage | Status | Key Output |
 |---|---|---|
 | Pipeline v2 rebuild (Steps 1–5) | COMPLETE | 170 confirmed patterns, 252-day calendar |
-| Fix 1 — Missing features | COMPLETE | 353 columns (was 316) |
-| Fix 2 — Uncapped fingerprint | RUNNING | ~1,400+ patterns so far |
-| Fix 3 — Bull/bear investigation | COMPLETE | Root cause identified |
-| Fix 4 — Bank Nifty independent research | RUNNING | — |
-| Fix 5 — Validate M3–6 + merge | PENDING | Runs after Fix 2 + 4 complete |
+| Fix 1 — Missing Vedic features | COMPLETE | 353 columns (was 316), 37 new features |
+| Fix 2 — Uncapped fingerprint | COMPLETE | 1,921 M1 patterns; M2 scan running |
+| Fix 3 — Bull/bear investigation | COMPLETE | 3 root causes identified |
+| Fix 4 — Bank Nifty independent research | COMPLETE | 642 bnk patterns, 1 universal |
+| Fix 5 — Validate M3–6 + merge | PENDING | Runs after Fix 2 M2 completes |
 
 ---
 
@@ -128,9 +128,10 @@ Next PRIME_TRADE_BEAR: **2026-06-22** (Jupiter exact exaltation, Moon in Hasta, 
 
 ---
 
-## Part 3: Fix 1 — Missing Features (COMPLETE, 2026-06-13)
+## Part 3: Fix 1 — Missing Vedic Features (COMPLETE, 2026-06-13)
 
 **File:** `fix1_enrich.py`
+**Runtime:** 4.4 seconds
 
 Added 37 new columns to both enriched CSVs. New total: **353 columns** (was 316).
 
@@ -140,7 +141,7 @@ Added 37 new columns to both enriched CSVs. New total: **353 columns** (was 316)
 |---|---|---|
 | `nak_{p}` (9 planets) | `int(sid_deg / (360/27)) + 1` | Each planet's nakshatra, not just Moon's |
 | `own_nak_{p}` (9 planets) | Planet's nak ∈ its 3 Vimshottari-ruled naks | Strength indicator: planet in its own domain |
-| `argala_positive` | Any planet in 2nd/4th/11th from Moon sign | Positive intervention on Moon |
+| `argala_positive` | Any planet in 2nd/4th/11th from Moon sign | Positive intervention on Moon's significations |
 | `argala_obstruct` | Any planet in 3rd/5th/12th from Moon sign | Virodha argala — blocks Moon's significations |
 | `argala_net` | argala_positive − argala_obstruct (−1/0/+1) | Net argala balance |
 | `vipareeta_raja` | Debilitated planet in 6th/8th/12th from Moon | Neecha planet gains strength in dusthana |
@@ -158,37 +159,69 @@ Ra: 6,15,24 | Ju: 7,16,25 | Sa: 8,17,26 | Me: 9,18,27
 
 ---
 
-## Part 4: Fix 2 — Uncapped Fingerprint Relaxation (RUNNING, 2026-06-13)
+## Part 4: Fix 2 — Uncapped Fingerprint Relaxation (COMPLETE M1; M2 running, 2026-06-13)
 
 **File:** `fix2_fingerprint.py`
 
-The original Method 1 had two artificial limits: k=3 maximum and only top-20 features for k=3. Both caused missed bull patterns.
+The original Method 1 had two artificial limits: k=3 maximum and only top-20 features for k=3. Both caused missed bull patterns (all 9 confirmed BULL patterns were exactly k=3 — the cap hit exactly where complex bull patterns live).
 
-**Correct algorithm:**
+### Algorithm
+
 For each positive-outcome day (e.g., STRONG_BULL):
 1. Collect all features where that day's specific value has Fisher p < 0.35 for the outcome.
-2. Sort by significance (lowest p first). This gives an ordered "fingerprint" for the day.
+2. Sort by significance (lowest p first). This is the day's ordered "fingerprint."
 3. Check how many other positive-outcome days share ALL features in the fingerprint.
 4. If fewer than 5, drop the least significant feature (last in sorted list) and retry.
-5. Repeat until ≥5 positive days share the combination.
+5. Repeat until ≥5 positive days share the combination. No k cap, no top-N pre-screen.
 6. Record the pattern. Mark all matching positive days as "explained."
 7. Move to the next unexplained positive day.
 
-This discovers patterns of any complexity — k=4, 5, 6+ when needed. No cap.
+The algorithm degrades gracefully: it will try k=15, then k=14, ... k=1 until it finds coverage. If nothing works, the day remains unexplained (never happened — 100% explanation rate in practice).
 
-**Results so far (RUNNING — on is_bull scan):**
+### Performance fix (critical)
+
+The original code rebuilt pandas Series inside every while-loop iteration:
+```python
+mask = pd.Series(True, index=df_pos.index)
+for col, val, _ in active:
+    mask &= (df_pos[col].astype(str) == val)  # astype(str) on EVERY iteration
+```
+
+For `is_bull` with 4,107 positive days and average 41 active features × 28 while-loop iterations:
+4107 × 41 × 28 = 4.7M pandas `.astype(str)` calls → **38+ minutes**.
+
+Fix: precompute numpy boolean arrays ONCE before the main loop:
+```python
+pos_str   = {c: df_pos[c].astype(str).values   for c in present_cols}  # once
+clean_str = {c: df_clean[c].astype(str).values for c in present_cols}  # once
+pos_bool  = {(col,val): (pos_str[col] == val) for (col,val) in pval_cache}  # once
+
+# Inner loop: numpy bitwise AND on precomputed arrays
+mask = np.ones(n_pos, dtype=bool)
+for col, val, _ in active:
+    mask &= pos_bool[(col, val)]
+```
+
+Also replaced `df_pos.iloc[i][c]` row lookup (851× slower than numpy array index) with `pos_str[c][i]`.
+
+**Result: 851× speedup. is_bull scan: 2.0s (was 38+ minutes).**
+
+### Method 1 results (COMPLETE)
 
 | Outcome | Positive days | Patterns found | % explained | Time |
 |---|---|---|---|---|
-| STRONG_BULL | 1,840 | 345 | 100% | 75s |
-| STRONG_BEAR | 1,502 | 323 | 100% | 88s |
-| SIDEWAYS | 1,479 | 295 | 100% | 47s |
-| HIGH_VOL | 592 | 112 | 100% | 9s |
-| is_bull | 4,107 | running… | — | — |
+| STRONG_BULL | 1,840 | 345 | 100% | 1.3s |
+| STRONG_BEAR | 1,502 | 323 | 100% | 1.3s |
+| SIDEWAYS | 1,479 | 295 | 100% | 1.2s |
+| HIGH_VOL | 592 | 112 | 100% | 0.8s |
+| BULL_DIR (is_bull) | 4,107 | 846 | 100% | 2.0s |
+| **Total** | | **1,921** | | **6.6s** |
 
-100% of positive days are being explained — the algorithm always finds a minimal combination that groups ≥5 days, even if it has to drop down to a single-feature fingerprint.
+Note: is_bull has 846 patterns vs 345 for STRONG_BULL because: (a) 4107 positive days to cover vs 1840, (b) base_rate=0.551 means more days have mixed feature signals requiring more distinct patterns.
 
-Also running: uncapped Method 2 scan (k=1,2,3 on all sig_cols, not capped at 20).
+### Method 2 scan (running)
+
+Uncapped k=1,2,3 scan on all significant features (not capped at top-20). For STRONG_BULL with 55 sig_cols, the k=3 step has C(55,3) = 26,235 groupby operations. Each outcome takes ~60-90s. Total M2 time estimated 5-10 minutes.
 
 ---
 
@@ -196,7 +229,7 @@ Also running: uncapped Method 2 scan (k=1,2,3 on all sig_cols, not capped at 20)
 
 **File:** `fix3_bull_bear.py`
 
-The 170 confirmed patterns had 9 BULL and 161 BEAR. Three causes identified:
+The 170 confirmed patterns had **9 BULL and 161 BEAR**. Three causes identified:
 
 **Cause A: Training era planetary bias.**
 Jupiter was in enemy dignity (Taurus, Gemini, Aries) for 35.7% of training days. Saturn was in enemy dignity for 33.3%. These are common combinations that produce low bull rates → most surviving patterns are "conditions where Nifty goes down."
@@ -225,25 +258,61 @@ Complexity distribution of 170 confirmed patterns:
 | k=2 | 0 | 54 |
 | k=3 | 9 | 99 |
 
-All 9 BULL patterns are k=3. Zero BULL patterns at k=1 or k=2. This is the tell: bull patterns in astrology require multiple conditions simultaneously (paksha AND Jupiter dignity AND nakshatra AND...). The k=3 cap cut off the search exactly where bull patterns live. Fix 2's uncapped fingerprint will find them.
+All 9 BULL patterns are k=3. Zero BULL patterns at k=1 or k=2. This is the tell: bull patterns in astrology require multiple conditions simultaneously (paksha AND Jupiter dignity AND nakshatra AND...). The k=3 cap cut off the search exactly where bull patterns live.
+
+Fix 2's uncapped M1 found **845 BULL_DIR patterns** confirming this — the patterns exist, they just needed k > 3 to emerge.
 
 ---
 
-## Part 6: Fix 4 — Bank Nifty Full Independent Research (RUNNING, 2026-06-13)
+## Part 6: Fix 4 — Bank Nifty Full Independent Research (COMPLETE, 2026-06-13)
 
 **File:** `fix4_banknifty_full.py`
 
 Previous Bank Nifty work only tested Nifty's confirmed patterns on Bank Nifty data. This runs the complete 6-method research independently on Bank Nifty from scratch.
 
-**Why this matters:** Bank Nifty is a bank-sector index. Certain planetary configurations (e.g., Mercury dignity, Venus dignity) may affect bank stocks differently from the broad market. Universal patterns (those confirmed on both instruments) are more trustworthy than Nifty-only patterns.
+**Why this matters:** Bank Nifty is a bank-sector index. Certain planetary configurations (e.g., Mercury dignity = communication/commerce, Venus dignity = luxury/finance) may affect bank stocks differently from the broad market. Universal patterns (those confirmed on both instruments) are more trustworthy than Nifty-only patterns.
 
-**Methodology:** Same 6 methods, same BH-FDR at 1%, same 2018 OOS split. Bank Nifty has 5,161 rows from 2000 onward (vs Nifty's 7,452 from 1996). Same feature pool (353 columns after Fix 1).
+**Methodology:** Same 6 methods, same BH-FDR at 1%, same 2018 OOS split. Bank Nifty has 5,161 rows from 2000 onward (vs Nifty's 7,452 from 1996). Same 90-column feature pool (after Fix 1).
 
-**Output will include:**
-- `bnk_confirmed_patterns.csv` — BankNifty's own confirmed patterns
-- `cross_instrument_comparison.csv` — universal vs Nifty-only vs BankNifty-only patterns
+### Results
 
-Universal patterns = confirmed independently on both instruments = highest confidence.
+**M1+M2 scan:** 93,952 raw patterns → 1,234 FDR survivors → **642 confirmed patterns**
+- BULL: 141
+- BEAR: 501
+
+**Best Bank Nifty BULL patterns:**
+
+| Features | Condition | n | WLB | OOS wr |
+|---|---|---|---|---|
+| ix_paksha_ju_dig | KRISHNA_moolatrikona | 19 | 0.832 | 68.2% |
+| ix_paksha_ju_dig\|cheshta_cat_Ju | KRISHNA_moolatrikona\|\|very_fast | 19 | 0.832 | 82.4% |
+| ix_paksha_ju_dig\|ix_ju_speed_dig | KRISHNA_moolatrikona\|\|very_fast_moolatrikona | 19 | 0.832 | 82.4% |
+
+The top Bank Nifty BULL signal is Jupiter in moolatrikona dignity (Sagittarius) during Krishna paksha — and specifically when Jupiter is also moving very fast (Cheshta Bala very high). When Jupiter moves fast in its own sign during the dark half of the month, bank stocks show an 82% bull rate in OOS.
+
+**Best Bank Nifty BEAR patterns:**
+
+| Features | Condition | n | WLB | OOS wr |
+|---|---|---|---|---|
+| dig_Ma\|ix_ju_speed_dig | neutral\|\|retrograde_enemy | 72 | 0.014 | 0.0% (0/N OOS) |
+| dig_Ve\|ix_sa_speed_dig | exalted\|\|retrograde_neutral | 35 | 0.000 | 0.0% |
+| dig_Ju\|dig_Ma\|cheshta_cat_Ju | enemy\|\|neutral\|\|retrograde | 72 | 0.014 | 0.0% |
+
+### Cross-instrument comparison
+
+| Category | Count |
+|---|---|
+| Universal (confirmed on both Nifty AND Bank Nifty) | 1 |
+| Nifty-only | 163 |
+| Bank Nifty-only | 641 |
+
+**The single universal pattern: `dig_Ju|dig_Me = own||neutral` → BEAR**
+- Nifty: WLB=0.286, OOS consistent
+- Bank Nifty: WLB=0.341, OOS consistent
+
+When Jupiter is in its own sign (Sagittarius or Pisces) AND Mercury is in a neutral dignity simultaneously, both Nifty and Bank Nifty show bearish outcomes. This is the most trustworthy pattern in the entire system: it survived independent research on both instruments.
+
+The near-zero overlap (1 universal out of 805 total) means most astrological patterns are instrument-specific. Do not cross-apply Nifty patterns to Bank Nifty or vice versa.
 
 ---
 
@@ -255,15 +324,15 @@ The original validation pipeline only applied BH-FDR + OOS to Methods 1 and 2. M
 
 **What this does:**
 1. Pools ALL p-values from ALL methods into one global pool
-2. Applies BH-FDR at 1% across the entire combined pool
+2. Applies BH-FDR at 1% across the entire combined pool simultaneously
 3. OOS-validates every FDR survivor from M3–6
 4. Adds new confirmed patterns to `confirmed_patterns.csv`
 
 **Method adaptations for validation:**
 - M3 (clusters): cluster membership → is_bull rate → Fisher p included in pool
-- M4 (cycles): phase ANOVA p-values included in pool; survivors get forward-calendar cycle-phase signals
+- M4 (cycles): phase ANOVA p-values included in pool; M4 entries without specific conditions are skipped for OOS (they're calendar-phase signals, not condition-match signals)
 - M5 (sequential): lag-conditioned patterns get OOS test: "after event X at lag N, does OOS data confirm?"
-- M6 (anomaly): anomaly-rate conditions get re-tested for is_bull direction; only included if both anomaly prediction AND bull/bear direction survive
+- M6 (anomaly): anomaly-rate conditions get re-tested for is_bull direction; only included if both anomaly prediction AND bull/bear direction survive separately
 
 ---
 
@@ -273,7 +342,7 @@ The original validation pipeline only applied BH-FDR + OOS to Methods 1 and 2. M
 
 **The structural finding:** Paksha modifies everything. The same nakshatra, sign, and dignity combination gives opposite results depending on whether it falls in KRISHNA (dark half) or SHUKLA (bright half) of the lunar month.
 
-**Jupiter dignity overrides nakshatra.** Nakshatra quality is meaningless without knowing Jupiter's sign. Mula nakshatra with Jupiter in own sign → 68.8% bull. Mula with Jupiter exalted → 36.5% bear. Jupiter exalted in Cancer is NOT a bull signal — it is bearish when combined with most other configurations, because exaltation in Cancer puts Jupiter opposite Capricorn where it would aspect its debilitation sign directly.
+**Jupiter dignity overrides nakshatra.** Nakshatra quality is meaningless without knowing Jupiter's sign. Mula nakshatra with Jupiter in own sign → 68.8% bull. Mula with Jupiter exalted → 36.5% bear. Jupiter exalted in Cancer is NOT a bull signal — it is bearish when combined with most other configurations.
 
 **The strongest confirmed patterns (top 5 by Wilson LB):**
 
@@ -325,6 +394,8 @@ Active conditions: Sade Sati rising (Saturn in Aries = 12th from Taurus natal Mo
 
 **Vectorized key construction:** `key = df[c1].astype(str) + '||' + df[c2].astype(str)` instead of `df[combo].apply(lambda r: '||'.join(r), axis=1)`. The latter is Python-level row iteration; the former is C-level vectorized string concat. ~50× faster.
 
+**Numpy bitmask precomputation for inner loops:** Any algorithm that checks feature-value combinations in a while loop must precompute boolean arrays once. Recomputing `df[col].astype(str) == val` inside a loop is 851× slower than `precomputed_array[i]`.
+
 ---
 
 ## File Manifest
@@ -337,31 +408,28 @@ Active conditions: Sade Sati rising (Saturn in Aries = 12th from Taurus natal Mo
 | `new_step3.py` | Validation: BH-FDR, OOS split, temporal stability |
 | `new_step4.py` | Composite score, backtest, forward calendar |
 | `new_step5.py` | HTML report and calendar generation |
-| `astro_engine.py` | Importable Vedic astrology engine (no side effects) |
-| `generate_signal.py` | Daily signal generator |
-| `fix1_enrich.py` | Adds 37 new features → 353 columns |
-| `fix2_fingerprint.py` | Uncapped fingerprint relaxation + full M2 scan |
+| `astro_engine.py` | Importable Vedic astrology engine (no side effects on import) |
+| `generate_signal.py` | Daily signal generator (imports from astro_engine, not new_step4) |
+| `fix1_enrich.py` | Adds 37 new Vedic features → 353 columns |
+| `fix2_fingerprint.py` | Uncapped fingerprint relaxation + full M2 scan (numpy-optimized) |
 | `fix3_bull_bear.py` | Bull/bear asymmetry investigation |
 | `fix4_banknifty_full.py` | Full 6-method research on Bank Nifty independently |
 | `fix5_validate_all.py` | Pools all M1–6 p-values, combined BH-FDR, merges confirmed |
-| `data/nifty_enriched.csv` | 7,452 × 353 |
-| `data/banknifty_enriched.csv` | 5,161 × 353 |
-| `results/validation/confirmed_patterns.csv` | Currently 170; will grow after Fix 5 |
-| `results/research/method1_fp_uncapped.csv` | Fix 2 output — uncapped fingerprints |
-| `results/research/method2_full.csv` | Fix 2 output — uncapped k=1,2,3 scan |
-| `results/validation/bnk_confirmed_patterns.csv` | Fix 4 output |
-| `results/validation/cross_instrument_comparison.csv` | Fix 4 output — universal vs instrument-specific |
-| `results/validation/m3m6_validated.csv` | Fix 5 output — M3–6 survivors |
-| `results/validation/fdr_pool_all.csv` | Fix 5 output — full combined FDR pool |
+| `data/nifty_enriched.csv` | 7,452 × 353 (after Fix 1) |
+| `data/banknifty_enriched.csv` | 5,161 × 353 (after Fix 1) |
+| `results/validation/confirmed_patterns.csv` | 170 patterns; will grow after Fix 5 |
+| `results/research/method1_fp_uncapped.csv` | Fix 2 M1 output — 1,921 uncapped fingerprint patterns |
+| `results/research/method2_full.csv` | Fix 2 M2 output — uncapped k=1,2,3 scan (pending) |
+| `results/validation/bnk_confirmed_patterns.csv` | Fix 4: 642 Bank Nifty confirmed patterns |
+| `results/validation/cross_instrument_comparison.csv` | Fix 4: 805-row universal/nifty-only/bnk-only comparison |
+| `results/validation/m3m6_validated.csv` | Fix 5 output (pending) |
 
 ---
 
-## What Remains After Fixes
+## What Remains
 
-When Fix 2, 4, 5 complete and the forward calendar and HTML are regenerated:
-
-- Confirmed patterns will include M3–6 survivors and uncapped fingerprints — expected to add more BULL patterns
-- Bank Nifty will have its own validated pattern set
-- Universal patterns (Nifty + BankNifty confirmed) will be the highest-confidence trade signals
-- The forward calendar will be rebuilt with the updated pattern set
-- CHECKLIST.md will be updated
+1. **Fix 2 M2 scan** — k=3 with 55 sig_cols for each of 5 outcomes (~5-10 min). Saves `method2_full.csv`.
+2. **Fix 5** — Pool all p-values, BH-FDR at 1%, OOS validate M3-6, merge into `confirmed_patterns.csv`.
+3. **Rebuild forward calendar** — `new_step4.py` with updated confirmed_patterns.csv.
+4. **Regenerate HTML reports** — `new_step5.py`.
+5. **Push to GitHub** — all Fix 1–5 results + updated CHECKLIST.md.

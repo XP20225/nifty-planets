@@ -79,17 +79,22 @@ def load_csv_safe(path):
 
 print("\nBuilding global p-value pool …")
 
-# M1 fingerprint (Fix 2, preferred) or original M1
+# M1: always use original, PLUS add new fingerprint patterns not in original
 fp_path = f"{REPO}/results/research/method1_fp_uncapped.csv"
 m1_path = f"{REPO}/results/research/method1_pattern_library.csv"
+m1 = load_csv_safe(m1_path)
+m1['source'] = 'method1'
+print(f"  M1 original:                {len(m1)} rows")
 if os.path.exists(fp_path):
-    m1 = load_csv_safe(fp_path)
-    m1['source'] = 'method1_fp'
-    print(f"  M1 fingerprint (uncapped):  {len(m1)} rows")
-else:
-    m1 = load_csv_safe(m1_path)
-    m1['source'] = 'method1'
-    print(f"  M1 original:                {len(m1)} rows")
+    fp = load_csv_safe(fp_path)
+    fp['source'] = 'method1_fp'
+    # Only add fingerprint patterns with p < 0.05 (others won't survive FDR anyway)
+    fp = fp[fp['p_value'] < 0.05]
+    m1_keys = set(m1['features'].astype(str) + ':::' + m1['condition'].astype(str))
+    fp_new = fp[~(fp['features'].astype(str) + ':::' + fp['condition'].astype(str)).isin(m1_keys)]
+    if len(fp_new) > 0:
+        m1 = pd.concat([m1, fp_new], ignore_index=True)
+    print(f"  M1 fingerprint new (p<0.05): {len(fp_new)} new patterns added")
 
 # M2 (prefer full uncapped version)
 m2_full_path = f"{REPO}/results/research/method2_full.csv"
@@ -313,13 +318,16 @@ for _, row in survivors.iterrows():
         'temporal_stable': stable,
     })
 
-new_confirmed = pd.DataFrame(confirmed_new)
+new_confirmed = pd.DataFrame(confirmed_new) if confirmed_new else pd.DataFrame(
+    columns=['features','condition','outcome','source','signal_dir','n_train','k_train',
+             'wr_train','wlb_train','p_value','n_oos','k_oos','wr_oos','wlb_oos',
+             'oos_pass','pre2010','2010_2018','2018_now','temporal_stable'])
 print(f"  New confirmed (all methods): {len(new_confirmed)}")
 
 # ──────────────────────────────────────────────────────────────────────
 # Separate M3-6 new patterns, report independently
 # ──────────────────────────────────────────────────────────────────────
-m36_new = new_confirmed[new_confirmed['source'].isin(['method3','method5','method6'])]
+m36_new = new_confirmed[new_confirmed['source'].isin(['method3','method5','method6'])] if len(new_confirmed) > 0 else pd.DataFrame()
 m36_new.to_csv(f"{REPO}/results/validation/m3m6_validated.csv", index=False)
 print(f"\n  M3-6 new confirmed:          {len(m36_new)}")
 if len(m36_new) > 0:

@@ -52,12 +52,12 @@ h1{font-size:1.5em;color:var(--accent);margin-bottom:8px}
 </head>
 <body>
 <h1>🪐 AstroQuant Forward Calendar — 2026-2027</h1>
-<p style="color:var(--muted);font-size:0.85em">Signals based on confirmed astrological patterns only. No market price data. Last updated: 2026-06-13 17:02 IST</p>
+<p style="color:var(--muted);font-size:0.85em">Signals based on confirmed astrological patterns only. No market price data. Last updated: 2026-06-14 09:21 IST</p>
 
 <div class="summary-row">
   <span class="badge prime-bull">PRIME BULL: 0 days</span>
-  <span class="badge prime-bear">PRIME BEAR: 74 days</span>
-  <span class="badge watch-bull">WATCH: 178 days</span>
+  <span class="badge prime-bear">PRIME BEAR: 54 days</span>
+  <span class="badge watch-bull">WATCH: 198 days</span>
   <span class="badge neutral-badge">NEUTRAL: 0 days</span>
 </div>
 <div class="summary-row">
@@ -89,7 +89,7 @@ const DATA = [
   {
     "date": "2026-06-15",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "Mrigashira",
@@ -101,14 +101,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-06-16",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "Punarvasu",
@@ -120,14 +120,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-06-17",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "Pushya",
@@ -139,14 +139,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-06-18",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 4,
     "nak": "Ashlesha",
@@ -158,14 +158,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-06-19",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.421,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Magha",
@@ -176,15 +176,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2026-06-22",
     "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "score": -1.0269,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Hasta",
@@ -198,12 +198,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2026-06-23",
     "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "score": -1.0269,
     "paksha": "SHUKLA",
     "tithi": 10,
     "nak": "Chitra",
@@ -217,12 +217,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2026-06-24",
     "class": "WATCH_BULL",
-    "score": -1.2274,
+    "score": -1.7355,
     "paksha": "SHUKLA",
     "tithi": 10,
     "nak": "Swati",
@@ -236,12 +236,12 @@ const DATA = [
     "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
     "n_bull": 1,
-    "n_bear": 4
+    "n_bear": 6
   },
   {
     "date": "2026-06-25",
     "class": "WATCH_BULL",
-    "score": -1.2274,
+    "score": -1.7355,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "Vishakha",
@@ -255,12 +255,12 @@ const DATA = [
     "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
     "n_bull": 1,
-    "n_bear": 4
+    "n_bear": 6
   },
   {
     "date": "2026-06-29",
     "class": "WATCH_BULL",
-    "score": -1.2274,
+    "score": -1.2698,
     "paksha": "SHUKLA",
     "tithi": 15,
     "nak": "Mula",
@@ -271,15 +271,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy",
+    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 1,
-    "n_bear": 4
+    "n_bull": 2,
+    "n_bear": 5
   },
   {
     "date": "2026-06-30",
     "class": "WATCH_BULL",
-    "score": -1.2274,
+    "score": -1.099,
     "paksha": "KRISHNA",
     "tithi": 16,
     "nak": "PurvaAshadha",
@@ -290,15 +290,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy",
+    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy|nak_mo_qual|dig_Ve|dig_Me=Ugra||enemy||enemy|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 1,
+    "n_bull": 4,
     "n_bear": 4
   },
   {
     "date": "2026-07-01",
     "class": "WATCH_BULL",
-    "score": -1.2274,
+    "score": -1.1993,
     "paksha": "KRISHNA",
     "tithi": 17,
     "nak": "UttaraAshadha",
@@ -309,15 +309,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy",
+    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 1,
+    "n_bull": 2,
     "n_bear": 4
   },
   {
     "date": "2026-07-02",
     "class": "WATCH_BULL",
-    "score": -1.2274,
+    "score": -1.1993,
     "paksha": "KRISHNA",
     "tithi": 18,
     "nak": "Shravana",
@@ -328,15 +328,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy",
+    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 1,
+    "n_bull": 2,
     "n_bear": 4
   },
   {
     "date": "2026-07-03",
     "class": "WATCH_BULL",
-    "score": -1.2274,
+    "score": -1.1993,
     "paksha": "KRISHNA",
     "tithi": 19,
     "nak": "Dhanishtha",
@@ -347,15 +347,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy",
+    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 1,
+    "n_bull": 2,
     "n_bear": 4
   },
   {
     "date": "2026-07-06",
     "class": "WATCH_BULL",
-    "score": -1.2274,
+    "score": -1.1993,
     "paksha": "KRISHNA",
     "tithi": 22,
     "nak": "UttaraBhadrapada",
@@ -366,15 +366,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy",
+    "bull_pats": "dig_Mo|dig_Ve|dig_Me=neutral||enemy||enemy|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 1,
+    "n_bull": 2,
     "n_bear": 4
   },
   {
     "date": "2026-07-07",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BEAR",
+    "score": -1.2512,
     "paksha": "KRISHNA",
     "tithi": 23,
     "nak": "Revati",
@@ -385,15 +385,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 4
   },
   {
     "date": "2026-07-08",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BULL",
+    "score": -1.1986,
     "paksha": "KRISHNA",
     "tithi": 24,
     "nak": "Ashwini",
@@ -404,15 +404,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
+    "n_bull": 3,
     "n_bear": 4
   },
   {
     "date": "2026-07-09",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BULL",
+    "score": -1.1986,
     "paksha": "KRISHNA",
     "tithi": 25,
     "nak": "Bharani",
@@ -423,15 +423,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
+    "n_bull": 3,
     "n_bear": 4
   },
   {
     "date": "2026-07-10",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BULL",
+    "score": -1.1986,
     "paksha": "KRISHNA",
     "tithi": 26,
     "nak": "Krittika",
@@ -442,15 +442,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
+    "n_bull": 3,
     "n_bear": 4
   },
   {
     "date": "2026-07-13",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "class": "WATCH_BEAR",
+    "score": -1.3296,
     "paksha": "KRISHNA",
     "tithi": 29,
     "nak": "Ardra",
@@ -461,15 +461,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2026-07-14",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "class": "WATCH_BEAR",
+    "score": -1.4246,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "Punarvasu",
@@ -480,15 +480,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 5
   },
   {
     "date": "2026-07-15",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "class": "WATCH_BEAR",
+    "score": -1.0116,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "Pushya",
@@ -499,15 +499,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2026-07-16",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "class": "WATCH_BEAR",
+    "score": -1.0116,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "Ashlesha",
@@ -518,15 +518,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2026-07-17",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "class": "WATCH_BULL",
+    "score": -0.959,
     "paksha": "SHUKLA",
     "tithi": 4,
     "nak": "Magha",
@@ -537,15 +537,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 2,
+    "n_bear": 4
   },
   {
     "date": "2026-07-20",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "class": "WATCH_BEAR",
+    "score": -1.0116,
     "paksha": "SHUKLA",
     "tithi": 7,
     "nak": "Hasta",
@@ -556,15 +556,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2026-07-21",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BEAR",
+    "score": -1.7874,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "Chitra",
@@ -575,15 +575,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
-    "n_bear": 4
+    "n_bull": 1,
+    "n_bear": 6
   },
   {
     "date": "2026-07-22",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BEAR",
+    "score": -1.7874,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Swati",
@@ -594,15 +594,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
-    "n_bear": 4
+    "n_bull": 1,
+    "n_bear": 6
   },
   {
     "date": "2026-07-23",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BEAR",
+    "score": -1.7874,
     "paksha": "SHUKLA",
     "tithi": 10,
     "nak": "Vishakha",
@@ -613,15 +613,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
-    "n_bear": 4
+    "n_bull": 1,
+    "n_bear": 6
   },
   {
     "date": "2026-07-24",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9319,
+    "class": "WATCH_BEAR",
+    "score": -1.0116,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "Anuradha",
@@ -632,15 +632,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2026-07-27",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BULL",
+    "score": -1.3218,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "PurvaAshadha",
@@ -651,15 +651,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
-    "n_bear": 4
+    "n_bull": 2,
+    "n_bear": 5
   },
   {
     "date": "2026-07-28",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BULL",
+    "score": -1.3218,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "UttaraAshadha",
@@ -670,15 +670,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
-    "n_bear": 4
+    "n_bull": 2,
+    "n_bear": 5
   },
   {
     "date": "2026-07-29",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BEAR",
+    "score": -1.3744,
     "paksha": "SHUKLA",
     "tithi": 15,
     "nak": "Shravana",
@@ -689,15 +689,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
-    "n_bear": 4
+    "n_bull": 1,
+    "n_bear": 5
   },
   {
     "date": "2026-07-30",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BEAR",
+    "score": -1.2512,
     "paksha": "KRISHNA",
     "tithi": 16,
     "nak": "Shravana",
@@ -708,15 +708,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 4
   },
   {
     "date": "2026-07-31",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.2947,
+    "class": "WATCH_BEAR",
+    "score": -1.6642,
     "paksha": "KRISHNA",
     "tithi": 17,
     "nak": "Dhanishtha",
@@ -727,10 +727,10 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|dig_Me=neutral||own|paksha|dig_Mo|dig_Ma=KRISHNA||neutral||neutral",
     "bear_pats": "dig_Sa|dig_Ma|sade_sati_phase=neutral||neutral||rising|dig_Ma|sade_sati_phase=neutral||rising|dig_Sa|dig_Mo=neutral||neutral",
-    "n_bull": 0,
-    "n_bear": 4
+    "n_bull": 2,
+    "n_bear": 5
   },
   {
     "date": "2026-08-03",
@@ -772,8 +772,8 @@ const DATA = [
   },
   {
     "date": "2026-08-05",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6888,
     "paksha": "KRISHNA",
     "tithi": 22,
     "nak": "Ashwini",
@@ -784,15 +784,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2026-08-06",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6888,
     "paksha": "KRISHNA",
     "tithi": 23,
     "nak": "Bharani",
@@ -803,9 +803,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
@@ -829,8 +829,8 @@ const DATA = [
   },
   {
     "date": "2026-08-10",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.3048,
     "paksha": "KRISHNA",
     "tithi": 28,
     "nak": "Punarvasu",
@@ -841,9 +841,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|sade_sati_phase|nakl_spd=enemy||rising||very_fast",
     "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 1
   },
   {
@@ -886,8 +886,8 @@ const DATA = [
   },
   {
     "date": "2026-08-13",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.421,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "Magha",
@@ -898,15 +898,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2026-08-14",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.421,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "PurvaPhalguni",
@@ -917,15 +917,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2026-08-17",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Chitra",
@@ -937,14 +937,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-08-18",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Swati",
@@ -956,14 +956,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-08-19",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7626,
     "paksha": "SHUKLA",
     "tithi": 7,
     "nak": "Vishakha",
@@ -974,15 +974,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ma|sade_sati_phase|nakl_spd=enemy||rising||very_fast",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-08-20",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "Anuradha",
@@ -994,14 +994,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-08-21",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.3998,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Jyeshtha",
@@ -1012,15 +1012,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Ma|sade_sati_phase|nakl_spd=enemy||rising||very_fast",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2026-08-24",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7839,
     "paksha": "SHUKLA",
     "tithi": 12,
     "nak": "PurvaAshadha",
@@ -1031,15 +1031,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-08-25",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 13,
     "nak": "UttaraAshadha",
@@ -1051,14 +1051,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-08-26",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "Shravana",
@@ -1070,14 +1070,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-08-27",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 15,
     "nak": "Dhanishtha",
@@ -1089,9 +1089,9 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-08-28",
@@ -1114,8 +1114,8 @@ const DATA = [
   },
   {
     "date": "2026-08-31",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9373,
+    "class": "WATCH_BULL",
+    "score": -0.8634,
     "paksha": "KRISHNA",
     "tithi": 19,
     "nak": "Revati",
@@ -1126,15 +1126,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|sade_sati_phase|nakl_spd=enemy||rising||very_fast",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2026-09-01",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9373,
+    "class": "WATCH_BULL",
+    "score": -0.8847,
     "paksha": "KRISHNA",
     "tithi": 20,
     "nak": "Ashwini",
@@ -1145,15 +1145,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2026-09-02",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9373,
+    "class": "WATCH_BULL",
+    "score": -0.7228,
     "paksha": "KRISHNA",
     "tithi": 21,
     "nak": "Bharani",
@@ -1164,15 +1164,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid|dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 3,
     "n_bear": 3
   },
   {
     "date": "2026-09-03",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4124,
     "paksha": "KRISHNA",
     "tithi": 22,
     "nak": "Krittika",
@@ -1183,15 +1183,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|hora_at_open=moolatrikona||friendly||Ve|vara_lord|dig_Ve|dig_Me=Ju||moolatrikona||friendly|dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 4,
     "n_bear": 2
   },
   {
     "date": "2026-09-04",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4748,
     "paksha": "KRISHNA",
     "tithi": 23,
     "nak": "Rohini",
@@ -1202,15 +1202,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2026-09-07",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.3048,
     "paksha": "KRISHNA",
     "tithi": 27,
     "nak": "Punarvasu",
@@ -1221,9 +1221,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ma|sade_sati_phase|nakl_spd=enemy||rising||very_fast",
     "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 1
   },
   {
@@ -1247,8 +1247,8 @@ const DATA = [
   },
   {
     "date": "2026-09-09",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.326,
     "paksha": "KRISHNA",
     "tithi": 29,
     "nak": "Magha",
@@ -1259,15 +1259,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 1
   },
   {
     "date": "2026-09-10",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.326,
     "paksha": "KRISHNA",
     "tithi": 30,
     "nak": "PurvaPhalguni",
@@ -1278,15 +1278,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 1
   },
   {
     "date": "2026-09-11",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.421,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "UttaraPhalguni",
@@ -1297,15 +1297,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2026-09-15",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7626,
     "paksha": "SHUKLA",
     "tithi": 5,
     "nak": "Vishakha",
@@ -1316,15 +1316,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ma|sade_sati_phase|nakl_spd=enemy||rising||very_fast",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-09-16",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Anuradha",
@@ -1336,14 +1336,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-09-17",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 7,
     "nak": "Anuradha",
@@ -1355,14 +1355,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-09-18",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "Jyeshtha",
@@ -1374,14 +1374,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-09-21",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 10,
     "nak": "UttaraAshadha",
@@ -1393,14 +1393,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-09-22",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "Shravana",
@@ -1412,14 +1412,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-09-23",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 12,
     "nak": "Dhanishtha",
@@ -1431,14 +1431,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-09-24",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 13,
     "nak": "Shatabhisha",
@@ -1450,14 +1450,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-09-25",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "PurvaBhadrapada",
@@ -1469,14 +1469,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-09-28",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9373,
+    "class": "WATCH_BULL",
+    "score": -0.785,
     "paksha": "KRISHNA",
     "tithi": 17,
     "nak": "Ashwini",
@@ -1487,15 +1487,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 3
   },
   {
     "date": "2026-09-29",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9373,
+    "class": "WATCH_BULL",
+    "score": -0.785,
     "paksha": "KRISHNA",
     "tithi": 19,
     "nak": "Bharani",
@@ -1506,15 +1506,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 3
   },
   {
     "date": "2026-09-30",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4126,
     "paksha": "KRISHNA",
     "tithi": 20,
     "nak": "Krittika",
@@ -1525,15 +1525,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid|dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 2
   },
   {
     "date": "2026-10-01",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4124,
     "paksha": "KRISHNA",
     "tithi": 21,
     "nak": "Rohini",
@@ -1544,15 +1544,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|hora_at_open=moolatrikona||friendly||Ve|vara_lord|dig_Ve|dig_Me=Ju||moolatrikona||friendly|dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 4,
     "n_bear": 2
   },
   {
     "date": "2026-10-05",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4748,
     "paksha": "KRISHNA",
     "tithi": 25,
     "nak": "Pushya",
@@ -1563,15 +1563,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2026-10-06",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4748,
     "paksha": "KRISHNA",
     "tithi": 26,
     "nak": "Ashlesha",
@@ -1582,15 +1582,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2026-10-07",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.36,
     "paksha": "KRISHNA",
     "tithi": 27,
     "nak": "Magha",
@@ -1601,15 +1601,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid|dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 3,
     "n_bear": 2
   },
   {
     "date": "2026-10-08",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.3597,
     "paksha": "KRISHNA",
     "tithi": 28,
     "nak": "PurvaPhalguni",
@@ -1620,15 +1620,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|hora_at_open=moolatrikona||friendly||Ve|vara_lord|dig_Ve|dig_Me=Ju||moolatrikona||friendly|dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 5,
     "n_bear": 2
   },
   {
     "date": "2026-10-09",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4748,
     "paksha": "KRISHNA",
     "tithi": 29,
     "nak": "UttaraPhalguni",
@@ -1639,15 +1639,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2026-10-12",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7368,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "Swati",
@@ -1658,15 +1658,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-10-13",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7368,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "Vishakha",
@@ -1677,15 +1677,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-10-14",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.3118,
     "paksha": "SHUKLA",
     "tithi": 4,
     "nak": "Anuradha",
@@ -1696,15 +1696,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid|dig_Ve|dig_Me=moolatrikona||friendly",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 2,
+    "n_bear": 2
   },
   {
     "date": "2026-10-15",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.3116,
     "paksha": "SHUKLA",
     "tithi": 5,
     "nak": "Jyeshtha",
@@ -1715,15 +1715,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Ve|dig_Me|hora_at_open=moolatrikona||friendly||Ve|vara_lord|dig_Ve|dig_Me=Ju||moolatrikona||friendly|dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 4,
+    "n_bear": 2
   },
   {
     "date": "2026-10-16",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6842,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Mula",
@@ -1734,15 +1734,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 2,
+    "n_bear": 3
   },
   {
     "date": "2026-10-19",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7368,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Shravana",
@@ -1753,15 +1753,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-10-21",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6746,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "Dhanishtha",
@@ -1772,15 +1772,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid|dig_Ve|dig_Me=moolatrikona||friendly",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 2,
+    "n_bear": 3
   },
   {
     "date": "2026-10-22",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6744,
     "paksha": "SHUKLA",
     "tithi": 12,
     "nak": "Shatabhisha",
@@ -1791,15 +1791,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ve|dig_Me|hora_at_open=moolatrikona||friendly||Ve|vara_lord|dig_Ve|dig_Me=Ju||moolatrikona||friendly|dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 4,
+    "n_bear": 3
   },
   {
     "date": "2026-10-23",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7368,
     "paksha": "SHUKLA",
     "tithi": 13,
     "nak": "PurvaBhadrapada",
@@ -1810,15 +1810,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-10-26",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9373,
+    "class": "WATCH_BULL",
+    "score": -0.785,
     "paksha": "KRISHNA",
     "tithi": 16,
     "nak": "Ashwini",
@@ -1829,15 +1829,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 3
   },
   {
     "date": "2026-10-27",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -0.9373,
+    "class": "WATCH_BULL",
+    "score": -0.785,
     "paksha": "KRISHNA",
     "tithi": 17,
     "nak": "Krittika",
@@ -1848,15 +1848,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 3
   },
   {
     "date": "2026-10-28",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4126,
     "paksha": "KRISHNA",
     "tithi": 18,
     "nak": "Rohini",
@@ -1867,15 +1867,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid|dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 2
   },
   {
     "date": "2026-10-29",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4124,
     "paksha": "KRISHNA",
     "tithi": 19,
     "nak": "Mrigashira",
@@ -1886,15 +1886,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|hora_at_open=moolatrikona||friendly||Ve|vara_lord|dig_Ve|dig_Me=Ju||moolatrikona||friendly|dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 4,
     "n_bear": 2
   },
   {
     "date": "2026-10-30",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4748,
     "paksha": "KRISHNA",
     "tithi": 20,
     "nak": "Ardra",
@@ -1905,15 +1905,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2026-11-02",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4748,
     "paksha": "KRISHNA",
     "tithi": 24,
     "nak": "Ashlesha",
@@ -1924,15 +1924,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2026-11-03",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4222,
     "paksha": "KRISHNA",
     "tithi": 25,
     "nak": "Magha",
@@ -1943,15 +1943,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 2
   },
   {
     "date": "2026-11-04",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.36,
     "paksha": "KRISHNA",
     "tithi": 26,
     "nak": "PurvaPhalguni",
@@ -1962,15 +1962,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid|dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 3,
     "n_bear": 2
   },
   {
     "date": "2026-11-05",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4124,
     "paksha": "KRISHNA",
     "tithi": 27,
     "nak": "UttaraPhalguni",
@@ -1981,9 +1981,9 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|hora_at_open=moolatrikona||friendly||Ve|vara_lord|dig_Ve|dig_Me=Ju||moolatrikona||friendly|dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 4,
     "n_bear": 2
   },
   {
@@ -2007,8 +2007,8 @@ const DATA = [
   },
   {
     "date": "2026-11-09",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "Vishakha",
@@ -2020,14 +2020,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-11-11",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "Jyeshtha",
@@ -2039,14 +2039,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-11-12",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7839,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "Mula",
@@ -2057,15 +2057,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-11-13",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7839,
     "paksha": "SHUKLA",
     "tithi": 4,
     "nak": "PurvaAshadha",
@@ -2076,15 +2076,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2026-11-16",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 7,
     "nak": "Shravana",
@@ -2096,14 +2096,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-11-17",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "Dhanishtha",
@@ -2115,14 +2115,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-11-18",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Shatabhisha",
@@ -2134,14 +2134,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-11-19",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 10,
     "nak": "PurvaBhadrapada",
@@ -2153,14 +2153,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-11-20",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "UttaraBhadrapada",
@@ -2172,14 +2172,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2026-11-23",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6842,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "Bharani",
@@ -2190,15 +2190,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 2,
+    "n_bear": 3
   },
   {
     "date": "2026-11-25",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4126,
     "paksha": "KRISHNA",
     "tithi": 17,
     "nak": "Rohini",
@@ -2209,15 +2209,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid|dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 2
   },
   {
     "date": "2026-11-26",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4124,
     "paksha": "KRISHNA",
     "tithi": 18,
     "nak": "Mrigashira",
@@ -2228,15 +2228,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me|hora_at_open=moolatrikona||friendly||Ve|vara_lord|dig_Ve|dig_Me=Ju||moolatrikona||friendly|dig_Ve|dig_Me|choghadiya_quality=moolatrikona||friendly||avoid",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 4,
     "n_bear": 2
   },
   {
     "date": "2026-11-27",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4748,
     "paksha": "KRISHNA",
     "tithi": 19,
     "nak": "Punarvasu",
@@ -2247,15 +2247,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2026-11-30",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4222,
     "paksha": "KRISHNA",
     "tithi": 22,
     "nak": "Magha",
@@ -2266,15 +2266,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 2
   },
   {
     "date": "2026-12-01",
-    "class": "WATCH_BEAR",
-    "score": -0.5745,
+    "class": "WATCH_BULL",
+    "score": -0.4222,
     "paksha": "KRISHNA",
     "tithi": 23,
     "nak": "PurvaPhalguni",
@@ -2285,9 +2285,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Ve|dig_Me=moolatrikona||friendly|dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "paksha|dig_Me|sade_sati_phase=KRISHNA||friendly||rising|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 2,
     "n_bear": 2
   },
   {
@@ -2388,7 +2388,7 @@ const DATA = [
   {
     "date": "2026-12-09",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "Jyeshtha",
@@ -2400,14 +2400,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-12-10",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0954,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "Mula",
@@ -2418,15 +2418,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2026-12-11",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0954,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "PurvaAshadha",
@@ -2437,15 +2437,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2026-12-14",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 5,
     "nak": "Dhanishtha",
@@ -2459,12 +2459,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2026-12-15",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Shatabhisha",
@@ -2478,12 +2478,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2026-12-16",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 7,
     "nak": "PurvaBhadrapada",
@@ -2497,12 +2497,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2026-12-17",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "UttaraBhadrapada",
@@ -2516,12 +2516,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2026-12-18",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Revati",
@@ -2535,12 +2535,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2026-12-21",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0954,
     "paksha": "SHUKLA",
     "tithi": 12,
     "nak": "Krittika",
@@ -2551,15 +2551,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2026-12-22",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "Rohini",
@@ -2571,14 +2571,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-12-23",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 15,
     "nak": "Mrigashira",
@@ -2590,14 +2590,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-12-24",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.5684,
     "paksha": "KRISHNA",
     "tithi": 16,
     "nak": "Ardra",
@@ -2609,14 +2609,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|tithi_quality|dig_Ma|dig_Ve=Nanda||friendly||own",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2026-12-28",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.5157,
     "paksha": "KRISHNA",
     "tithi": 21,
     "nak": "PurvaPhalguni",
@@ -2627,15 +2627,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa=neutral|tithi_quality|dig_Ma|dig_Ve=Nanda||friendly||own",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2026-12-29",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.326,
     "paksha": "KRISHNA",
     "tithi": 22,
     "nak": "UttaraPhalguni",
@@ -2646,9 +2646,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 1
   },
   {
@@ -2748,8 +2748,8 @@ const DATA = [
   },
   {
     "date": "2027-01-06",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 29,
     "nak": "Mula",
@@ -2760,15 +2760,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2027-01-07",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 30,
     "nak": "PurvaAshadha",
@@ -2779,15 +2779,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2027-01-08",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "UttaraAshadha",
@@ -2801,12 +2801,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-01-11",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 4,
     "nak": "Dhanishtha",
@@ -2820,12 +2820,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-01-12",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 5,
     "nak": "Shatabhisha",
@@ -2839,12 +2839,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-01-13",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "PurvaBhadrapada",
@@ -2858,12 +2858,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-01-14",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 7,
     "nak": "UttaraBhadrapada",
@@ -2877,12 +2877,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-01-15",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "Revati",
@@ -2896,12 +2896,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-01-18",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "Krittika",
@@ -2913,14 +2913,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-01-19",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 12,
     "nak": "Rohini",
@@ -2932,14 +2932,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-01-20",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 13,
     "nak": "Ardra",
@@ -2951,14 +2951,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-01-21",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "Punarvasu",
@@ -2970,14 +2970,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-01-22",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 15,
     "nak": "Pushya",
@@ -2989,14 +2989,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-01-25",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.326,
     "paksha": "KRISHNA",
     "tithi": 19,
     "nak": "PurvaPhalguni",
@@ -3007,9 +3007,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 1
   },
   {
@@ -3109,8 +3109,8 @@ const DATA = [
   },
   {
     "date": "2027-02-02",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 27,
     "nak": "Mula",
@@ -3121,15 +3121,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2027-02-03",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 28,
     "nak": "PurvaAshadha",
@@ -3140,15 +3140,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2027-02-04",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 29,
     "nak": "UttaraAshadha",
@@ -3159,9 +3159,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
@@ -3186,7 +3186,7 @@ const DATA = [
   {
     "date": "2027-02-08",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "Shatabhisha",
@@ -3200,12 +3200,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-02-09",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "PurvaBhadrapada",
@@ -3219,12 +3219,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-02-10",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 4,
     "nak": "UttaraBhadrapada",
@@ -3238,12 +3238,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-02-11",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 5,
     "nak": "Revati",
@@ -3257,12 +3257,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-02-12",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0954,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Ashwini",
@@ -3273,15 +3273,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 3
+    "n_bull": 1,
+    "n_bear": 4
   },
   {
     "date": "2027-02-15",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Rohini",
@@ -3293,14 +3293,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-02-16",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 10,
     "nak": "Mrigashira",
@@ -3312,14 +3312,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-02-17",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "Ardra",
@@ -3331,14 +3331,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-02-18",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 13,
     "nak": "Punarvasu",
@@ -3350,14 +3350,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-02-19",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "Pushya",
@@ -3369,14 +3369,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-02-22",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.326,
     "paksha": "KRISHNA",
     "tithi": 17,
     "nak": "UttaraPhalguni",
@@ -3387,9 +3387,9 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 1
   },
   {
@@ -3470,8 +3470,8 @@ const DATA = [
   },
   {
     "date": "2027-03-01",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 24,
     "nak": "Mula",
@@ -3482,15 +3482,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2027-03-02",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 25,
     "nak": "Mula",
@@ -3501,15 +3501,15 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2027-03-03",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 26,
     "nak": "PurvaAshadha",
@@ -3520,9 +3520,9 @@ const DATA = [
     "retro_me": 1,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
@@ -3566,7 +3566,7 @@ const DATA = [
   {
     "date": "2027-03-08",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "PurvaBhadrapada",
@@ -3580,12 +3580,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-03-09",
     "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "score": -1.148,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "UttaraBhadrapada",
@@ -3599,12 +3599,12 @@ const DATA = [
     "bull_pats": "nan",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
     "n_bull": 0,
-    "n_bear": 3
+    "n_bear": 4
   },
   {
     "date": "2027-03-10",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "Revati",
@@ -3616,14 +3616,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2027-03-11",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7839,
     "paksha": "SHUKLA",
     "tithi": 4,
     "nak": "Ashwini",
@@ -3634,15 +3634,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2027-03-12",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7839,
     "paksha": "SHUKLA",
     "tithi": 5,
     "nak": "Bharani",
@@ -3653,15 +3653,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2027-03-15",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "Mrigashira",
@@ -3673,14 +3673,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-03-16",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Ardra",
@@ -3692,14 +3692,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-03-17",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 10,
     "nak": "Punarvasu",
@@ -3711,14 +3711,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-03-18",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "Pushya",
@@ -3730,14 +3730,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-03-19",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 12,
     "nak": "Ashlesha",
@@ -3749,9 +3749,9 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-03-22",
@@ -3850,8 +3850,8 @@ const DATA = [
   },
   {
     "date": "2027-03-29",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6888,
     "paksha": "KRISHNA",
     "tithi": 23,
     "nak": "Mula",
@@ -3862,15 +3862,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2027-03-30",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6888,
     "paksha": "KRISHNA",
     "tithi": 23,
     "nak": "PurvaAshadha",
@@ -3881,9 +3881,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
@@ -3983,8 +3983,8 @@ const DATA = [
   },
   {
     "date": "2027-04-07",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "Revati",
@@ -3996,14 +3996,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2027-04-08",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7839,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "Ashwini",
@@ -4014,15 +4014,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2027-04-09",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7839,
     "paksha": "SHUKLA",
     "tithi": 3,
     "nak": "Krittika",
@@ -4033,15 +4033,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2027-04-12",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Ardra",
@@ -4053,14 +4053,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-04-13",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "Punarvasu",
@@ -4072,14 +4072,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-04-14",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "Pushya",
@@ -4091,14 +4091,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-04-15",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.9561,
     "paksha": "SHUKLA",
     "tithi": 10,
     "nak": "Ashlesha",
@@ -4109,15 +4109,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "paksha|dig_Sa|dig_Ve=SHUKLA||neutral||exalted",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Ve|nakl_dig=SHUKLA||exalted||debilitated|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2027-04-16",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.3898,
     "paksha": "SHUKLA",
     "tithi": 11,
     "nak": "Magha",
@@ -4128,15 +4128,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "paksha|dig_Sa|dig_Ve=SHUKLA||neutral||exalted|dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 2,
+    "n_bear": 2
   },
   {
     "date": "2027-04-19",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4424,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "Hasta",
@@ -4147,15 +4147,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "paksha|dig_Sa|dig_Ve=SHUKLA||neutral||exalted",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2027-04-20",
     "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "score": -0.8052,
     "paksha": "SHUKLA",
     "tithi": 15,
     "nak": "Chitra",
@@ -4166,10 +4166,10 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "paksha|dig_Sa|dig_Ve=SHUKLA||neutral||exalted",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 3
   },
   {
     "date": "2027-04-21",
@@ -4230,8 +4230,8 @@ const DATA = [
   },
   {
     "date": "2027-04-26",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 21,
     "nak": "PurvaAshadha",
@@ -4242,15 +4242,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2027-04-27",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 22,
     "nak": "UttaraAshadha",
@@ -4261,9 +4261,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
@@ -4363,8 +4363,8 @@ const DATA = [
   },
   {
     "date": "2027-05-05",
-    "class": "PRIME_TRADE_BEAR",
-    "score": -1.053,
+    "class": "WATCH_BULL",
+    "score": -1.0004,
     "paksha": "KRISHNA",
     "tithi": 29,
     "nak": "Ashwini",
@@ -4375,15 +4375,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Mo|dig_Ma|dig_Me=neutral||friendly||neutral|dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 3
   },
   {
     "date": "2027-05-06",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.7526,
     "paksha": "SHUKLA",
     "tithi": 1,
     "nak": "Bharani",
@@ -4394,15 +4394,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 2
+    "bull_pats": "paksha|dig_Sa|dig_Ve=SHUKLA||neutral||exalted|dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 2,
+    "n_bear": 3
   },
   {
     "date": "2027-05-07",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 2,
     "nak": "Krittika",
@@ -4414,14 +4414,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-05-10",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 5,
     "nak": "Ardra",
@@ -4433,14 +4433,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-05-11",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Pushya",
@@ -4452,14 +4452,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-05-12",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 7,
     "nak": "Ashlesha",
@@ -4471,14 +4471,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-05-13",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.421,
     "paksha": "SHUKLA",
     "tithi": 8,
     "nak": "Magha",
@@ -4489,15 +4489,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2027-05-14",
-    "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "class": "WATCH_BULL",
+    "score": -0.421,
     "paksha": "SHUKLA",
     "tithi": 9,
     "nak": "PurvaPhalguni",
@@ -4508,15 +4508,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
-    "n_bull": 0,
-    "n_bear": 1
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
+    "n_bull": 1,
+    "n_bear": 2
   },
   {
     "date": "2027-05-17",
     "class": "WATCH_BEAR",
-    "score": -0.3786,
+    "score": -0.4737,
     "paksha": "SHUKLA",
     "tithi": 13,
     "nak": "Chitra",
@@ -4528,14 +4528,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa=neutral",
+    "bear_pats": "dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 1
+    "n_bear": 2
   },
   {
     "date": "2027-05-18",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 14,
     "nak": "Swati",
@@ -4547,14 +4547,14 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2027-05-19",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.8365,
     "paksha": "SHUKLA",
     "tithi": 15,
     "nak": "Vishakha",
@@ -4566,9 +4566,9 @@ const DATA = [
     "sade_sati": 1,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
+    "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral|paksha|dig_Sa=SHUKLA||neutral",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2027-05-20",
@@ -4610,8 +4610,8 @@ const DATA = [
   },
   {
     "date": "2027-05-24",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6888,
     "paksha": "KRISHNA",
     "tithi": 19,
     "nak": "PurvaAshadha",
@@ -4622,9 +4622,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
@@ -4724,8 +4724,8 @@ const DATA = [
   },
   {
     "date": "2027-06-01",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6888,
     "paksha": "KRISHNA",
     "tithi": 27,
     "nak": "Ashwini",
@@ -4736,15 +4736,15 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
     "date": "2027-06-02",
-    "class": "WATCH_BEAR",
-    "score": -0.7415,
+    "class": "WATCH_BULL",
+    "score": -0.6888,
     "paksha": "KRISHNA",
     "tithi": 28,
     "nak": "Bharani",
@@ -4755,9 +4755,9 @@ const DATA = [
     "retro_me": 0,
     "sade_sati": 1,
     "maha": "Su",
-    "bull_pats": "nan",
+    "bull_pats": "dig_Sa|elem_Mo=neutral||F",
     "bear_pats": "dig_Sa|dig_Mo=neutral||neutral|dig_Sa=neutral",
-    "n_bull": 0,
+    "n_bull": 1,
     "n_bear": 2
   },
   {
@@ -4838,8 +4838,8 @@ const DATA = [
   },
   {
     "date": "2027-06-09",
-    "class": "WATCH_BEAR",
-    "score": -0.7423,
+    "class": "PRIME_TRADE_BEAR",
+    "score": -0.932,
     "paksha": "SHUKLA",
     "tithi": 6,
     "nak": "Ashlesha",
@@ -4851,9 +4851,9 @@ const DATA = [
     "sade_sati": 0,
     "maha": "Su",
     "bull_pats": "nan",
-    "bear_pats": "paksha|sade_sati_phase=SHUKLA||none|sade_sati_phase=none",
+    "bear_pats": "paksha|sade_sati_phase=SHUKLA||none|sade_sati_phase=none|tithi_quality|dig_Ma|dig_Ve=Nanda||friendly||own",
     "n_bull": 0,
-    "n_bear": 2
+    "n_bear": 3
   },
   {
     "date": "2027-06-10",

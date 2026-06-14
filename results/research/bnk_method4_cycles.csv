@@ -1,0 +1,5 @@
+cycle_name,period_td,acf_value,acf_significant,fft_power_ratio,phase_anova_p,evidence
+Moon_monthly,29.5,-0.013,False,1.01,0.977795,NO
+Mercury_synodic,116.0,0.0222,False,0.39,0.917695,NO
+Venus_synodic,161.0,0.017,False,3.15,0.019708,YES
+Rahu_sign,390.0,-0.0088,False,2.95,0.557678,NO

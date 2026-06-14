@@ -1,0 +1,16 @@
+feature,value,n,k_anomaly,anomaly_rate,wilson_lower,p_value
+vara_lord,Ve,1021,111,0.1087,0.0911,8.5e-05
+vara_lord,Ma,1036,58,0.056,0.0436,0.00281
+vara_dig,debilitated,411,18,0.0438,0.0279,0.005281
+dig_Me,enemy,459,21,0.0458,0.0301,0.005978
+dig_Mo,debilitated,404,43,0.1064,0.08,0.032789
+karana_quality,neutral,1398,127,0.0908,0.0769,0.035524
+vara_lord,Mo,1033,65,0.0629,0.0497,0.044308
+vara_dig,exalted,391,41,0.1049,0.0782,0.048829
+nak_mo_name,Dhanishtha,189,8,0.0423,0.0216,0.070813
+nak_mo_name,Anuradha,196,22,0.1122,0.0753,0.076164
+nak_mo_qual,Dhruva,759,47,0.0619,0.0469,0.078442
+nak_mo_name,PurvaBhadrapada,198,22,0.1111,0.0745,0.07884
+dig_Sa,own,873,81,0.0928,0.0753,0.082931
+nak_mo_name,Shravana,177,20,0.113,0.0743,0.085444
+karana_quality,auspicious,2842,205,0.0721,0.0632,0.094711
