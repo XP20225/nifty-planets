@@ -320,6 +320,88 @@
   .pagination button:disabled { opacity: .35; cursor: default; }
   .pagination .page-info { font-size: 12px; color: var(--muted); padding: 0 8px; }
 
+  /* ── Sticky OHLC columns (cols 2-6 = Open, High, Low, Close, Chg%) ── */
+  #mainTable td:nth-child(-n+6),
+  #mainTable th:nth-child(-n+6) {
+    position: sticky;
+    background: inherit;
+  }
+  #mainTable td:nth-child(-n+6) { z-index: 40; }
+  #mainTable thead th:nth-child(-n+6) { z-index: 100; }
+  #mainTable thead th:first-child { z-index: 110; }
+
+  /* ── Multi-select filter component ── */
+  .ms-wrap { position: relative; display: inline-flex; align-items: center; width: 100%; gap: 2px; }
+  .ms-trigger {
+    flex: 1; display: flex; align-items: center; gap: 2px; min-width: 0;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 3px; color: #fff; font-size: 10px; padding: 2px 4px;
+    cursor: pointer; user-select: none; overflow: hidden;
+  }
+  .ms-trigger:hover { border-color: var(--saffron); }
+  .ms-trigger.has-sel { border-color: var(--saffron); background: rgba(245,158,11,.2); }
+  .ms-lbl { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ms-arr { opacity: 0.5; flex-shrink: 0; font-size: 8px; }
+  .ms-x {
+    flex-shrink: 0; background: none; border: none;
+    color: rgba(255,255,255,.5); cursor: pointer; font-size: 10px;
+    padding: 0 1px; line-height: 1;
+  }
+  .ms-x:hover { color: #fff; }
+  .ms-panel {
+    display: none; position: fixed; z-index: 9999;
+    background: #1e1b4b; border: 1px solid rgba(255,255,255,.3);
+    border-radius: 5px; padding: 4px 0; min-width: 130px; max-height: 200px;
+    overflow-y: auto; box-shadow: 0 6px 20px rgba(0,0,0,.6);
+  }
+  .ms-panel.open { display: block; }
+  .ms-panel label {
+    display: flex; align-items: center; gap: 5px;
+    color: #e2e8f0; font-size: 11px; padding: 4px 10px;
+    cursor: pointer; white-space: nowrap;
+  }
+  .ms-panel label:hover { background: rgba(255,255,255,.1); }
+  .ms-panel input[type=checkbox] { cursor: pointer; accent-color: var(--saffron); }
+
+  /* ── Text filter with clear button ── */
+  .tf-wrap { position: relative; display: flex; align-items: center; width: 100%; }
+  .tf-wrap .col-filter { flex: 1; padding-right: 16px; }
+  .tf-x {
+    position: absolute; right: 2px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: rgba(255,255,255,.4);
+    font-size: 9px; cursor: pointer; padding: 0; line-height: 1; display: none;
+  }
+  .tf-x.visible { display: block; }
+  .tf-x:hover { color: #fff; }
+
+  /* ── Conditions filter bar ── */
+  .cond-bar {
+    background: #fff; border-bottom: 1px solid var(--border);
+    padding: 5px 12px; display: flex; gap: 6px; align-items: center;
+    flex-wrap: wrap; font-size: 11px;
+  }
+  .cond-group { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .cond-group-lbl {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--muted); white-space: nowrap;
+    padding: 0 4px 0 0; border-right: 1px solid var(--border); margin-right: 2px;
+  }
+  .cond-chip {
+    padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600;
+    border: 1px solid var(--border); background: #fff; color: #374151;
+    cursor: pointer; white-space: nowrap; transition: all 0.1s;
+  }
+  .cond-chip:hover { border-color: var(--indigo); color: var(--indigo); }
+  .cond-chip.active { background: var(--indigo); color: var(--saffron); border-color: var(--indigo); }
+  .cond-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+  .cond-clear-all {
+    margin-left: auto; padding: 2px 8px; border-radius: 4px; font-size: 10px;
+    border: 1px solid #dc2626; color: #dc2626; background: none; cursor: pointer;
+    font-weight: 600; display: none;
+  }
+  .cond-clear-all.visible { display: inline-block; }
+  .cond-clear-all:hover { background: #fef2f2; }
+
   /* ── Loading overlay ── */
   #loading {
     position: fixed; inset: 0; background: var(--indigo);
@@ -463,6 +545,29 @@
   </header>
 
   <div class="stats-bar" id="statsBar"></div>
+
+  <div class="cond-bar" id="condBar">
+    <div class="cond-group">
+      <span class="cond-group-lbl">℞ Retro</span>
+      <button class="cond-chip" data-cond="retro_Me" onclick="toggleCond('retro_Me',this)"><span class="p-mercury">Mercury</span></button>
+      <button class="cond-chip" data-cond="retro_Ve" onclick="toggleCond('retro_Ve',this)"><span class="p-venus">Venus</span></button>
+      <button class="cond-chip" data-cond="retro_Ma" onclick="toggleCond('retro_Ma',this)"><span class="p-mars">Mars</span></button>
+      <button class="cond-chip" data-cond="retro_Ju" onclick="toggleCond('retro_Ju',this)"><span class="p-jupiter">Jupiter</span></button>
+      <button class="cond-chip" data-cond="retro_Sa" onclick="toggleCond('retro_Sa',this)"><span class="p-saturn">Saturn</span></button>
+    </div>
+    <div class="cond-sep"></div>
+    <div class="cond-group">
+      <span class="cond-group-lbl">Status</span>
+      <button class="cond-chip" data-cond="any_exalt"    onclick="toggleCond('any_exalt',this)">Exalted <span class="badge b-ex" style="margin:0">Ex</span></button>
+      <button class="cond-chip" data-cond="any_debil"    onclick="toggleCond('any_debil',this)">Debilitated <span class="badge b-de" style="margin:0">De</span></button>
+      <button class="cond-chip" data-cond="any_gandanta" onclick="toggleCond('any_gandanta',this)">Gandanta <span class="badge b-gand" style="margin:0">G</span></button>
+      <button class="cond-chip" data-cond="graha_yuddha" onclick="toggleCond('graha_yuddha',this)">War <span class="badge b-war" style="margin:0">⚔</span></button>
+      <button class="cond-chip" data-cond="eclipse_zone" onclick="toggleCond('eclipse_zone',this)">Eclipse <span class="badge b-ecl" style="margin:0">☽E</span></button>
+      <button class="cond-chip" data-cond="any_combust"  onclick="toggleCond('any_combust',this)">Combust <span class="badge b-comb" style="margin:0">☀</span></button>
+      <button class="cond-chip" data-cond="any_vargottama" onclick="toggleCond('any_vargottama',this)">Vargottama <span class="badge b-varg" style="margin:0">V</span></button>
+    </div>
+    <button class="cond-clear-all" id="condClearAll" onclick="clearAllConds()">✕ Clear Conditions</button>
+  </div>
 
   <div class="table-wrap">
     <table id="mainTable">
@@ -1000,16 +1105,16 @@ function buildHeader() {
   r3 += `<th>${mkNumF('low')}</th>`;
   r3 += `<th>${mkNumF('close')}</th>`;
   r3 += `<th>${mkNumF('chg','e.g. >2')}</th>`;
-  r3 += `<th class="group-start">${mkSelF('vara',   DAYS_ALL, tVara)}</th>`;
-  r3 += `<th>${mkSelF('tithi',  [...new Set(ALL_TITHIS)], tTithi)}</th>`;
-  r3 += `<th>${mkSelF('paksha', ['Shukla','Krishna'],     tPaksha)}</th>`;
-  r3 += `<th>${mkSelF('karana', ALL_KARANAS, v => lang==='ta' ? (TA.karanas[v]||v) : v)}</th>`;
-  r3 += `<th>${mkSelF('yogi_nak', NAKS, tNak)}</th>`;
+  r3 += `<th class="group-start">${mkMultiSelF('vara',   DAYS_ALL, tVara)}</th>`;
+  r3 += `<th>${mkMultiSelF('tithi',  [...new Set(ALL_TITHIS)], tTithi)}</th>`;
+  r3 += `<th>${mkMultiSelF('paksha', ['Shukla','Krishna'], tPaksha)}</th>`;
+  r3 += `<th>${mkMultiSelF('karana', ALL_KARANAS, v => lang==='ta' ? (TA.karanas[v]||v) : v)}</th>`;
+  r3 += `<th>${mkMultiSelF('yogi_nak', NAKS, tNak)}</th>`;
   r3 += `<th></th>`;
   for (const pk of PLANETS) {
     r3 += `<th class="group-start">${mkNumF(pk+'_deg','0-360')}</th>`;
-    r3 += `<th>${mkSelF(pk+'_sign', SIGNS, tSign)}</th>`;
-    r3 += `<th>${mkSelF(pk+'_nak', NAKS, tNak)}</th>`;
+    r3 += `<th>${mkMultiSelF(pk+'_sign', SIGNS, tSign)}</th>`;
+    r3 += `<th>${mkMultiSelF(pk+'_nak', NAKS, tNak)}</th>`;
   }
   r3 += '</tr>';
 
@@ -1035,6 +1140,7 @@ function buildHeader() {
       applyFilters();
     });
   });
+  setStickyOffsets();
 }
 
 // ── Render page ───────────────────────────────────────────────────────────────
@@ -1107,6 +1213,7 @@ function renderPage() {
     html += '</tr>';
   }
   tbody.innerHTML = html;
+  setStickyOffsets();
 
   // Update download button with row count
   const dlBtn = document.getElementById('dlBtn');
@@ -1190,20 +1297,23 @@ function applyFilters() {
       if (colFilters[col] && !matchNum(ohlc[col], colFilters[col])) return false;
     }
 
-    // Per-column: vara / tithi / paksha
-    if (colFilters.vara   && getDay(r)            !== colFilters.vara)   return false;
-    if (colFilters.tithi  && getTithi(r).name     !== colFilters.tithi)  return false;
-    if (colFilters.paksha && getTithi(r).paksha   !== colFilters.paksha) return false;
-
-    // Per-column: karana
-    if (colFilters.karana) {
-      if (getKarana(r).name !== colFilters.karana) return false;
-    }
-
-    // Per-column: yogi nakshatra
-    if (colFilters.yogi_nak) {
-      if (getYogi(r).nak !== colFilters.yogi_nak) return false;
-    }
+    // Per-column: vara / tithi / paksha / karana / yogi (multi-select Sets)
+    const fVara   = colFilters.vara;
+    const fTithi  = colFilters.tithi;
+    const fPaksha = colFilters.paksha;
+    const fKarana = colFilters.karana;
+    const fYogi   = colFilters.yogi_nak;
+    if (fVara   instanceof Set && fVara.size   > 0 && !fVara.has(getDay(r)))            return false;
+    if (fTithi  instanceof Set && fTithi.size  > 0 && !fTithi.has(getTithi(r).name))    return false;
+    if (fPaksha instanceof Set && fPaksha.size > 0 && !fPaksha.has(getTithi(r).paksha)) return false;
+    if (fKarana instanceof Set && fKarana.size > 0 && !fKarana.has(getKarana(r).name))  return false;
+    if (fYogi   instanceof Set && fYogi.size   > 0 && !fYogi.has(getYogi(r).nak))       return false;
+    // Legacy string fallback (for non-multi-select paths)
+    if (typeof fVara  ==='string' && fVara   && getDay(r)          !== fVara)   return false;
+    if (typeof fTithi ==='string' && fTithi  && getTithi(r).name   !== fTithi)  return false;
+    if (typeof fPaksha==='string' && fPaksha && getTithi(r).paksha !== fPaksha) return false;
+    if (typeof fKarana==='string' && fKarana && getKarana(r).name  !== fKarana) return false;
+    if (typeof fYogi  ==='string' && fYogi   && getYogi(r).nak     !== fYogi)   return false;
 
     // Per-column: planets
     for (const pk of PLANETS) {
@@ -1212,10 +1322,15 @@ function applyFilters() {
       const fDeg  = colFilters[pk+'_deg'];
       if (!fSign && !fNak && !fDeg) continue;
       const info = getPInfo(r, pk);
-      if (fSign && info.sign !== fSign)                    return false;
-      if (fNak  && info.nak  !== fNak)                     return false;
-      if (fDeg  && !matchNum(info.lon ?? 0, fDeg))         return false;
+      if (fSign instanceof Set && fSign.size > 0 && !fSign.has(info.sign)) return false;
+      if (fNak  instanceof Set && fNak.size  > 0 && !fNak.has(info.nak))   return false;
+      if (typeof fSign==='string' && fSign && info.sign !== fSign) return false;
+      if (typeof fNak ==='string' && fNak  && info.nak  !== fNak)  return false;
+      if (fDeg  && !matchNum(info.lon ?? 0, fDeg))                 return false;
     }
+
+    // Special conditions filter
+    if (!checkConditions(r)) return false;
 
     return true;
   });
@@ -1269,6 +1384,17 @@ function resetFilters() {
     if (el.tagName==='SELECT') el.selectedIndex = 0;
     else el.value = '';
   });
+  // Clear multi-select state
+  document.querySelectorAll('.ms-panel input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.ms-lbl').forEach(lbl => lbl.textContent = 'Any');
+  document.querySelectorAll('.ms-trigger').forEach(t => t.classList.remove('has-sel'));
+  document.querySelectorAll('.ms-x').forEach(x => { x.style.opacity='0'; x.style.pointerEvents='none'; });
+  // Clear tf-clear buttons
+  document.querySelectorAll('.tf-x').forEach(b => b.classList.remove('visible'));
+  // Clear conditions
+  activeConditions.clear();
+  document.querySelectorAll('.cond-chip.active').forEach(b => b.classList.remove('active'));
+  document.getElementById('condClearAll')?.classList.remove('visible');
   document.querySelectorAll('.sortable').forEach(t=>t.classList.remove('sort-asc','sort-desc'));
   filtered = [...allRecords];
   currentPage = 1;
@@ -1322,6 +1448,177 @@ function toggleLang() {
   buildAyanBtns();
   buildHeader();
   renderPage();
+}
+
+// ── Sticky OHLC: dynamic left-offset calculation ──────────────────────────────
+const stickyStyleEl = document.createElement('style');
+document.head.appendChild(stickyStyleEl);
+
+function setStickyOffsets() {
+  requestAnimationFrame(() => {
+    const r2 = document.querySelector('#thead tr:nth-child(2)');
+    if (!r2) return;
+    const ths = [...r2.querySelectorAll('th')].slice(0, 6);
+    let left = 0, css = '';
+    for (let i = 0; i < ths.length; i++) {
+      css += `#mainTable tr > :nth-child(${i+1}) { left: ${left}px !important; }\n`;
+      left += ths[i].offsetWidth;
+    }
+    stickyStyleEl.textContent = css;
+  });
+}
+window.addEventListener('resize', setStickyOffsets);
+
+// ── Multi-select filter component ─────────────────────────────────────────────
+function mkMultiSelF(key, opts, labelFn) {
+  const sel = colFilters[key] instanceof Set ? colFilters[key] : new Set();
+  const count = sel.size;
+  const lbl = count === 0 ? 'Any'
+             : count <= 2 ? [...sel].map(v => labelFn ? labelFn(v) : v).join(', ')
+             : `${count} selected`;
+  const hasSel = count > 0;
+  const items = opts.map(v => {
+    const chk = sel.has(v) ? ' checked' : '';
+    const display = labelFn ? labelFn(v) : v;
+    return `<label><input type="checkbox" value="${v}"${chk} onchange="toggleMsItem('${key}','${v}',this.checked)">${display}</label>`;
+  }).join('');
+  return `<div class="ms-wrap">
+    <div class="ms-trigger${hasSel?' has-sel':''}" onclick="openMs(event,'ms_${key}')">
+      <span class="ms-lbl" id="ms_lbl_${key}">${lbl}</span>
+      <span class="ms-arr">▾</span>
+    </div>
+    <button class="ms-x${hasSel?'':''}" id="ms_x_${key}" onclick="clearMsFilter('${key}')" title="Clear filter" style="${hasSel?'':'opacity:0;pointer-events:none'}">✕</button>
+    <div class="ms-panel" id="ms_${key}">${items}</div>
+  </div>`;
+}
+
+let _openPanelKey = null;
+function openMs(evt, panelId) {
+  evt.stopPropagation();
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const isOpen = panel.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.ms-panel.open').forEach(p => p.classList.remove('open'));
+  _openPanelKey = null;
+  if (!isOpen) {
+    panel.classList.add('open');
+    _openPanelKey = panelId;
+    // Position below trigger
+    const trigger = evt.currentTarget;
+    const rect = trigger.getBoundingClientRect();
+    panel.style.top  = (rect.bottom + 2) + 'px';
+    panel.style.left = rect.left + 'px';
+  }
+}
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ms-panel.open').forEach(p => p.classList.remove('open'));
+  _openPanelKey = null;
+});
+
+function toggleMsItem(key, val, checked) {
+  if (!(colFilters[key] instanceof Set)) colFilters[key] = new Set();
+  if (checked) colFilters[key].add(val);
+  else          colFilters[key].delete(val);
+  if (colFilters[key].size === 0) delete colFilters[key];
+  _updateMsLabel(key);
+  currentPage = 1;
+  applyFilters();
+}
+function _updateMsLabel(key) {
+  const sel = colFilters[key] instanceof Set ? colFilters[key] : new Set();
+  const lbl = document.getElementById(`ms_lbl_${key}`);
+  const xBtn = document.getElementById(`ms_x_${key}`);
+  const trigger = lbl?.closest('.ms-trigger');
+  if (lbl) {
+    const count = sel.size;
+    lbl.textContent = count === 0 ? 'Any'
+                    : count <= 2 ? [...sel].join(', ')
+                    : `${count} selected`;
+  }
+  if (xBtn) { xBtn.style.opacity = sel.size ? '1' : '0'; xBtn.style.pointerEvents = sel.size ? 'auto' : 'none'; }
+  if (trigger) { trigger.classList.toggle('has-sel', sel.size > 0); }
+}
+function clearMsFilter(key) {
+  delete colFilters[key];
+  _updateMsLabel(key);
+  // Uncheck all boxes in panel
+  const panel = document.getElementById(`ms_${key}`);
+  if (panel) panel.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+  currentPage = 1;
+  applyFilters();
+}
+
+// ── Text/num filter clear helpers ─────────────────────────────────────────────
+function mkTextF(key, ph) {
+  const val = colFilters[key] || '';
+  return `<div class="tf-wrap"><input class="col-filter" type="text" placeholder="${ph||'…'}"
+    value="${val}" oninput="setColFilter('${key}',this.value);updateTfClear('${key}',this.value)">
+    <button class="tf-x${val?'  visible':''}" id="tfx_${key}" onclick="clearTf('${key}')" title="Clear">✕</button></div>`;
+}
+function mkNumF(key, ph) {
+  const val = colFilters[key] || '';
+  return `<div class="tf-wrap"><input class="col-filter" type="text" placeholder="${ph||'>0'}"
+    value="${val}" title="Use: >X  <X  >=X  X-Y  or exact"
+    oninput="setColFilter('${key}',this.value);updateTfClear('${key}',this.value)">
+    <button class="tf-x${val?' visible':''}" id="tfx_${key}" onclick="clearTf('${key}')" title="Clear">✕</button></div>`;
+}
+function updateTfClear(key, val) {
+  const btn = document.getElementById(`tfx_${key}`);
+  if (btn) btn.classList.toggle('visible', !!val);
+}
+function clearTf(key) {
+  delete colFilters[key];
+  const wrap = document.getElementById(`tfx_${key}`)?.closest('.tf-wrap');
+  if (wrap) { const inp = wrap.querySelector('input'); if (inp) inp.value = ''; }
+  const btn = document.getElementById(`tfx_${key}`);
+  if (btn) btn.classList.remove('visible');
+  currentPage = 1;
+  applyFilters();
+}
+
+// ── Conditions filter (retrograde + special status) ───────────────────────────
+const activeConditions = new Set();
+
+function toggleCond(cond, btn) {
+  if (activeConditions.has(cond)) activeConditions.delete(cond);
+  else                             activeConditions.add(cond);
+  btn.classList.toggle('active', activeConditions.has(cond));
+  document.getElementById('condClearAll').classList.toggle('visible', activeConditions.size > 0);
+  currentPage = 1;
+  applyFilters();
+}
+function clearAllConds() {
+  activeConditions.clear();
+  document.querySelectorAll('.cond-chip.active').forEach(b => b.classList.remove('active'));
+  document.getElementById('condClearAll').classList.remove('visible');
+  currentPage = 1;
+  applyFilters();
+}
+function checkConditions(r) {
+  if (activeConditions.size === 0) return true;
+  const ayan = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
+  for (const cond of activeConditions) {
+    if (cond.startsWith('retro_')) {
+      const pk = cond.slice(6);
+      if (!isRetro(r, pk)) return false;
+    } else if (cond === 'any_exalt') {
+      if (!PLANETS.some(pk => getPlanetDignity(r, pk, ayan) === 'Ex')) return false;
+    } else if (cond === 'any_debil') {
+      if (!PLANETS.some(pk => getPlanetDignity(r, pk, ayan) === 'De')) return false;
+    } else if (cond === 'any_gandanta') {
+      if (!PLANETS.some(pk => { const t = r.p?.[pk]; return t != null && isGandanta(normLon(t - ayan)); })) return false;
+    } else if (cond === 'graha_yuddha') {
+      if (getGrahaYuddha(r).size === 0) return false;
+    } else if (cond === 'eclipse_zone') {
+      if (!PLANETS.some(pk => isEclipseZone(r, pk))) return false;
+    } else if (cond === 'any_combust') {
+      if (!PLANETS.some(pk => isCombust(r, pk))) return false;
+    } else if (cond === 'any_vargottama') {
+      if (!PLANETS.some(pk => { const t = r.p?.[pk]; return t != null && isVargottama(normLon(t - ayan)); })) return false;
+    }
+  }
+  return true;
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
