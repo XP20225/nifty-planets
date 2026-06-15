@@ -283,7 +283,7 @@ def compute_day_features(d, positions=None):
     # Panchaka
     feat['panchaka'] = int(nak_num >= 23)
 
-    # Aspect: Jupiter, Saturn aspecting Moon
+    # Aspect: Jupiter, Saturn aspecting Moon (legacy compatibility)
     def _asp(p_sign, p_name, target_sign):
         aspects = {(p_sign+5)%12+1}  # 7th
         for off in SPECIAL_ASPECTS.get(p_name,[]):
@@ -292,6 +292,60 @@ def compute_day_features(d, positions=None):
     feat['ju_asp_mo'] = _asp(feat['sign_Ju'], 'Ju', feat['sign_Mo'])
     feat['sa_asp_mo'] = _asp(feat['sign_Sa'], 'Sa', feat['sign_Mo'])
     feat['ma_asp_mo'] = _asp(feat['sign_Ma'], 'Ma', feat['sign_Mo'])
+
+    # Fix 6: Comprehensive inter-planetary aspects (398 features)
+    _P_ASP = {'Su':[7],'Mo':[7],'Me':[7],'Ve':[7],
+              'Ma':[4,7,8],'Ju':[5,7,9],'Sa':[3,7,10],
+              'Ra':[5,7,9],'Ke':[5,7,9]}
+    _S_LORD = {1:'Ma',2:'Ve',3:'Me',4:'Mo',5:'Su',6:'Me',
+               7:'Ve',8:'Ma',9:'Ju',10:'Sa',11:'Sa',12:'Ju'}
+    _OWN_S  = {'Ma':{1,8},'Ve':{2,7},'Me':{3,6},'Mo':{4},
+               'Su':{5},'Ju':{9,12},'Sa':{10,11}}
+    _NATAL  = 2   # Nifty inception Moon: Taurus
+    _ALL_P  = ['Su','Mo','Ma','Me','Ju','Ve','Sa','Ra','Ke']
+    _KEY_PR = [('Ju','Sa'),('Ju','Ma'),('Sa','Ma'),('Ju','Su'),('Sa','Su'),
+               ('Ma','Su'),('Ju','Mo'),('Sa','Mo'),('Ma','Mo'),('Ve','Ju'),
+               ('Ve','Sa'),('Ve','Ma'),('Me','Ju'),('Me','Sa'),('Me','Ma'),
+               ('Ra','Ju'),('Ra','Sa'),('Ra','Mo'),('Su','Mo'),('Me','Ve')]
+    _DASP   = {'conj':0,'opp':180,'trine':120,'sq':90,'sext':60}
+    _DORB   = {'conj':8,'opp':8,'trine':7,'sq':7,'sext':6}
+
+    def _asign(sg, H): return ((sg - 1 + H - 1) % 12) + 1
+
+    for _p1 in _ALL_P:
+        _sg1 = feat.get(f'sign_{_p1}', 0)
+        if not _sg1: continue
+        _all_asp = {}
+        for _H in _P_ASP.get(_p1, []):
+            _asg = _asign(_sg1, _H)
+            _all_asp[_H] = _asg
+            feat[f'asp{_H}_{_p1}_lord']       = _S_LORD[_asg]
+            feat[f'aspected_sign_{_p1}_{_H}'] = _asg
+            feat[f'asp{_H}_{_p1}_natal_mo']   = int(_asg == _NATAL)
+            for _p2 in _ALL_P:
+                if _p2 == _p1: continue
+                feat[f'asp{_H}_{_p1}_{_p2}'] = int(feat.get(f'sign_{_p2}', 0) == _asg)
+        _asp_set = set(_all_asp.values())
+        for _p2 in list(_OWN_S.keys()):
+            feat[f'asp_{_p1}_dom_{_p2}'] = int(bool(_asp_set & _OWN_S[_p2]))
+
+    for _p1, _p2 in _KEY_PR:
+        _s1 = sid.get(_p1); _s2 = sid.get(_p2)
+        if _s1 is None or _s2 is None: continue
+        _raw = abs(_s1 - _s2) % 360
+        _sep = _raw if _raw <= 180 else 360 - _raw
+        for _an, _ad in _DASP.items():
+            _orb = _DORB[_an]
+            _in = int(abs(_sep - _ad) <= _orb)
+            feat[f'deg_{_an}_{_p1}_{_p2}'] = _in
+            feat[f'ex_{_an}_{_p1}_{_p2}']  = int(_in and abs(_sep - _ad) <= 3)
+
+    for _slow in ['Sa','Ju','Ma']:
+        _sg_s = feat.get(f'sign_{_slow}', 0)
+        if not _sg_s: continue
+        _asgs = {_asign(_sg_s, _H) for _H in _P_ASP[_slow]}
+        feat[f'n_asp_under_{_slow}'] = sum(1 for _p in _ALL_P if _p != _slow
+                                            and feat.get(f'sign_{_p}', 0) in _asgs)
 
     # Interaction features
     feat['ix_paksha_ju_dig']    = feat['paksha'] + '_' + feat['dig_Ju']

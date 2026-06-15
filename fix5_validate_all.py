@@ -64,6 +64,22 @@ for c in ['is_bull','is_strong_bull','is_strong_bear','is_sideways','is_high_vol
     if c in df.columns: df[c] = df[c].fillna(-1).astype(int)
 
 df_clean = df[df['is_bull'].isin([0,1])].copy()
+
+# Create binary _s columns (needed for combined_scan_k12 pattern matching)
+EXCL_PFX = ('open','high','low','close','volume','fwd_','ret_','is_','log_',
+             'range_','atr','date','sid_','spd_','sign_','prior_ret')
+EXCL_EX  = {'index','oc','signal','outcome_3d'}
+for col in df_clean.columns:
+    if col.startswith(EXCL_PFX) or col in EXCL_EX: continue
+    s = df_clean[col].dropna()
+    if s.empty: continue
+    vals = set(s.unique())
+    if vals <= {0, 1, 0.0, 1.0}:
+        sname = col + '_s'
+        if sname not in df_clean.columns:
+            df_clean[sname] = col + '=' + df_clean[col].astype(str)
+print(f"  Binary _s columns created: {sum(1 for c in df_clean.columns if c.endswith('_s'))}")
+
 df_train  = df_clean[df_clean['date'] < OOS_SPLIT].copy()
 df_oos    = df_clean[df_clean['date'] >= OOS_SPLIT].copy()
 N = len(df_clean); BASE_BULL = df_clean['is_bull'].mean()
@@ -95,6 +111,35 @@ if os.path.exists(fp_path):
     if len(fp_new) > 0:
         m1 = pd.concat([m1, fp_new], ignore_index=True)
     print(f"  M1 fingerprint new (p<0.05): {len(fp_new)} new patterns added")
+
+# Combined k=1,2 scan (all 668 features including aspects, from combined_scan_k12.py)
+# Take only the top candidates to avoid correlation explosion:
+#   - Top 5000 BULL (highest wilson_lower) + top 5000 BEAR (lowest wilson_lower)
+#   - Only patterns with at least one non-aspect feature in k=2 (no pure-aspect regime patterns)
+#   - Minimum n=20 (not just barely-significant small samples)
+comb_path = f"{REPO}/results/research/method1_combined_k12.csv"
+if os.path.exists(comb_path):
+    comb = load_csv_safe(comb_path)
+    comb['source'] = 'method1_combined'
+    BASE_BULL_RATE = 0.551
+    # Filter: n >= 20, and for k=2 require at least one non-aspect feature
+    ASP_PFX = ('asp3_','asp4_','asp5_','asp7_','asp8_','asp9_','asp10_',
+                'asp_','deg_','ex_','n_asp','mut_','any_','natal_','aspected_')
+    def _has_non_asp(f_str):
+        parts = str(f_str).split('|')
+        if len(parts) == 1: return True   # k=1: always include
+        return any(not any(p.rstrip('_s').startswith(pf) for pf in ASP_PFX) for p in parts)
+    comb = comb[comb['n'] >= 20].copy()
+    comb = comb[comb['features'].apply(_has_non_asp)]
+    # Top 5000 BULL + 5000 BEAR by wilson_lower
+    comb_bull = comb[comb['win_rate'] > BASE_BULL_RATE].nlargest(5000, 'wilson_lower')
+    comb_bear = comb[comb['win_rate'] <= BASE_BULL_RATE].nsmallest(5000, 'wilson_lower')
+    comb_top  = pd.concat([comb_bull, comb_bear], ignore_index=True)
+    m1_keys = set(m1['features'].astype(str) + ':::' + m1['condition'].astype(str))
+    comb_new = comb_top[~(comb_top['features'].astype(str) + ':::' + comb_top['condition'].astype(str)).isin(m1_keys)]
+    if len(comb_new) > 0:
+        m1 = pd.concat([m1, comb_new], ignore_index=True)
+    print(f"  Combined k=1,2 top (n>=20): {len(comb_new)} patterns added")
 
 # M2 (prefer full uncapped version)
 m2_full_path = f"{REPO}/results/research/method2_full.csv"
