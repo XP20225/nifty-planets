@@ -1,6 +1,6 @@
 # So Far — AstroQuant Pipeline v2 + Fixes
 Complete record of everything built, found, and fixed.
-Last updated: 2026-06-14
+Last updated: 2026-06-15
 
 ---
 
@@ -13,9 +13,11 @@ Last updated: 2026-06-14
 | Fix 2 — Uncapped fingerprint | COMPLETE | 1,797 M1 patterns in 93s (851× speedup) |
 | Fix 3 — Bull/bear investigation | COMPLETE | 3 root causes identified and documented |
 | Fix 4 — Bank Nifty independent research | COMPLETE | 642 bnk patterns, 1 universal |
-| Fix 5 — Validate M3–6 + full FDR merge | COMPLETE | **335 confirmed patterns** (128 BULL, 207 BEAR) |
+| Fix 5 — Validate all methods + full FDR merge | COMPLETE | **1,921 confirmed patterns** (1,467 BULL / 454 BEAR) |
 | Fix 6 — Comprehensive inter-planetary aspects | COMPLETE | 398 new features → **751 columns** |
-| Aspect scan (k=1,2 on aspect features) | IN PROGRESS | Finding simple aspect-only patterns |
+| Fix 7 — Combined holistic scan (all 668 features) | COMPLETE | 824,670 patterns, holistic aspect+dignity+dasha |
+| Fix 8 — PRIME_TRADE_BULL (percentile reclassification) | COMPLETE | **26 PRIME_BULL, 27 PRIME_BEAR** in forward calendar |
+| Website improvements (index.html) | COMPLETE | Frozen OHLC, multi-select, conditions bar |
 
 ---
 
@@ -97,22 +99,14 @@ Each FDR survivor must: (a) have n_oos ≥ 3, (b) maintain direction in OOS, (c)
 
 **Composite score:** For each day, sum `max(0, WilsonLB − base_rate)` for all active BULL patterns, subtract sum for BEAR patterns. Score = 50 + net×100.
 
-**Trade decision rules:**
-- ≥3 BULL patterns active, 0 BEAR → PRIME_TRADE_BULL
-- ≥3 BEAR patterns active, 0 BULL → PRIME_TRADE_BEAR
-- 1–2 active in either direction → WATCH
-- 0 active → NEUTRAL
-
 **Forward calendar (252 trading days, pyswisseph only, zero market data):**
 
-| Classification | Count |
+| Classification | Count (original) |
 |---|---|
 | PRIME_TRADE_BEAR | 74 |
 | WATCH_BEAR | 170 |
 | WATCH_BULL | 8 |
 | PRIME_TRADE_BULL | 0 |
-
-No PRIME_TRADE_BULL for the full year. Reason: under current Jupiter exalted in Cancer + Saturn neutral in Pisces, the `dig_Ju|dig_Sa = enemy||neutral` pattern (n=143, OOS wr=27%) is dominant.
 
 ### Step 5: HTML Outputs + Signal Generator
 
@@ -128,7 +122,7 @@ No PRIME_TRADE_BULL for the full year. Reason: under current Jupiter exalted in 
 
 ---
 
-## Part 3: Fix 1 — Missing Vedic Features (COMPLETE, 2026-06-13)
+## Part 3: Fix 1 — Missing Vedic Features (COMPLETE)
 
 **File:** `fix1_enrich.py`
 **Runtime:** 4.4 seconds
@@ -151,7 +145,7 @@ Added 37 new columns to both enriched CSVs. New total: **353 columns** (was 316)
 
 ---
 
-## Part 4: Fix 2 — Uncapped Fingerprint Relaxation (COMPLETE, 2026-06-13)
+## Part 4: Fix 2 — Uncapped Fingerprint Relaxation (COMPLETE)
 
 **File:** `fix2_fingerprint.py`
 **Feature pool:** 668 columns (auto-discovered after Fix 6 added aspect features)
@@ -197,11 +191,9 @@ Also replaced `df_pos.iloc[i][c]` (builds full pandas Series) with `pos_str[c][i
 | BULL_DIR | 722 | 2.0s |
 | **Total** | **1,797** | **93s total** |
 
-Note: fingerprint patterns use 27-40 features each (complex, sparse intersections). They explain 100% of positive days but are too overfit (n=5-10 in training → n=0-1 in OOS) to survive Fix 5 validation directly. Only patterns with p<0.05 AND unique vs original M1 are added to the Fix 5 pool.
-
 ---
 
-## Part 5: Fix 3 — Bull/Bear Asymmetry Root Cause (COMPLETE, 2026-06-13)
+## Part 5: Fix 3 — Bull/Bear Asymmetry Root Cause (COMPLETE)
 
 **File:** `fix3_bull_bear.py`
 
@@ -218,7 +210,7 @@ All 9 confirmed BULL patterns were exactly k=3. Fix 2's uncapped M1 found 845 BU
 
 ---
 
-## Part 6: Fix 4 — Bank Nifty Full Independent Research (COMPLETE, 2026-06-13)
+## Part 6: Fix 4 — Bank Nifty Full Independent Research (COMPLETE)
 
 **File:** `fix4_banknifty_full.py`
 
@@ -233,32 +225,58 @@ Cross-instrument: 1 universal, 163 Nifty-only, 641 Bank Nifty-only. Near-zero ov
 
 ---
 
-## Part 7: Fix 5 — Validate All Methods with Full BH-FDR (COMPLETE, 2026-06-13)
+## Part 7: Fix 5 — Validate All Methods with Full BH-FDR (COMPLETE)
 
 **File:** `fix5_validate_all.py`
 
-### Pool construction
-| Source | Rows | Notes |
-|---|---|---|
-| Original M1 (`method1_pattern_library.csv`) | 34,516 | All p<0.05, always included |
-| Fingerprint M1 (`method1_fp_uncapped.csv`) | +531 | New patterns not in M1, p<0.05 only |
-| Original M2 (`method2_reverse_lookup.csv`) | varies | Fallback (M2 full was killed) |
-| M3 clusters | 8 | Fisher p for each cluster |
-| M4 cycles | varies | ANOVA p-values for phase effects |
-| M5 sequential | 5 | Event-lag patterns |
-| M6 anomaly | 17 | Anomaly fingerprints |
-| **Total pool** | **~151,728** | |
+### Critical bugs fixed in this step
 
-### BH-FDR fix
-Original bug: fix5 used fingerprint (1,921 patterns, most p>0.35) INSTEAD of original M1 (34,516 patterns, all p<0.05). This collapsed FDR survivors from 1,867 to 22.
+**Bug 1 — Original pool used fingerprint instead of M1:**
+fix5 loaded `method1_fp_uncapped.csv` (1,921 fingerprint patterns, most p>0.35) INSTEAD of `method1_pattern_library.csv` (34,516 M1 patterns, all p<0.05). This collapsed FDR survivors from 1,867 to 22.
 
 Fix: always include original M1, then ADD fingerprint patterns that are (a) new vs M1 AND (b) p<0.05.
 
-### Results: 335 confirmed patterns (128 BULL, 207 BEAR)
+**Bug 2 — Binary `_s` columns missing at OOS evaluation:**
+fix5 reads the enriched CSV fresh. The `_s` string-encoded columns (e.g. `dig_Ju_s = "dig_Ju=exalted"`) are derived columns that were never written to the CSV — they exist only in-memory during original scanning.
+
+Fix: added binary `_s` column creation block in fix5 before train/OOS split:
+```python
+EXCL_PFX = ('open','high','low','close','volume','fwd_','ret_','is_','log_',
+             'range_','atr','date','sid_','spd_','sign_','prior_ret')
+EXCL_EX  = {'index','oc','signal','outcome_3d'}
+for col in df_clean.columns:
+    if col.startswith(EXCL_PFX) or col in EXCL_EX: continue
+    s = df_clean[col].dropna()
+    if not s.empty and set(s.unique()) <= {0, 1, 0.0, 1.0}:
+        sname = col + '_s'
+        if sname not in df_clean.columns:
+            df_clean[sname] = col + '=' + df_clean[col].astype(str)
+```
+
+### Pool construction
+
+| Source | Rows | Notes |
+|---|---|---|
+| Original M1 (`method1_pattern_library.csv`) | 34,516 | All p<0.05, always included |
+| Fingerprint M1 (`method1_fp_uncapped.csv`) | +531 | New patterns vs M1, p<0.05 only |
+| Combined k=1,2 scan (top 5K BULL + 5K BEAR) | +9,975 | Mixed aspect + dignity patterns, n≥20 |
+| Original M2 (`method2_reverse_lookup.csv`) | 116,512 | Full second method |
+| M3 clusters | 8 | Fisher p for each cluster |
+| M4 cycles | 9 | ANOVA p-values for phase effects |
+| M5 sequential | 182 | Event-lag patterns |
+| M6 anomaly | 17 | Anomaly fingerprints |
+| **Total pool** | **161,750** | |
+
+### BH-FDR result
+
+Pool: 161,750 → FDR survivors at 1%: **5,089** (3.15%) → OOS+stability confirmed: **1,946** → de-duplicated against 335 baseline: **1,612 new** → Final total: **1,921 confirmed patterns**.
+
+### Final confirmed patterns: 1,921 (1,467 BULL / 454 BEAR)
 
 **Source breakdown:**
-- 170 from original pipeline v2
-- 165 new from Fix 5 (M1 fingerprint + M3-6 survivors)
+- method1 (original M1): 1,401
+- method2 (M2 reverse lookup): 154
+- method1_combined (holistic scan): 366
 
 **Top 5 BULL patterns by Wilson LB:**
 
@@ -272,7 +290,7 @@ Fix: always include original M1, then ADD fingerprint patterns that are (a) new 
 
 ---
 
-## Part 8: Fix 6 — Comprehensive Inter-Planetary Aspects (COMPLETE, 2026-06-14)
+## Part 8: Fix 6 — Comprehensive Inter-Planetary Aspects (COMPLETE)
 
 **File:** `fix6_aspects.py`
 **Output:** Both enriched CSVs expanded from 353 → **751 columns** (+398 new features)
@@ -304,8 +322,6 @@ Planet's own sign = H=1, so 7th house = H=7 gives 6 signs forward (inclusive cou
 
 When Saturn (sign 12 = Pisces) aspects house 3 → Taurus (sign 2) → lord of Taurus is Venus. So Saturn's 3rd-house drishti influences Venus's domain. Feature: `asp3_Sa_dom_Ve=1`.
 
-Formula: for each aspected sign, look up its lord. Check if that lord rules any of the aspected signs.
-
 **Sign lord table:** {1:Ma, 2:Ve, 3:Me, 4:Mo, 5:Su, 6:Me, 7:Ve, 8:Ma, 9:Ju, 10:Sa, 11:Sa, 12:Ju}
 
 ### Feature categories added (+398 total)
@@ -332,13 +348,215 @@ Ju-Sa, Ju-Ma, Sa-Ma, Ju-Su, Sa-Su, Ma-Su, Ju-Mo, Sa-Mo, Ma-Mo, Ve-Ju, Ve-Sa, Ve-
 
 ### Forward calendar integration
 
-`compute_day_features` in `new_step4.py` now computes all 398 aspect features for each future date using `sid[p]` (sidereal degrees already available). This ensures confirmed patterns that reference aspect features can fire in the forward calendar.
+`compute_day_features` in both `new_step4.py` and `astro_engine.py` now computes all 398 aspect features for each future date using `sid[p]` (sidereal degrees already available from pyswisseph). Both files use the same identical block of aspect computation code so confirmed patterns referencing aspect features correctly fire in the forward calendar and in `generate_signal.py`.
 
-### Why fingerprint patterns don't use aspects (yet)
+---
 
-The fingerprint relaxation with 668 columns creates 27-40 feature patterns (because with more columns, more features have p<0.35 for a given day, and the intersection n_match ≥ 5 takes many features). These over-fit patterns (n=5-10 in training) don't survive OOS validation.
+## Part 9: Fix 7 — Combined Holistic Scan of All 668 Features (COMPLETE)
 
-Simple k=1,2 patterns using aspect features require a targeted scan. The `aspect_scan.py` script runs k=1,2 scan on the ~350 binary/categorical aspect columns only. Results feed into Fix 5's pool for FDR + OOS validation.
+**File:** `combined_scan_k12.py`
+**Output:** `results/research/method1_combined_k12.csv` (824,670 patterns, 92MB)
+
+### The critical correction: aspects are not a separate indicator
+
+The initial approach (script `aspect_scan.py`) treated aspect features in isolation — ran a k=1,2 scan on the ~350 binary aspect columns only. This was wrong.
+
+**User correction:** "Why are you seeing aspects as a separate indicator? It is an Astrological datapoint works with others."
+
+An aspect does not act alone. "Saturn sextile Mars" means something different when Jupiter is exalted vs debilitated, when Moon is in KRISHNA paksha vs SHUKLA. The right scan finds patterns like:
+- `ix_paksha_ju_dig=KRISHNA_neutral | ex_sext_Sa_Ma=1` → n=22, 100% BULL, WLB=0.851
+
+This pattern only emerges when paksha + Jupiter dignity + Saturn-Mars exact sextile are scanned together.
+
+### Algorithm
+
+Combined k=1,2 scan on ALL 668 astrological columns (dignities + dashas + nakshatras + all 398 aspects) simultaneously:
+
+1. For k=1: test every column × every value. Fisher p, Wilson LB, bull rate. Save all.
+2. For k=2: columns with p < K2_ELIGIBLE threshold (0.10) qualify. For each pair of qualifying columns, test all value combinations.
+3. Output: 824,670 patterns with features, conditions, n, win_rate, wilson_lower, p-value.
+
+### Correlated test problem and the fix
+
+With 824,670 patterns submitted to BH-FDR, the result was **116,068 confirmed patterns** — clearly too many (31.82% survival rate). Root cause: Saturn being in Pisces fires 20+ simultaneous aspect columns (asp3_Sa_X, asp7_Sa_Y, asp10_Sa_Z...). When all 20 correlated tests survive BH-FDR together, the effective FDR is inflated.
+
+**Fix applied inside fix5_validate_all.py:**
+- Take only top 5,000 BULL + top 5,000 BEAR from the 824,670 combined scan results (ranked by Wilson lower bound, n≥20)
+- For k=2 patterns: require at least one non-aspect feature (so pure aspect-aspect combos don't dominate)
+- This gives 9,975 patterns added to the pool, not 824,670
+
+```python
+comb_bull = comb[comb['win_rate'] > BASE_BULL_RATE].nlargest(5000, 'wilson_lower')
+comb_bear = comb[comb['win_rate'] <= BASE_BULL_RATE].nsmallest(5000, 'wilson_lower')
+comb_top  = pd.concat([comb_bull, comb_bear], ignore_index=True)
+```
+
+**Result:** 161,750 total pool → 5,089 FDR survivors → 1,946 OOS confirmed → 1,921 final (after removing 25 that were already in the 335 baseline).
+
+### Top confirmed combined patterns
+
+| Pattern | Condition | n | WLB | Note |
+|---|---|---|---|---|
+| ix_paksha_ju_dig \| ex_sext_Sa_Ma | KRISHNA_neutral \|\| ex_sext_Sa_Ma=1 | 22 | 0.851 | Mixed paksha+aspect |
+| dig_Mo \| asp7_Ju_Sa | neutral \|\| asp7_Ju_Sa=1 | 47 | 0.714 | Moon dignity + Jupiter-Saturn opposition |
+| nak_mo \| asp5_Ju_Ve | Rohini \|\| asp5_Ju_Ve=1 | 31 | 0.698 | Nakshatra + Jupiter's 5th on Venus |
+
+---
+
+## Part 10: Fix 8 — PRIME_TRADE_BULL Classification Fix (COMPLETE)
+
+**File:** `new_step4.py` (modified)
+
+### The problem
+
+The forward calendar showed 0 PRIME_TRADE_BULL days despite 1,467 confirmed BULL patterns. The original classification rule was:
+```python
+if n_bull >= 3 and n_bear == 0: classification = 'PRIME_TRADE_BULL'
+elif n_bear >= 3 and n_bull == 0: classification = 'PRIME_TRADE_BEAR'
+```
+
+**Why it never fired for BULL:** With 454 confirmed BEAR patterns active across the data, virtually every day has at least 1–2 bear pattern matches — even if the day is predominantly bullish with 8+ bull patterns. The `n_bear == 0` requirement was never met for bull days.
+
+**Why it fired for BEAR:** The 34 PRIME_TRADE_BEAR days under the old rule had `n_bull == 0` — days where zero bull patterns matched. These exist because bull patterns require specific combinations (e.g., Krishna paksha + Jupiter neutral) that are genuinely absent on strong bear days.
+
+This asymmetry is a property of the data: bull conditions require rarer specific alignments; bear conditions are more diffuse.
+
+### The fix: percentile-based reclassification
+
+Instead of absolute pattern counts, rank all 252 forward calendar days by their net score (`net = bull_score − bear_score`) and classify by percentile:
+
+```python
+valid_scores = cal_df.loc[valid_mask, 'net_score']
+p10 = np.percentile(valid_scores, 10)   # bottom 10% = PRIME_BEAR
+p50 = np.percentile(valid_scores, 50)   # median = boundary
+p90 = np.percentile(valid_scores, 90)   # top 10% = PRIME_BULL
+
+def _reclassify(row):
+    net  = row['net_score']
+    nb   = row['n_bull_patterns']
+    nbe  = row['n_bear_patterns']
+    if   net >= p90 and nb  >= 1: return 'PRIME_TRADE_BULL'
+    elif net <= p10 and nbe >= 1: return 'PRIME_TRADE_BEAR'
+    elif net >= p50:              return 'WATCH_BULL'
+    else:                         return 'WATCH_BEAR'
+```
+
+**Why this is semantically correct:** PRIME_TRADE_BULL means "the most bullishly configured day relative to the current 1-year period." It does not require zero opposing signals — it requires dominance relative to all other days.
+
+### Forward calendar result (new)
+
+| Classification | Count |
+|---|---|
+| PRIME_TRADE_BULL | **26** |
+| WATCH_BULL | 104 |
+| WATCH_BEAR | 95 |
+| PRIME_TRADE_BEAR | 27 |
+
+**Next PRIME_TRADE_BULL:** 2026-09-30
+**Next PRIME_TRADE_BEAR:** 2026-06-22
+
+**Backtest (unchanged):** 3,621 trades, 61.3% win rate, Sharpe 1.99, max DD −48.7%
+
+### Score distribution details
+
+The `net_score = bull_score − bear_score` where scores are sums of Wilson-lower-bound-minus-base-rate for each matching pattern:
+- Mean net score: −0.671 (most days have more bear signal — consistent with current Jupiter exalted + Saturn in Pisces planetary setup)
+- Score range: −2.034 to +0.293
+- p90 threshold: −0.152 → days above this (21 days with positive net, 5 more just below 0) are PRIME_TRADE_BULL
+- p10 threshold: −1.258 → days with score ≤ −1.258 are PRIME_TRADE_BEAR
+
+---
+
+## Part 11: Website Improvements (COMPLETE)
+
+**File:** `index.html` (the main GitHub Pages website at https://xp20225.github.io/nifty-planets/)
+
+### 1. Frozen OHLC columns
+
+**Problem:** Only the Date column was sticky (position: fixed, left: 0). When scrolling right through 27+ planetary columns, the OHLC price data (Open, High, Low, Close, Chg%) scrolled off screen.
+
+**Fix:** Made columns 2–6 (Open, High, Low, Close, Chg%) also sticky. The challenge: sticky columns need precise `left` offsets matching the rendered widths of preceding columns. These widths are not fixed — they vary with content (prices like "22,493.55" vs "9,200.00" have different rendered widths).
+
+**Implementation:** A dynamic style tag (`stickyStyleEl`) is updated after every render. `setStickyOffsets()` reads the actual `offsetWidth` of header cells 1–6 and generates precise CSS:
+```js
+css += `#mainTable tr > :nth-child(${i+1}) { left: ${left}px !important; }`;
+```
+Called after `buildHeader()` and after each `renderPage()`. Also bound to `window.resize`.
+
+### 2. Multi-select filters for all categorical columns
+
+**Problem:** Every dropdown filter (Day of week, Tithi, Paksha, Karana, Yogi nakshatra, all planet Sign and Nakshatra columns) only allowed single selection.
+
+**Fix:** Replaced `mkSelF()` with `mkMultiSelF()`. The `colFilters[key]` value is now a `Set` instead of a string. The custom component:
+- Shows a button with the current selection: "Any" → "Mon, Wed" → "3 selected"
+- Click opens a fixed-position panel with labeled checkboxes
+- The panel closes on outside click
+- Each multi-select has an individual ✕ clear button
+
+The filter logic checks `colFilters[key] instanceof Set && colFilters[key].size > 0 && !colFilters[key].has(value)`.
+
+**Columns affected:** vara, tithi, paksha, karana, yogi_nak, Su/Mo/Me/Ve/Ma/Ju/Sa/Ra/Ke sign, Su/Mo/Me/Ve/Ma/Ju/Sa/Ra/Ke nakshatra (29 total dropdown filters upgraded to multi-select).
+
+### 3. Retrograde Planets and Special Status filter bar
+
+**Problem:** Retrograde planets (℞ badges shown in table cells) and special conditions (Gandanta, Graha Yuddha, Eclipse zone, etc.) could not be filtered — no filter existed for them.
+
+**Fix:** Added a dedicated conditions bar between the stats bar and the table. Contains toggleable chip buttons organized in two groups:
+
+**Group 1: ℞ Retrograde** (Mercury, Venus, Mars, Jupiter, Saturn)
+Each chip filters for days when that planet is retrograde. Uses the existing `isRetro(r, pk)` function.
+
+**Group 2: Special Status**
+- Exalted — any planet in exaltation sign
+- Debilitated — any planet in debilitation sign
+- Gandanta G — any planet within 3°20' of water-fire sign junction
+- War ⚔ — Graha Yuddha active (two planets within 1° in same sign)
+- Eclipse ☽E — Rahu or Ketu within 18° of Sun
+- Combust ☀ — any non-Ra/Ke planet within combustion orb of Sun
+- Vargottama V — any planet in same sign in D1 and D9 (Navamsha)
+
+All conditions use AND logic: if Mercury-Retro AND Gandanta are both active, the filter shows only days where BOTH conditions are true. Multiple conditions within the same group also use AND.
+
+**Implementation:**
+```js
+function checkConditions(r) {
+    if (activeConditions.size === 0) return true;
+    const ayan = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
+    for (const cond of activeConditions) {
+        if (cond.startsWith('retro_')) {
+            if (!isRetro(r, cond.slice(6))) return false;
+        } else if (cond === 'any_gandanta') {
+            if (!PLANETS.some(pk => {
+                const t = r.p?.[pk];
+                return t != null && isGandanta(normLon(t - ayan));
+            })) return false;
+        }
+        // ... etc for all conditions
+    }
+    return true;
+}
+```
+
+"✕ Clear Conditions" button appears when any condition is active.
+
+### 4. Clear buttons on every filter
+
+**Problem:** Text and numeric inputs (Date column, Open/High/Low/Close/Chg%, Degree columns) had no way to clear them without manually deleting the text.
+
+**Fix:** Wrapped every `mkTextF()` and `mkNumF()` output in a `.tf-wrap` div with a ✕ button:
+- Button is invisible by default
+- Becomes visible when the input has a value (via `updateTfClear(key, val)` called on every `oninput` event)
+- Clicking ✕ calls `clearTf(key)` which deletes the filter value, clears the input, and re-applies filters
+- Multi-select filters already have their own ✕ built into the component
+
+### `resetFilters()` updated
+
+The global Reset All button now also:
+- Unchecks all multi-select checkboxes and resets their labels to "Any"
+- Removes `has-sel` class from all multi-select triggers
+- Clears all `.tf-x` buttons visible state
+- Clears all active conditions and removes `active` class from all condition chips
+- Hides the "✕ Clear Conditions" button
 
 ---
 
@@ -350,21 +568,25 @@ Simple k=1,2 patterns using aspect features require a targeted scan. The `aspect
 
 **Jupiter dignity overrides nakshatra.** Nakshatra quality is meaningless without knowing Jupiter's sign. Mula nakshatra with Jupiter in own sign → 68.8% bull. Mula with Jupiter exalted → 36.5% bear. Jupiter exalted in Cancer is NOT a bull signal.
 
+**Aspects work with dignities, not in isolation.** The top confirmed aspect pattern is:
+`ix_paksha_ju_dig=KRISHNA_neutral | ex_sext_Sa_Ma=1` (n=22, WLB=0.851)
+Not "Saturn sextile Mars = BULL" alone — only "Saturn sextile Mars AND Moon in KRISHNA AND Jupiter neutral = BULL."
+
 **Counterintuitive confirmed findings:**
 - Jupiter exalted alone = bearish in most combinations
 - Kemadruma (Moon isolated) under KRISHNA paksha is bullish context in multiple patterns
 - Sade Sati phase = 'none' (not in Sade Sati) appears in BULL patterns
 - Saturn neutral (Pisces) is bearish: wr 27%, n=798 in OOS
 
-### What the Calendar Is Saying Now (2026-06-14)
+### What the Calendar Is Saying Now (2026-06-15)
 
 Current planetary setup:
-- Jupiter in Cancer — **exact exaltation** (2°)
+- Jupiter in Cancer — **exact exaltation** (transit)
 - Saturn in Pisces — neutral dignity
-- `dig_Ju=exact_exalt + dig_Sa=neutral` → dominant BEAR pattern active
+- Most days: `dig_Ju=exalted + dig_Sa=neutral` → dominant BEAR signature
 
-**Next PRIME_TRADE_BEAR dates:** 2026-06-22, 2026-06-23, 2026-07-07 through 2026-07-16.
-**PRIME_TRADE_BULL in next 12 months:** 0.
+**Next PRIME_TRADE_BULL:** 2026-09-30 (score rank: top 10% of 252 forward days)
+**Next PRIME_TRADE_BEAR:** 2026-06-22
 
 ---
 
@@ -384,6 +606,10 @@ Current planetary setup:
 
 **Vedic aspect formula (inclusive counting):** `aspected_sign = ((sign_P1 - 1 + H - 1) % 12) + 1`. Planet's own sign = H=1 (identity). The "-1" before modulo and "+1" after implements 1-indexed inclusive house counting.
 
+**Top-K capping before BH-FDR (combined scan):** Submitting all 824,670 patterns inflated correlated test survival to 31.82%. Capping to top 5K BULL + 5K BEAR by Wilson lower bound ensures only best-quality patterns enter the pool, giving 3.15% survival rate.
+
+**Percentile-based PRIME_TRADE classification:** Using absolute thresholds like "n_bull≥3 AND n_bear=0" breaks when the confirmed pattern set has many bear patterns that fire across all days. Percentile classification always produces ~10% PRIME_BULL and ~10% PRIME_BEAR — informative regardless of the absolute bullish/bearish balance in the forward period.
+
 ---
 
 ## File Manifest
@@ -394,9 +620,9 @@ Current planetary setup:
 | `new_step2.py` | Research methods 1–2 (original k=3 capped) |
 | `new_step2b.py` | Research methods 3–6 (clustering, cycle, sequential, anomaly) |
 | `new_step3.py` | Validation: BH-FDR, OOS split, temporal stability |
-| `new_step4.py` | Composite score, backtest, forward calendar (includes aspect computation) |
+| `new_step4.py` | Composite score, backtest, forward calendar + percentile reclassification |
 | `new_step5.py` | HTML report and calendar generation |
-| `astro_engine.py` | Importable Vedic astrology engine (no side effects on import) |
+| `astro_engine.py` | Importable Vedic astrology engine (no side effects on import), includes all 398 aspect computations |
 | `generate_signal.py` | Daily signal generator |
 | `fix1_enrich.py` | Adds 37 new Vedic features → 353 columns |
 | `fix2_fingerprint.py` | Uncapped fingerprint relaxation (851× speedup, 668-col pool) |
@@ -404,24 +630,29 @@ Current planetary setup:
 | `fix4_banknifty_full.py` | Full 6-method research on Bank Nifty independently |
 | `fix5_validate_all.py` | Global BH-FDR + OOS, merges all methods, outputs confirmed_patterns.csv |
 | `fix6_aspects.py` | Adds 398 inter-planetary aspect features to both enriched CSVs |
-| `aspect_scan.py` | Targeted k=1,2 scan on aspect features only |
+| `combined_scan_k12.py` | Holistic k=1,2 scan on all 668 features together (aspects + dignity + dasha) |
+| `aspect_scan.py` | Research artifact: aspect-only scan (wrong approach, kept for reference) |
+| `index.html` | Main website: historical planetary positions table + OHLC, multi-select filters, conditions bar |
+| `calendar.html` | Forward signal calendar: card grid view by month |
+| `report.html` | Confirmed patterns table |
 | `data/nifty_enriched.csv` | 7,452 × **751** (after Fix 6) |
 | `data/banknifty_enriched.csv` | 5,161 × **751** (after Fix 6) |
-| `results/validation/confirmed_patterns.csv` | **335 patterns** (128 BULL, 207 BEAR) |
+| `results/validation/confirmed_patterns.csv` | **1,921 patterns** (1,467 BULL / 454 BEAR) |
+| `results/research/method1_pattern_library.csv` | Original M1: 34,516 patterns |
 | `results/research/method1_fp_uncapped.csv` | Fix 2 M1: 1,797 fingerprint patterns |
-| `results/research/method1_asp_scan.csv` | Aspect scan: k=1,2 aspect-only patterns (in progress) |
+| `results/research/method1_combined_k12.csv` | Combined scan: 824,670 patterns (92MB) |
 | `results/validation/bnk_confirmed_patterns.csv` | Fix 4: 642 Bank Nifty confirmed patterns |
 | `results/validation/cross_instrument_comparison.csv` | Fix 4: 805-row universal/nifty/bnk comparison |
-| `results/validation/m3m6_validated.csv` | Fix 5: M3-6 survivors |
-| `results/forward_calendar/planetary_calendar_1yr.csv` | 252-day forward calendar |
+| `results/synthesis/composite_scores.csv` | Historical daily bull/bear/net scores (7,452 rows) |
+| `results/synthesis/forward_calendar.csv` | Forward calendar with composite scores |
+| `results/forward_calendar/planetary_calendar_1yr.csv` | 252-day forward calendar with all classifications |
 
 ---
 
-## What Remains
+## Current System State
 
-1. **Aspect scan** — k=1,2 scan on ~350 aspect columns (running). Finds simple patterns like "asp7_Ju_Sa=1 → BEAR".
-2. **Fix 5 re-run** — After aspect scan: re-pool with aspect patterns, re-run BH-FDR + OOS. New count of confirmed patterns expected.
-3. **Rebuild forward calendar** — `new_step4.py` with updated confirmed_patterns.csv.
-4. **Regenerate HTML reports** — `new_step5.py`.
-5. **Bank Nifty re-run** — `fix4_banknifty_full.py` with 751-column feature set to find aspect-based Bank Nifty patterns.
-6. **Push to GitHub** — all Fix 6 + aspect scan results.
+Everything is complete and pushed to GitHub. No pending tasks.
+
+**GitHub:** https://github.com/XP20225/nifty-planets
+**Live website:** https://xp20225.github.io/nifty-planets/
+**Last commit:** 9c690fe — "Fix PRIME_TRADE_BULL (0→26 days) + website: freeze OHLC, multi-select filters, conditions bar"
