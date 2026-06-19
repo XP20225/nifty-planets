@@ -1,4 +1,12 @@
 features,condition,outcome,n,k_pos,win_rate,wilson_lower,p_value,complexity,source,fdr_survive
+choghadiya|tithi_num,choghadiya==U&tithi_num==30,BULL,25,21,0.84,0.6535,0.003835,2,muhurta,False
+choghadiya|tithi_num,choghadiya==U&tithi_num==19,BULL,26,21,0.8077,0.6212,0.009068,2,muhurta,False
+choghadiya|paksha,choghadiya==U&paksha==KRISHNA,BULL,335,206,0.6179,0.5648,0.009167,2,muhurta,False
+choghadiya|nak_mo,choghadiya==U&nak_mo==4,BEAR,26,8,0.3077,0.165,0.016304,2,muhurta,False
+choghadiya|tithi_num,choghadiya==U&tithi_num==11,BEAR,22,7,0.3182,0.1636,0.031908,2,muhurta,False
+choghadiya|sign_Mo,choghadiya==U&sign_Mo==4,BULL,53,36,0.6981,0.5646,0.036015,2,muhurta,False
+choghadiya|dig_Mo,choghadiya==U&dig_Mo==own,BULL,53,36,0.6981,0.5646,0.036015,2,muhurta,False
+choghadiya|tithi_num,choghadiya==U&tithi_num==26,BULL,19,15,0.7895,0.5667,0.038556,2,muhurta,False
 paksha|dig_Sa|dig_Ma,KRISHNA||own||own,BULL_DIR,41,39,0.9512,0.8386,3e-08,3,method1,True
 dig_Mo|dig_Ma|mahadasha,friendly||own||Ju,BULL_DIR,28,27,0.9643,0.8229,2.47e-06,3,method1,True
 dig_Sa|dig_Ve|dig_Me,neutral||neutral||debilitated,BULL_DIR,17,17,1.0,0.8157,6.553e-05,3,method1,True

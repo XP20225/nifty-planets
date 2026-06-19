@@ -1920,3 +1920,12 @@ paksha|ix_ju_dig_moon_sign|retro_Ju_s,SHUKLA||own_Mo12||retro_Ju=0,unknown,,meth
 ix_paksha_ju_dig|ix_ju_dig_moon_sign|retro_Ju_s,SHUKLA_own||own_Mo12||retro_Ju=0,unknown,,method2,BEAR,31,9,0.2903,0.161,,0.00031415,20,6,0.3,0.1455,True,0.25,0.3636,0.3,True,False
 tithi_quality|nak_mo_name|kemadruma_s,Nanda||UttaraAshadha||kemadruma=0,unknown,,method2,BEAR,32,8,0.25,0.1325,,0.00031415,19,7,0.3684,0.1915,True,0.1818,0.4,0.3684,True,False
 paksha|mod_Mo|ju_asp_mo_s,SHUKLA||D||ju_asp_mo=0,unknown,,method2,BEAR,662,319,0.4819,0.444,,0.00031452,264,140,0.5303,0.4701,True,0.4867,0.4739,0.5303,True,False
+moon_phase|nakl_dig|choghadiya_quality,FIRST_Q||debilitated||avoid,STRONG_BEAR,,method1,BEAR,23,9,0.3913,0.2216,,5.261e-05,6,3,0.5,0.1876,True,0.3333,0.4545,0.5,True,False
+vara_dig|sade_sati_phase|choghadiya_quality,friendly||rising||avoid,STRONG_BEAR,,method1,BEAR,54,29,0.537,0.4061,,9.37e-05,31,15,0.4839,0.3197,True,0.537,,0.4839,True,False
+vara_dig|sade_sati_phase|hora_at_open,friendly||rising||Ju,STRONG_BEAR,,method1,BEAR,26,11,0.4231,0.2554,,9.37e-05,13,7,0.5385,0.2914,True,0.4231,,0.5385,True,False
+dig_Ju|elem_Mo|choghadiya_quality,own||A||avoid,STRONG_BEAR,,method1,BEAR,118,64,0.5424,0.4526,,2.25e-05,65,30,0.4615,0.3459,True,0.5238,0.5882,0.4615,True,False
+dig_Sa|sade_sati_phase|choghadiya_quality,neutral||none||good,SIDEWAYS,,method1,BULL,29,18,0.6207,0.44,,8.79e-06,102,52,0.5098,0.4142,True,,0.6207,0.5098,True,False
+choghadiya_quality|ashtama_shani_s,good||ashtama_shani=1,SIDEWAYS,,method1,BULL,29,18,0.6207,0.44,,8.79e-06,102,52,0.5098,0.4142,True,,0.6207,0.5098,True,False
+dig_Sa|mahadasha|choghadiya_quality,neutral||Ra||good,SIDEWAYS,,method1,BULL,29,18,0.6207,0.44,,8.79e-06,102,52,0.5098,0.4142,True,,0.6207,0.5098,True,False
+paksha|dig_Sa|hora_at_open,SHUKLA||neutral||Ma,SIDEWAYS,,method1,BULL,17,10,0.5882,0.3601,,0.00010381,23,12,0.5217,0.3296,True,0.5714,,0.5217,True,False
+hora_at_open|chandra_mangala_s,Ju||chandra_mangala=1,STRONG_BEAR,,method1,BEAR,179,91,0.5084,0.4357,,0.00014353,64,33,0.5156,0.3958,True,0.487,0.5469,0.5156,True,False

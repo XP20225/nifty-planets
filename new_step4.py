@@ -634,24 +634,6 @@ for d in trading_days:
 
 cal_df = pd.DataFrame(calendar_rows)
 
-# Percentile-based reclassification — ensures balanced PRIME/WATCH output
-valid_mask = cal_df['classification'] != 'ERROR'
-valid_scores = cal_df.loc[valid_mask, 'net_score']
-if len(valid_scores) >= 20:
-    p10 = np.percentile(valid_scores, 10)
-    p50 = np.percentile(valid_scores, 50)
-    p90 = np.percentile(valid_scores, 90)
-    def _reclassify(row):
-        if row['classification'] == 'ERROR': return 'ERROR'
-        net = row['net_score']
-        nb  = row.get('n_bull_patterns', 0)
-        nbe = row.get('n_bear_patterns', 0)
-        if   net >= p90 and nb  >= 1: return 'PRIME_TRADE_BULL'
-        elif net <= p10 and nbe >= 1: return 'PRIME_TRADE_BEAR'
-        elif net >= p50:              return 'WATCH_BULL'
-        else:                         return 'WATCH_BEAR'
-    cal_df['classification'] = cal_df.apply(_reclassify, axis=1)
-
 cal_df.to_csv(f"{REPO}/results/forward_calendar/planetary_calendar_1yr.csv", index=False)
 print(f"Forward calendar saved: {len(cal_df)} trading days")
 print(cal_df['classification'].value_counts().to_string())

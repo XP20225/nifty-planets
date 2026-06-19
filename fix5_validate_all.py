@@ -141,6 +141,29 @@ if os.path.exists(comb_path):
         m1 = pd.concat([m1, comb_new], ignore_index=True)
     print(f"  Combined k=1,2 top (n>=20): {len(comb_new)} patterns added")
 
+# Muhurta targeted scan (hora, choghadiya, rahu_kalam, gulika_kalam)
+muhurta_path = f"{REPO}/results/research/muhurta_targeted.csv"
+if os.path.exists(muhurta_path):
+    mu = load_csv_safe(muhurta_path)
+    mu = mu[mu['p_value'] < 0.05]
+    mu['source'] = 'muhurta'
+    m1_keys = set(m1['features'].astype(str) + ':::' + m1['condition'].astype(str))
+    mu_new = mu[~(mu['features'].astype(str) + ':::' + mu['condition'].astype(str)).isin(m1_keys)]
+    for _, row in mu_new.iterrows():
+        pool.append({
+            'features'   : row['features'],
+            'condition'  : row['condition'],
+            'outcome'    : row['outcome'],
+            'n'          : row['n'],
+            'k_pos'      : int(row['n'] * row['win_rate']),
+            'win_rate'   : row['win_rate'],
+            'wilson_lower': row['wilson_lower'],
+            'p_value'    : float(row['p_value']),
+            'complexity' : row.get('k', 1),
+            'source'     : 'muhurta',
+        })
+    print(f"  Muhurta targeted (p<0.05):  {len(mu_new)} new patterns added")
+
 # M2 (prefer full uncapped version)
 m2_full_path = f"{REPO}/results/research/method2_full.csv"
 m2_path = f"{REPO}/results/research/method2_reverse_lookup.csv"

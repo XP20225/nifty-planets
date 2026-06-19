@@ -58,6 +58,30 @@ DASHA_TOTAL   = 120
 DASHA_NATURE  = {'Ke':'malefic','Ve':'benefic','Su':'malefic','Mo':'benefic','Ma':'malefic',
                  'Ra':'malefic','Ju':'benefic','Sa':'malefic','Me':'neutral'}
 INCEPTION_DATE = date(1996, 4, 22)
+RAHU_KALAM_PORTION  = {6:7, 0:2, 1:7, 2:5, 3:6, 4:4, 5:3}
+GULIKA_KALAM_PORTION = {6:6, 0:5, 1:4, 2:3, 3:2, 4:1, 5:7}
+MRITYU_BHAGA = {
+    'Su': {1:20,2:9,3:12,4:6,5:3,6:27,7:16,8:29,9:6,10:20,11:13,12:14},
+    'Mo': {1:26,2:12,3:13,4:25,5:24,6:11,7:26,8:14,9:13,10:25,11:5,12:12},
+    'Ma': {1:28,2:20,3:15,4:13,5:9,6:28,7:26,8:12,9:13,10:11,11:25,12:16},
+    'Me': {1:15,2:14,3:13,4:12,5:15,6:15,7:4,8:13,9:14,10:12,11:11,12:14},
+    'Ju': {1:14,2:26,3:11,4:5,5:10,6:13,7:10,8:5,9:12,10:14,11:20,12:26},
+    'Ve': {1:27,2:11,3:29,4:14,5:10,6:10,7:11,8:29,9:14,10:4,11:20,12:16},
+    'Sa': {1:20,2:21,3:22,4:5,5:20,6:10,7:22,8:14,9:14,10:20,11:28,12:26},
+}
+_MUMBAI_LAT = 18.9750
+_MUMBAI_LON = 72.8258
+_MUMBAI_ALT = 14.0
+_MARKET_OPEN_H = 9.25  # 9:15 AM IST as fractional hours
+
+def _get_sunrise_sunset_ist(d):
+    jd = swe.julday(d.year, d.month, d.day, 0.0)
+    geopos = (_MUMBAI_LON, _MUMBAI_LAT, _MUMBAI_ALT)
+    _, tret_r = swe.rise_trans(jd, swe.SUN, 1, geopos, 0.0, 0.0)
+    _, tret_s = swe.rise_trans(jd, swe.SUN, 2, geopos, 0.0, 0.0)
+    rise_ist = (tret_r[0] - jd) * 24.0 + 5.5
+    set_ist  = (tret_s[0] - jd) * 24.0 + 5.5
+    return rise_ist, set_ist
 
 def sign_of(d): return int(d / 30) + 1
 def deg_in_sign(d): return d % 30
@@ -237,11 +261,34 @@ def compute_day_features(d, positions=None):
 
     dow = d.weekday()
     day_lord_map = {0:'Mo',1:'Ma',2:'Me',3:'Ju',4:'Ve',5:'Sa',6:'Su'}
+    try:
+        rise_ist, set_ist = _get_sunrise_sunset_ist(d)
+    except Exception:
+        rise_ist, set_ist = 6.0, 18.0
+    day_dur   = set_ist - rise_ist
+    portion_h = day_dur / 8.0
+
     hora_start = HORA_IDX[day_lord_map[dow]]
-    feat['hora_at_open'] = HORA_SEQ[(hora_start + 3) % 7]
-    chog_seq = CHOGHADIYA_DAY[dow]
-    feat['choghadiya'] = chog_seq[2]
-    feat['choghadiya_quality'] = CHOGHADIYA_QUALITY[chog_seq[2]]
+    hora_num   = max(0, int(_MARKET_OPEN_H - rise_ist))
+    feat['hora_at_open'] = HORA_SEQ[(hora_start + hora_num) % 7]
+
+    chog_seq  = CHOGHADIYA_DAY[dow]
+    chog_idx  = min(int((_MARKET_OPEN_H - rise_ist) / portion_h), 7) if portion_h > 0 else 2
+    feat['choghadiya']         = chog_seq[chog_idx]
+    feat['choghadiya_quality'] = CHOGHADIYA_QUALITY[chog_seq[chog_idx]]
+
+    rk_portion = RAHU_KALAM_PORTION[dow]
+    rk_start   = rise_ist + (rk_portion - 1) * portion_h
+    feat['rahu_kalam_open'] = int(rk_start <= _MARKET_OPEN_H < rk_start + portion_h)
+
+    gk_portion = GULIKA_KALAM_PORTION[dow]
+    gk_start   = rise_ist + (gk_portion - 1) * portion_h
+    feat['gulika_kalam_open'] = int(gk_start <= _MARKET_OPEN_H < gk_start + portion_h)
+
+    mo_sg = feat.get('sign_Mo', sign_of(sid.get('Mo', 0)))
+    mo_dg = sid.get('Mo', 0) % 30
+    mb_deg = MRITYU_BHAGA.get('Mo', {}).get(mo_sg, -99)
+    feat['mrityu_Mo'] = int(abs(mo_dg - mb_deg) <= 1)
 
     maha, ant = compute_vimshottari(d)
     feat['mahadasha']  = maha

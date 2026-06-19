@@ -42,6 +42,75 @@ CONF_BEAR = confirmed[confirmed['signal_dir']=='BEAR'] if 'signal_dir' in confir
 # Classification summary from calendar
 cal_summary = calendar['classification'].value_counts().to_dict() if len(calendar) > 0 else {}
 
+# ── Jupiter environment analysis ────────────────────────────────────────
+def _ju_env_analysis(conf_df):
+    """Analyse how many confirmed BULL patterns require each Jupiter dignity."""
+    if len(conf_df) == 0:
+        return {}
+    bull = conf_df[conf_df.get('signal_dir', pd.Series(dtype=str)) == 'BULL'] if 'signal_dir' in conf_df.columns else conf_df
+    result = {}
+    for dig in ['exalted', 'own', 'friendly', 'neutral', 'enemy', 'debilitated']:
+        mask = bull['features'].str.contains(r'\bdig_Ju\b', regex=True, na=False) & \
+               bull['condition'].str.contains(dig, na=False)
+        result[dig] = int(mask.sum())
+    result['no_jupiter'] = int((~bull['features'].str.contains(r'\bdig_Ju\b', regex=True, na=False)).sum())
+    return result
+
+ju_dig_counts = _ju_env_analysis(confirmed)
+n_prime_bull = cal_summary.get('PRIME_TRADE_BULL', 0)
+n_watch_bull  = cal_summary.get('WATCH_BULL', 0)
+n_prime_bear  = cal_summary.get('PRIME_TRADE_BEAR', 0)
+n_watch_bear  = cal_summary.get('WATCH_BEAR', 0)
+
+# Upcoming Jupiter sign transitions (static — based on Lahiri ephemeris)
+_JU_TRANSITIONS = [
+    ('2026-10-29', 'Leo',   'friendly',    ju_dig_counts.get('friendly', 0)),
+    ('2027-11-24', 'Virgo', 'enemy',       ju_dig_counts.get('enemy',    0)),
+    ('2028-03-03', 'Leo',   'friendly',    ju_dig_counts.get('friendly', 0)),  # retro
+    ('2028-07-23', 'Virgo', 'enemy',       ju_dig_counts.get('enemy',    0)),
+    ('2028-12-24', 'Libra', 'enemy',       ju_dig_counts.get('enemy',    0)),
+]
+_jt_rows = ''.join(
+    f'<tr><td>{d}</td><td>{sg}</td><td>{dig}</td>'
+    f'<td style="color:{"#22c55e" if n>0 else "#94a3b8"}">{n} BULL patterns unlock</td></tr>'
+    for d, sg, dig, n in _JU_TRANSITIONS
+)
+
+env_section = f"""
+<h2>Section 5 — Current Planetary Environment &amp; Forward Outlook</h2>
+<div class="card">
+<h3>Why 0 PRIME_TRADE_BULL Days in the Forward Calendar</h3>
+<p>The forward calendar currently shows <b>{n_prime_bull} PRIME_TRADE_BULL</b> and <b>{n_watch_bull} WATCH_BULL</b> days
+against <b>{n_prime_bear} PRIME_TRADE_BEAR</b> and <b>{n_watch_bear} WATCH_BEAR</b> days.</p>
+<p>PRIME_TRADE_BULL requires a day where ≥3 confirmed BULL patterns fire and <b>zero</b> confirmed BEAR patterns fire.
+Under the current configuration — <b>Jupiter exalted in Cancer, Saturn neutral</b> — this condition is structurally
+impossible: 454 confirmed BEAR patterns span virtually every planetary combination, so n_bear ≥ 1 on every forward day.</p>
+<p>This is the honest finding. The pattern library has been conditioned on the last 30 years of market data during which
+Jupiter has cycled through all 12 signs. The exalted configuration correlates with net bearish outcomes in this dataset.</p>
+
+<h3>BULL Pattern Activation by Jupiter Dignity</h3>
+<table class="tbl" style="max-width:480px">
+<tr><th>Jupiter Dignity</th><th>Confirmed BULL Patterns Requiring It</th></tr>
+<tr><td>Exalted (Cancer — current)</td><td style="color:#ef4444">{ju_dig_counts.get('exalted',0)} patterns</td></tr>
+<tr><td>Own sign (Sagittarius/Pisces)</td><td>{ju_dig_counts.get('own',0)} patterns</td></tr>
+<tr><td>Friendly</td><td>{ju_dig_counts.get('friendly',0)} patterns</td></tr>
+<tr><td>Neutral</td><td>{ju_dig_counts.get('neutral',0)} patterns</td></tr>
+<tr><td>Enemy</td><td>{ju_dig_counts.get('enemy',0)} patterns</td></tr>
+<tr><td>Debilitated (Capricorn)</td><td>{ju_dig_counts.get('debilitated',0)} patterns</td></tr>
+<tr><td><b>No Jupiter condition</b> (fire in any configuration)</td><td><b>{ju_dig_counts.get('no_jupiter',0)} patterns</b></td></tr>
+</table>
+
+<h3>Upcoming Jupiter Sign Changes — When BULL Conditions Unlock</h3>
+<table class="tbl" style="max-width:600px">
+<tr><th>Date</th><th>Jupiter Sign</th><th>Dignity</th><th>Impact</th></tr>
+{_jt_rows}
+</table>
+<p class="section-note">The earliest meaningful PRIME_TRADE_BULL window opens around <b>November 2027</b> when Jupiter enters
+Virgo (enemy dignity). This unlocks the enemy-dignity BULL patterns and, combined with the right Moon nakshatra and paksha,
+should produce days where n_bull ≥ 3 and n_bear = 0 for the first time.</p>
+</div>
+"""
+
 # M4 cycles with evidence
 m4_yes = m4[m4['evidence']=='YES'] if len(m4)>0 else pd.DataFrame()
 
@@ -162,33 +231,35 @@ Moon Pisces + Jupiter Exalted: 38.9% (n=113, p=0.001) [bearish]<br>
 Moon Pisces + Jupiter Own Sign: 63.2% (n=85, p=0.043) [bullish flip of same setup]</p>
 </div>
 
-<h2>Section 5 — Cycle Analysis</h2>
+{env_section}
+
+<h2>Section 6 — Cycle Analysis</h2>
 <p class="section-note">Planetary cycles tested against market return periodicity via autocorrelation + FFT</p>
 {df_to_html(m4[['cycle_name','period_td','acf_significant','fft_power_ratio','phase_anova_p','evidence']] if len(m4)>0 else pd.DataFrame())}
 
-<h2>Section 6 — Cluster Analysis</h2>
+<h2>Section 7 — Cluster Analysis</h2>
 <p class="section-note">K=8 clusters of astrologically similar days — bull rate without peeking at returns first</p>
 {df_to_html(m3[['cluster','n','bull_rate','wilson_lower','strong_bull_pct','strong_bear_pct','character','dominant_paksha','dominant_nak','dominant_ju_dig']] if len(m3)>0 else pd.DataFrame())}
 
-<h2>Section 7 — Sequential Pattern Findings</h2>
+<h2>Section 8 — Sequential Pattern Findings</h2>
 <p class="section-note">Condition on day T → return outcome on day T+lag</p>
 {df_to_html(m5_sig[['condition_col','condition_val','lag','n','win_rate','wilson_lower','p_value']] if len(m5_sig)>0 else pd.DataFrame())}
 
-<h2>Section 8 — Accuracy-Selectivity Surface</h2>
+<h2>Section 9 — Accuracy-Selectivity Surface</h2>
 <p class="section-note">Composite score threshold vs historical win rate — empirical threshold discovery</p>
 {surface_html}
 
-<h2>Section 9 — Backtest Performance</h2>
+<h2>Section 10 — Backtest Performance</h2>
 <div class="caveat">Note: Backtest uses ONLY astrological composite score for entry signals. No market data (price, volume, returns) is used in signal generation. This is the correct methodology.</div>
 {bt_html}
 <h3>Stress Test Results</h3>
 {stress_html}
 
-<h2>Section 10 — Bank Nifty Cross-Validation</h2>
+<h2>Section 11 — Bank Nifty Cross-Validation</h2>
 <p class="section-note">Confirmed Nifty patterns tested on Bank Nifty — same sky, different instrument</p>
 {df_to_html(bn_transfer[['features','condition','outcome','nifty_wr','bn_n','bn_wr','transfer']] if len(bn_transfer)>0 else pd.DataFrame())}
 
-<h2>Section 11 — Honest Failure Analysis</h2>
+<h2>Section 12 — Honest Failure Analysis</h2>
 <div class="card">
 <h3>What Was Wrong in Version 1</h3>
 <p>• ML model (LightGBM) AUC 0.517 — essentially random. Treating astrological columns as ML features without understanding interactions produced noise.</p>

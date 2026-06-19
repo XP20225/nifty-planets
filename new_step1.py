@@ -7,6 +7,7 @@ No market data (log_ret, range_pct, etc.) used as features — only as outcome l
 import json, math, warnings, os
 import numpy as np
 import pandas as pd
+import swisseph as swe
 from datetime import date, timedelta, datetime
 
 warnings.filterwarnings('ignore')
@@ -277,28 +278,57 @@ def kemadruma(moon_sign, all_signs):
     no_kendra = all(s not in non_luminary_signs for s in kendras)
     return no_flanking and no_kendra
 
-def hora_at_open(weekday):
-    # weekday: 0=Mon, 6=Sun
+_MUMBAI_LAT = 18.9750  # Bombay Stock Exchange
+_MUMBAI_LON = 72.8258
+_MUMBAI_ALT = 14.0
+
+def _get_sunrise_sunset_ist(d):
+    """Return (rise_ist, set_ist) as fractional hours for Mumbai on date d."""
+    jd = swe.julday(d.year, d.month, d.day, 0.0)
+    geopos = (_MUMBAI_LON, _MUMBAI_LAT, _MUMBAI_ALT)
+    ret_r, tret_r = swe.rise_trans(jd, swe.SUN, 1, geopos, 0.0, 0.0)
+    ret_s, tret_s = swe.rise_trans(jd, swe.SUN, 2, geopos, 0.0, 0.0)
+    rise_ist = (tret_r[0] - jd) * 24.0 + 5.5
+    set_ist  = (tret_s[0] - jd) * 24.0 + 5.5
+    return rise_ist, set_ist
+
+def hora_at_open(weekday, rise_ist=SUNRISE_H):
     day_lord_map = {0:'Mo',1:'Ma',2:'Me',3:'Ju',4:'Ve',5:'Sa',6:'Su'}
     day_lord = day_lord_map[weekday]
     start_idx = HORA_IDX[day_lord]
-    hours_from_sunrise = MARKET_OPEN_H - SUNRISE_H  # 3.25h
-    hora_num = int(hours_from_sunrise)  # 3rd hora (0-indexed)
+    hora_num = int(MARKET_OPEN_H - rise_ist)
     hora_planet = HORA_SEQ[(start_idx + hora_num) % 7]
     return hora_planet
 
-def choghadiya_at_open(weekday):
+def choghadiya_at_open(weekday, rise_ist=SUNRISE_H, set_ist=None):
+    if set_ist is None:
+        set_ist = rise_ist + 12.0
     seq = CHOGHADIYA_DAY[weekday]
-    hours_from_sunrise = MARKET_OPEN_H - SUNRISE_H  # 3.25h
-    chog_idx = int(hours_from_sunrise / PORTION_H)  # 3.25/1.5 = 2.17 → idx 2
-    chog_idx = min(chog_idx, 7)
+    day_dur = set_ist - rise_ist
+    portion_h = day_dur / 8.0
+    chog_idx = min(int((MARKET_OPEN_H - rise_ist) / portion_h), 7)
     return seq[chog_idx], CHOGHADIYA_QUALITY[seq[chog_idx]]
 
-def rahu_kalam_at_open(weekday):
+def rahu_kalam_at_open(weekday, rise_ist=SUNRISE_H, set_ist=None):
+    if set_ist is None:
+        set_ist = rise_ist + 12.0
+    day_dur = set_ist - rise_ist
+    portion_h = day_dur / 8.0
     portion = RAHU_KALAM_PORTION[weekday]
-    rk_start = SUNRISE_H + (portion - 1) * PORTION_H
-    rk_end   = rk_start + PORTION_H
+    rk_start = rise_ist + (portion - 1) * portion_h
+    rk_end   = rk_start + portion_h
     return 1 if rk_start <= MARKET_OPEN_H < rk_end else 0
+
+def gulika_kalam_at_open(weekday, rise_ist=SUNRISE_H, set_ist=None):
+    GULIKA_KALAM_PORTION = {6:6, 0:5, 1:4, 2:3, 3:2, 4:1, 5:7}
+    if set_ist is None:
+        set_ist = rise_ist + 12.0
+    day_dur = set_ist - rise_ist
+    portion_h = day_dur / 8.0
+    portion = GULIKA_KALAM_PORTION[weekday]
+    gk_start = rise_ist + (portion - 1) * portion_h
+    gk_end   = gk_start + portion_h
+    return 1 if gk_start <= MARKET_OPEN_H < gk_end else 0
 
 def compute_vimshottari(birth_date, birth_moon_nak, target_date):
     # birth_moon_nak: 1-27
@@ -537,14 +567,32 @@ def enrich(df):
     df['gand_any'] = df[[f'gand_{p}' for p in PLANETS]].max(axis=1)
     df['sandhi_mo'] = (df['dg_Mo'] >= 29).astype(int)
 
-    print("Computing Weekday / Hora / Choghadiya …")
+    print("Computing Weekday / Hora / Choghadiya (sunrise-accurate) …")
     df['dow'] = pd.to_datetime(df['date']).dt.dayofweek  # 0=Mon
     df['vara_lord'] = df['dow'].map({0:'Mo',1:'Ma',2:'Me',3:'Ju',4:'Ve',5:'Sa',6:'Su'})
-    df['hora_at_open']   = df['dow'].apply(hora_at_open)
-    chog_data = df['dow'].apply(choghadiya_at_open)
-    df['choghadiya']        = chog_data.apply(lambda x: x[0])
-    df['choghadiya_quality'] = chog_data.apply(lambda x: x[1])
-    df['rahu_kalam_open']   = df['dow'].apply(rahu_kalam_at_open)
+
+    # Precompute sunrise/sunset per unique date (pyswisseph)
+    unique_dates = pd.to_datetime(df['date']).dt.date.unique()
+    _sr_cache = {}
+    for ud in unique_dates:
+        try:
+            _sr_cache[ud] = _get_sunrise_sunset_ist(ud)
+        except Exception:
+            _sr_cache[ud] = (SUNRISE_H, SUNRISE_H + 12.0)
+
+    def _get_sr(row):
+        return _sr_cache.get(pd.to_datetime(row['date']).date(), (SUNRISE_H, SUNRISE_H + 12.0))
+
+    _sr_series = df.apply(_get_sr, axis=1)
+    _rise = _sr_series.apply(lambda x: x[0])
+    _set  = _sr_series.apply(lambda x: x[1])
+
+    df['hora_at_open'] = [hora_at_open(w, r) for w, r in zip(df['dow'], _rise)]
+    chog_data = [choghadiya_at_open(w, r, s) for w, r, s in zip(df['dow'], _rise, _set)]
+    df['choghadiya']         = [x[0] for x in chog_data]
+    df['choghadiya_quality'] = [x[1] for x in chog_data]
+    df['rahu_kalam_open']    = [rahu_kalam_at_open(w, r, s) for w, r, s in zip(df['dow'], _rise, _set)]
+    df['gulika_kalam_open']  = [gulika_kalam_at_open(w, r, s) for w, r, s in zip(df['dow'], _rise, _set)]
 
     print("Computing Yogas …")
     sign_cols = {p: df[f'sign_{p}'] for p in PLANETS}
