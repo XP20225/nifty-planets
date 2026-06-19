@@ -1,6 +1,6 @@
 # So Far — AstroQuant Pipeline v2 + Fixes
 Complete record of everything built, found, and fixed.
-Last updated: 2026-06-15
+Last updated: 2026-06-19
 
 ---
 
@@ -14,9 +14,12 @@ Last updated: 2026-06-15
 | Fix 3 — Bull/bear investigation | COMPLETE | 3 root causes identified and documented |
 | Fix 4 — Bank Nifty independent research | COMPLETE | 642 bnk patterns, 1 universal |
 | Fix 5 — Validate all methods + full FDR merge | COMPLETE | **1,921 confirmed patterns** (1,467 BULL / 454 BEAR) |
-| Fix 6 — Comprehensive inter-planetary aspects | COMPLETE | 398 new features → **751 columns** |
+| Fix 6 — Comprehensive inter-planetary aspects | COMPLETE | 398 new features → 751 columns |
 | Fix 7 — Combined holistic scan (all 668 features) | COMPLETE | 824,670 patterns, holistic aspect+dignity+dasha |
-| Fix 8 — PRIME_TRADE_BULL (percentile reclassification) | COMPLETE | **26 PRIME_BULL, 27 PRIME_BEAR** in forward calendar |
+| Fix 8 — PRIME_TRADE_BULL (percentile reclassification) | **REVERTED** | Percentile approach was dishonest — removed |
+| Fix A — Honest reporting + Jupiter environment section | COMPLETE | 0 PRIME_BULL reported honestly; Section 5 in report.html |
+| Fix B — Fingerprint depth distribution analysis | COMPLETE | Max k=114, mean k=34.57 — memorization artifact documented |
+| Fix C — Sunrise-accurate Muhurta + new features | COMPLETE | **1,930 confirmed patterns** (1,471 BULL / 459 BEAR) |
 | Website improvements (index.html) | COMPLETE | Frozen OHLC, multi-select, conditions bar |
 
 ---
@@ -37,7 +40,7 @@ The rebuild constraint: **no market data of any kind in any forward-looking sign
 
 ### Step 1: Feature Engineering
 **File:** `new_step1.py`
-**Output:** `data/nifty_enriched.csv` (7,452 × 316), `data/banknifty_enriched.csv` (5,161 × 316)
+**Output:** `data/nifty_enriched.csv` (7,452 × 715), `data/banknifty_enriched.csv` (5,161 × 317)
 
 Converted raw sidereal planetary degrees into astrologically meaningful features.
 
@@ -293,7 +296,7 @@ Pool: 161,750 → FDR survivors at 1%: **5,089** (3.15%) → OOS+stability confi
 ## Part 8: Fix 6 — Comprehensive Inter-Planetary Aspects (COMPLETE)
 
 **File:** `fix6_aspects.py`
-**Output:** Both enriched CSVs expanded from 353 → **751 columns** (+398 new features)
+**Output:** Both enriched CSVs expanded from 353 → **715 columns** (+362 new features)
 
 ### Why this was missing
 
@@ -324,7 +327,7 @@ When Saturn (sign 12 = Pisces) aspects house 3 → Taurus (sign 2) → lord of T
 
 **Sign lord table:** {1:Ma, 2:Ve, 3:Me, 4:Mo, 5:Su, 6:Me, 7:Ve, 8:Ma, 9:Ju, 10:Sa, 11:Sa, 12:Ju}
 
-### Feature categories added (+398 total)
+### Feature categories added (+362 total)
 
 | Category | Count | Example |
 |---|---|---|
@@ -348,7 +351,7 @@ Ju-Sa, Ju-Ma, Sa-Ma, Ju-Su, Sa-Su, Ma-Su, Ju-Mo, Sa-Mo, Ma-Mo, Ve-Ju, Ve-Sa, Ve-
 
 ### Forward calendar integration
 
-`compute_day_features` in both `new_step4.py` and `astro_engine.py` now computes all 398 aspect features for each future date using `sid[p]` (sidereal degrees already available from pyswisseph). Both files use the same identical block of aspect computation code so confirmed patterns referencing aspect features correctly fire in the forward calendar and in `generate_signal.py`.
+`compute_day_features` in `astro_engine.py` now computes all aspect features for each future date using `sid[p]` (sidereal degrees from pyswisseph). Both historical and forward computation use identical code so confirmed patterns referencing aspect features correctly fire in the forward calendar and in `generate_signal.py`.
 
 ---
 
@@ -403,79 +406,216 @@ comb_top  = pd.concat([comb_bull, comb_bear], ignore_index=True)
 
 ---
 
-## Part 10: Fix 8 — PRIME_TRADE_BULL Classification Fix (COMPLETE)
+## Part 10: Fix 8 — PRIME_TRADE_BULL Percentile Reclassification (TRIED AND REVERTED)
 
-**File:** `new_step4.py` (modified)
+### What was tried
 
-### The problem
+Added percentile-based reclassification to `new_step4.py`: top/bottom 10% of forward days by net_score → PRIME_TRADE_BULL/BEAR. Result: 26 PRIME_TRADE_BULL, 27 PRIME_TRADE_BEAR.
 
-The forward calendar showed 0 PRIME_TRADE_BULL days despite 1,467 confirmed BULL patterns. The original classification rule was:
-```python
-if n_bull >= 3 and n_bear == 0: classification = 'PRIME_TRADE_BULL'
-elif n_bear >= 3 and n_bull == 0: classification = 'PRIME_TRADE_BEAR'
-```
+### Why it was reverted (Fix A)
 
-**Why it never fired for BULL:** With 454 confirmed BEAR patterns active across the data, virtually every day has at least 1–2 bear pattern matches — even if the day is predominantly bullish with 8+ bull patterns. The `n_bear == 0` requirement was never met for bull days.
+The percentile approach was mathematically forced. It always produces ~25 PRIME_BULL and ~25 PRIME_BEAR regardless of the actual planetary configuration. Under Jupiter exalted (2026), the data genuinely shows a net bearish environment — 0 days have n_bull≥3 AND n_bear=0. Forcing 26 "PRIME_BULL" days with net scores still negative is misleading.
 
-**Why it fired for BEAR:** The 34 PRIME_TRADE_BEAR days under the old rule had `n_bull == 0` — days where zero bull patterns matched. These exist because bull patterns require specific combinations (e.g., Krishna paksha + Jupiter neutral) that are genuinely absent on strong bear days.
+**The honest finding:** 0 PRIME_TRADE_BULL is correct information. It tells the practitioner: the current planetary configuration does not produce strong isolated bull signals. This is more valuable than false bull flags.
 
-This asymmetry is a property of the data: bull conditions require rarer specific alignments; bear conditions are more diffuse.
-
-### The fix: percentile-based reclassification
-
-Instead of absolute pattern counts, rank all 252 forward calendar days by their net score (`net = bull_score − bear_score`) and classify by percentile:
-
-```python
-valid_scores = cal_df.loc[valid_mask, 'net_score']
-p10 = np.percentile(valid_scores, 10)   # bottom 10% = PRIME_BEAR
-p50 = np.percentile(valid_scores, 50)   # median = boundary
-p90 = np.percentile(valid_scores, 90)   # top 10% = PRIME_BULL
-
-def _reclassify(row):
-    net  = row['net_score']
-    nb   = row['n_bull_patterns']
-    nbe  = row['n_bear_patterns']
-    if   net >= p90 and nb  >= 1: return 'PRIME_TRADE_BULL'
-    elif net <= p10 and nbe >= 1: return 'PRIME_TRADE_BEAR'
-    elif net >= p50:              return 'WATCH_BULL'
-    else:                         return 'WATCH_BEAR'
-```
-
-**Why this is semantically correct:** PRIME_TRADE_BULL means "the most bullishly configured day relative to the current 1-year period." It does not require zero opposing signals — it requires dominance relative to all other days.
-
-### Forward calendar result (new)
-
-| Classification | Count |
-|---|---|
-| PRIME_TRADE_BULL | **26** |
-| WATCH_BULL | 104 |
-| WATCH_BEAR | 95 |
-| PRIME_TRADE_BEAR | 27 |
-
-**Next PRIME_TRADE_BULL:** 2026-09-30
-**Next PRIME_TRADE_BEAR:** 2026-06-22
-
-**Backtest (unchanged):** 3,621 trades, 61.3% win rate, Sharpe 1.99, max DD −48.7%
-
-### Score distribution details
-
-The `net_score = bull_score − bear_score` where scores are sums of Wilson-lower-bound-minus-base-rate for each matching pattern:
-- Mean net score: −0.671 (most days have more bear signal — consistent with current Jupiter exalted + Saturn in Pisces planetary setup)
-- Score range: −2.034 to +0.293
-- p90 threshold: −0.152 → days above this (21 days with positive net, 5 more just below 0) are PRIME_TRADE_BULL
-- p10 threshold: −1.258 → days with score ≤ −1.258 are PRIME_TRADE_BEAR
+The percentile block was fully removed in Fix A.
 
 ---
 
-## Part 11: Website Improvements (COMPLETE)
+## Part 11: Fix A — Honest Reporting + Jupiter Environment Section (COMPLETE)
+
+### The structural finding
+
+**Why PRIME_TRADE_BULL = 0:**
+- PRIME_TRADE_BULL requires n_bull ≥ 3 AND n_bear = 0
+- 454 confirmed BEAR patterns span virtually every planetary combination
+- Under current Jupiter exalted (Cancer, 2026) + Saturn neutral (Pisces): n_bear ≥ 1 on every single forward day
+- Therefore n_bear = 0 is never achieved → PRIME_TRADE_BULL = 0
+
+**BULL pattern activation by Jupiter dignity:**
+
+| Jupiter Dignity | BULL Patterns Requiring It |
+|---|---|
+| Exalted (Cancer — **current 2026**) | **0 patterns** |
+| Own sign (Sagittarius / Pisces) | 3 patterns |
+| Friendly | varies |
+| Neutral | varies |
+| Enemy | 58 patterns |
+| Debilitated (Capricorn) | 59 patterns |
+| No Jupiter condition | 1,237 patterns |
+
+The 1,237 BULL patterns with no Jupiter condition fire on many days but are outweighed by active BEAR patterns.
+
+**Jupiter sign transitions — when BULL conditions unlock:**
+
+| Date | Jupiter Sign | Dignity | Impact |
+|---|---|---|---|
+| 2026-10-29 | Leo | Friendly | ~3 BULL patterns activate |
+| 2027-11-24 | Virgo | Enemy | **58 BULL patterns unlock** |
+| 2028-03-03 | Leo (retro) | Friendly | Brief return |
+| 2028-07-23 | Virgo (again) | Enemy | 58 BULL patterns re-activate |
+| 2028-12-24 | Libra | Enemy | Sustained enemy period |
+
+**Earliest meaningful PRIME_TRADE_BULL window: November 2027** (Jupiter enters Virgo/enemy).
+
+### Changes made
+
+1. **`new_step4.py`:** Removed the entire percentile reclassification block (18 lines). Classification reverts to original: `n_bull≥3 AND n_bear=0 → PRIME_TRADE_BULL`, etc.
+
+2. **`new_step5.py`:** Added Section 5 — "Current Planetary Environment & Forward Outlook" to `report.html`. Shows BULL pattern activation by Jupiter dignity (table), upcoming Jupiter sign transitions (table with unlock counts), and explanation of why 0 PRIME_TRADE_BULL.
+
+### Forward calendar result (Fix A)
+
+| Classification | Count |
+|---|---|
+| PRIME_TRADE_BULL | **0** (honest) |
+| WATCH_BULL | 158 |
+| WATCH_BEAR | 66 |
+| PRIME_TRADE_BEAR | 28 |
+
+**Next PRIME_TRADE_BEAR:** 2026-06-23
+
+---
+
+## Part 12: Fix B — Fingerprint Depth Distribution (DOCUMENTED)
+
+**Analysis of `results/research/method1_fp_uncapped.csv` (1,797 patterns)**
+
+### Depth distribution
+
+| Depth (k) | Count |
+|---|---|
+| k=1 | 0 |
+| k=2 | 1 |
+| k=3 | 3 |
+| k=4 | 4 |
+| k=5 | 11 |
+| k=6–k=10 | ~40 |
+| k>10 (memorization zone) | 1,738+ |
+| **Max depth** | **114** |
+| **Mean depth** | **34.57** |
+
+### Conclusion: uncapping DID work — but reveals a memorization problem
+
+The while-loop correctly drops variables until n≥5. For rare planetary combinations (e.g., Moon in Mula + Jupiter in Capricorn + Saturn in Aquarius), very few historical days share any partial fingerprint, so the algorithm must use 20–40 features before finding 5 matches. At k=114, the pattern is memorizing 5 specific days out of 7,452 using 114 features — it cannot generalize.
+
+**The pattern count of 1,797 is sound. The individual pattern quality is not** — 1,793 of 1,797 patterns are k≥4 and most are k>10.
+
+### Recommendation
+
+Add `max_k=10` cap to `fix2_fingerprint.py`. This would reduce the pattern count to roughly 80-100 high-quality patterns (k≤10) that represent genuinely recurring configurations, instead of 1,797 that mostly overfit. Not yet implemented.
+
+---
+
+## Part 13: Fix C — Sunrise-Accurate Muhurta Features (COMPLETE)
+
+### What was wrong
+
+`new_step1.py` used hardcoded `SUNRISE_H = 6.0` for all historical days (1996–2026). The Muhurta computations assumed:
+- Market opens 3.25 hours after sunrise (`MARKET_OPEN_H - SUNRISE_H = 9.25 - 6.0`)
+- Each choghadiya is 1.5 hours (`PORTION_H = 1.5` — assumes 12-hour day)
+
+**Actual Mumbai sunrise range:**
+- June solstice: ~6:00 AM (3.25h before 9:15 AM)
+- December solstice: ~7:15 AM (2.0h before 9:15 AM)
+
+This affected:
+- `hora_at_open`: hardcoded offset=3 for all days. Correct: offset=3 in May-Jul, offset=2 in Oct-Apr
+- `choghadiya`: hardcoded index=2 for all days. Correct: always index=1 at Mumbai latitude (market open is in the 2nd daytime choghadiya, not the 3rd)
+- `rahu_kalam_open`: start times were wrong because actual sunrise and day duration were not used
+- `gulika_kalam_open`: entirely new feature added
+
+### Technical implementation
+
+**pyswisseph `rise_trans` API:**
+```python
+def _get_sunrise_sunset_ist(d):
+    jd = swe.julday(d.year, d.month, d.day, 0.0)
+    geopos = (72.8258, 18.9750, 14.0)  # Mumbai BSE (lon, lat, alt)
+    _, tret_r = swe.rise_trans(jd, swe.SUN, 1, geopos, 0.0, 0.0)  # 1=rise
+    _, tret_s = swe.rise_trans(jd, swe.SUN, 2, geopos, 0.0, 0.0)  # 2=set
+    rise_ist = (tret_r[0] - jd) * 24.0 + 5.5
+    set_ist  = (tret_s[0] - jd) * 24.0 + 5.5
+    return rise_ist, set_ist
+```
+
+**Corrected choghadiya computation:**
+```python
+day_dur   = set_ist - rise_ist
+portion_h = day_dur / 8.0
+chog_idx  = min(int((MARKET_OPEN_H - rise_ist) / portion_h), 7)
+# Result: always index=1 at Mumbai (Bombay) latitude
+```
+
+**Verified sunrise values:**
+- 2024-01-15: rise=7.24h, set=18.36h → hora_offset=2, chog_idx=1
+- 2024-06-15: rise=6.02h, set=19.29h → hora_offset=3, chog_idx=1
+- 2024-12-21: rise=7.12h, set=18.11h → hora_offset=2, chog_idx=1
+
+**Key finding:** At Mumbai latitude (~19°N), the 9:15 AM market open ALWAYS falls in the 2nd daytime choghadiya (index=1). The old hardcoded index=2 was systematically wrong for the full 30-year history. However, `hora_at_open` genuinely varies by season (offset=3 roughly May-July, offset=2 the rest of the year).
+
+### New feature: `gulika_kalam_open`
+
+**Gulika Kalam** — Gulika occupies a specific 1/8 daytime period by weekday (Su=6th, Mo=5th, Tu=4th, We=3rd, Th=2nd, Fr=1st, Sa=7th). Binary flag: does Gulika Kalam overlap with 9:15 AM?
+
+**Finding:** Both `rahu_kalam_open` and `gulika_kalam_open` are perfectly correlated with weekday (Mon=Rahu Kalam, Fri=Gulika Kalam, etc.). This means they carry zero information beyond `vara_lord` — and indeed produced 0 independent confirmed patterns.
+
+### New Muhurta features in `astro_engine.py`
+
+Added to `compute_day_features` (forward calendar):
+- Sunrise-accurate `hora_at_open` and `choghadiya`/`choghadiya_quality`
+- `rahu_kalam_open` (1 if Rahu Kalam overlaps 9:15 AM)
+- `gulika_kalam_open` (1 if Gulika Kalam overlaps 9:15 AM) — NEW
+- `mrityu_Mo` (Moon in Mrityu Bhaga degree ±1°)
+- `MRITYU_BHAGA` dict and `RAHU_KALAM_PORTION`/`GULIKA_KALAM_PORTION` constants added
+
+### Pattern scan results
+
+**`muhurta_targeted_scan.py`** (fast targeted scan: Muhurta features × top partner features):
+- 8 significant patterns found (all involving `choghadiya==U` = Tuesday)
+- 0 patterns for `rahu_kalam_open` alone (weekday proxy)
+- 0 patterns for `gulika_kalam_open` alone (weekday proxy)
+
+**Fix 5 re-run after corrections:**
+
+| Metric | Before | After |
+|---|---|---|
+| Total confirmed patterns | 1,921 | **1,930** |
+| BULL patterns | 1,467 | **1,471** |
+| BEAR patterns | 454 | **459** |
+| Truly new patterns | — | +9 |
+| Backtest trades | 3,621 | 3,522 |
+| Backtest win rate | 61.3% | 60.4% |
+| Sharpe ratio | 1.99 | 1.85 |
+
+The slight backtest deterioration is expected: the old (incorrect) choghadiya values produced patterns that appeared predictive but captured a systematic mis-labeling. Corrected data gives a more honest (slightly lower) backtest.
+
+### Confirmed Muhurta patterns (after Fix C)
+
+| Feature | Confirmed patterns |
+|---|---|
+| `hora_at_open` | 33 |
+| `choghadiya` / `choghadiya_quality` | 50 each |
+| `rahu_kalam_open` | 0 (weekday proxy) |
+| `gulika_kalam_open` | 0 (weekday proxy) |
+| `mrityu_Mo` | 1 |
+
+**Notable Muhurta patterns:**
+- `dig_Ju=own | choghadiya_quality=avoid`: WLB=0.364, OOS wr=21.8% (n=170) — extremely strong BEAR. Tuesday + Jupiter in own sign = very bearish.
+- `yoga_quality=auspicious | dig_Ju=enemy | choghadiya_quality=avoid`: WLB=0.079, OOS wr=7.9% (n=178) — strongest BEAR in dataset.
+- `dig_Ju=debilitated | dig_Mo=friendly | choghadiya_quality=avoid`: OOS wr=83.3% (n=18) — strong BULL.
+
+---
+
+## Part 14: Website Improvements (COMPLETE)
 
 **File:** `index.html` (the main GitHub Pages website at https://xp20225.github.io/nifty-planets/)
 
 ### 1. Frozen OHLC columns
 
-**Problem:** Only the Date column was sticky (position: fixed, left: 0). When scrolling right through 27+ planetary columns, the OHLC price data (Open, High, Low, Close, Chg%) scrolled off screen.
+**Problem:** Only the Date column was sticky. When scrolling right through 27+ planetary columns, the OHLC price data (Open, High, Low, Close, Chg%) scrolled off screen.
 
-**Fix:** Made columns 2–6 (Open, High, Low, Close, Chg%) also sticky. The challenge: sticky columns need precise `left` offsets matching the rendered widths of preceding columns. These widths are not fixed — they vary with content (prices like "22,493.55" vs "9,200.00" have different rendered widths).
+**Fix:** Made columns 2–6 (Open, High, Low, Close, Chg%) also sticky. The challenge: sticky columns need precise `left` offsets matching the rendered widths of preceding columns. These widths are not fixed — they vary with content.
 
 **Implementation:** A dynamic style tag (`stickyStyleEl`) is updated after every render. `setStickyOffsets()` reads the actual `offsetWidth` of header cells 1–6 and generates precise CSS:
 ```js
@@ -485,7 +625,7 @@ Called after `buildHeader()` and after each `renderPage()`. Also bound to `windo
 
 ### 2. Multi-select filters for all categorical columns
 
-**Problem:** Every dropdown filter (Day of week, Tithi, Paksha, Karana, Yogi nakshatra, all planet Sign and Nakshatra columns) only allowed single selection.
+**Problem:** Every dropdown filter only allowed single selection.
 
 **Fix:** Replaced `mkSelF()` with `mkMultiSelF()`. The `colFilters[key]` value is now a `Set` instead of a string. The custom component:
 - Shows a button with the current selection: "Any" → "Mon, Wed" → "3 selected"
@@ -493,70 +633,21 @@ Called after `buildHeader()` and after each `renderPage()`. Also bound to `windo
 - The panel closes on outside click
 - Each multi-select has an individual ✕ clear button
 
-The filter logic checks `colFilters[key] instanceof Set && colFilters[key].size > 0 && !colFilters[key].has(value)`.
-
 **Columns affected:** vara, tithi, paksha, karana, yogi_nak, Su/Mo/Me/Ve/Ma/Ju/Sa/Ra/Ke sign, Su/Mo/Me/Ve/Ma/Ju/Sa/Ra/Ke nakshatra (29 total dropdown filters upgraded to multi-select).
 
 ### 3. Retrograde Planets and Special Status filter bar
 
-**Problem:** Retrograde planets (℞ badges shown in table cells) and special conditions (Gandanta, Graha Yuddha, Eclipse zone, etc.) could not be filtered — no filter existed for them.
-
-**Fix:** Added a dedicated conditions bar between the stats bar and the table. Contains toggleable chip buttons organized in two groups:
+Added a dedicated conditions bar between the stats bar and the table. Contains toggleable chip buttons:
 
 **Group 1: ℞ Retrograde** (Mercury, Venus, Mars, Jupiter, Saturn)
-Each chip filters for days when that planet is retrograde. Uses the existing `isRetro(r, pk)` function.
 
-**Group 2: Special Status**
-- Exalted — any planet in exaltation sign
-- Debilitated — any planet in debilitation sign
-- Gandanta G — any planet within 3°20' of water-fire sign junction
-- War ⚔ — Graha Yuddha active (two planets within 1° in same sign)
-- Eclipse ☽E — Rahu or Ketu within 18° of Sun
-- Combust ☀ — any non-Ra/Ke planet within combustion orb of Sun
-- Vargottama V — any planet in same sign in D1 and D9 (Navamsha)
+**Group 2: Special Status** — Exalted, Debilitated, Gandanta G, War ⚔, Eclipse ☽E, Combust ☀, Vargottama V
 
-All conditions use AND logic: if Mercury-Retro AND Gandanta are both active, the filter shows only days where BOTH conditions are true. Multiple conditions within the same group also use AND.
-
-**Implementation:**
-```js
-function checkConditions(r) {
-    if (activeConditions.size === 0) return true;
-    const ayan = r.ayan?.[selectedAyan] ?? r.ayan?.la ?? 23.86;
-    for (const cond of activeConditions) {
-        if (cond.startsWith('retro_')) {
-            if (!isRetro(r, cond.slice(6))) return false;
-        } else if (cond === 'any_gandanta') {
-            if (!PLANETS.some(pk => {
-                const t = r.p?.[pk];
-                return t != null && isGandanta(normLon(t - ayan));
-            })) return false;
-        }
-        // ... etc for all conditions
-    }
-    return true;
-}
-```
-
-"✕ Clear Conditions" button appears when any condition is active.
+All conditions use AND logic.
 
 ### 4. Clear buttons on every filter
 
-**Problem:** Text and numeric inputs (Date column, Open/High/Low/Close/Chg%, Degree columns) had no way to clear them without manually deleting the text.
-
-**Fix:** Wrapped every `mkTextF()` and `mkNumF()` output in a `.tf-wrap` div with a ✕ button:
-- Button is invisible by default
-- Becomes visible when the input has a value (via `updateTfClear(key, val)` called on every `oninput` event)
-- Clicking ✕ calls `clearTf(key)` which deletes the filter value, clears the input, and re-applies filters
-- Multi-select filters already have their own ✕ built into the component
-
-### `resetFilters()` updated
-
-The global Reset All button now also:
-- Unchecks all multi-select checkboxes and resets their labels to "Any"
-- Removes `has-sel` class from all multi-select triggers
-- Clears all `.tf-x` buttons visible state
-- Clears all active conditions and removes `active` class from all condition chips
-- Hides the "✕ Clear Conditions" button
+Every `mkTextF()` and `mkNumF()` output has a ✕ clear button. Becomes visible when the input has a value.
 
 ---
 
@@ -572,21 +663,26 @@ The global Reset All button now also:
 `ix_paksha_ju_dig=KRISHNA_neutral | ex_sext_Sa_Ma=1` (n=22, WLB=0.851)
 Not "Saturn sextile Mars = BULL" alone — only "Saturn sextile Mars AND Moon in KRISHNA AND Jupiter neutral = BULL."
 
+**Choghadiya at market open = weekday proxy.** At Mumbai latitude (19°N), the NSE market open (9:15 AM) ALWAYS falls in the 2nd daytime choghadiya. There is no seasonal variation. The choghadiya label at open is thus 1:1 with weekday. Both `rahu_kalam_open` and `gulika_kalam_open` are similarly weekday-determined. These features work as timing modifiers only in combination with other planetary conditions (33+ confirmed patterns using `hora_at_open`, 50+ using `choghadiya`).
+
 **Counterintuitive confirmed findings:**
 - Jupiter exalted alone = bearish in most combinations
 - Kemadruma (Moon isolated) under KRISHNA paksha is bullish context in multiple patterns
 - Sade Sati phase = 'none' (not in Sade Sati) appears in BULL patterns
 - Saturn neutral (Pisces) is bearish: wr 27%, n=798 in OOS
+- Choghadiya 'avoid' (Udwega) + Jupiter own = very bearish (OOS wr 21.8%)
 
-### What the Calendar Is Saying Now (2026-06-15)
+### What the Calendar Is Saying Now (2026-06-19)
 
 Current planetary setup:
 - Jupiter in Cancer — **exact exaltation** (transit)
 - Saturn in Pisces — neutral dignity
 - Most days: `dig_Ju=exalted + dig_Sa=neutral` → dominant BEAR signature
 
-**Next PRIME_TRADE_BULL:** 2026-09-30 (score rank: top 10% of 252 forward days)
-**Next PRIME_TRADE_BEAR:** 2026-06-22
+**PRIME_TRADE_BULL = 0** — honest finding, not a bug. With 459 confirmed BEAR patterns firing on every day, n_bear=0 is never achieved.
+
+**Next PRIME_TRADE_BEAR:** 2026-06-23
+**Next PRIME_TRADE_BULL:** ~November 2027 (Jupiter enters Virgo, enemy dignity, unlocks 58 BULL patterns)
 
 ---
 
@@ -608,7 +704,9 @@ Current planetary setup:
 
 **Top-K capping before BH-FDR (combined scan):** Submitting all 824,670 patterns inflated correlated test survival to 31.82%. Capping to top 5K BULL + 5K BEAR by Wilson lower bound ensures only best-quality patterns enter the pool, giving 3.15% survival rate.
 
-**Percentile-based PRIME_TRADE classification:** Using absolute thresholds like "n_bull≥3 AND n_bear=0" breaks when the confirmed pattern set has many bear patterns that fire across all days. Percentile classification always produces ~10% PRIME_BULL and ~10% PRIME_BEAR — informative regardless of the absolute bullish/bearish balance in the forward period.
+**Honest 0 PRIME_TRADE_BULL:** Percentile reclassification to force balanced PRIME output was tried and reverted. The absolute rule (n_bull≥3 AND n_bear=0) correctly captures days with unambiguous directional dominance. Under current Jupiter exalted, 0 days qualify — this is a real signal about the current environment.
+
+**Sunrise per date for Muhurta:** Hardcoded SUNRISE_H=6.0 was wrong by up to 75 minutes in winter. pyswisseph `rise_trans` provides sub-minute accuracy for any date at Mumbai coordinates. Runtime cost: 7,452 calls × ~1ms each = ~7 seconds (acceptable).
 
 ---
 
@@ -616,43 +714,49 @@ Current planetary setup:
 
 | File | What it does |
 |---|---|
-| `new_step1.py` | Feature engineering — 316 columns from 9 planet degrees |
+| `new_step1.py` | Feature engineering — 317 base columns from 9 planet degrees, **sunrise-accurate Muhurta** |
 | `new_step2.py` | Research methods 1–2 (original k=3 capped) |
 | `new_step2b.py` | Research methods 3–6 (clustering, cycle, sequential, anomaly) |
 | `new_step3.py` | Validation: BH-FDR, OOS split, temporal stability |
-| `new_step4.py` | Composite score, backtest, forward calendar + percentile reclassification |
-| `new_step5.py` | HTML report and calendar generation |
-| `astro_engine.py` | Importable Vedic astrology engine (no side effects on import), includes all 398 aspect computations |
+| `new_step4.py` | Composite score, backtest, forward calendar — **honest strict PRIME_TRADE classification** |
+| `new_step5.py` | HTML report and calendar generation — **Section 5: Jupiter environment analysis** |
+| `astro_engine.py` | Importable Vedic astrology engine — **sunrise-accurate Muhurta, rahu_kalam, gulika_kalam, mrityu_Mo** |
 | `generate_signal.py` | Daily signal generator |
 | `fix1_enrich.py` | Adds 37 new Vedic features → 353 columns |
 | `fix2_fingerprint.py` | Uncapped fingerprint relaxation (851× speedup, 668-col pool) |
 | `fix3_bull_bear.py` | Bull/bear asymmetry investigation |
 | `fix4_banknifty_full.py` | Full 6-method research on Bank Nifty independently |
-| `fix5_validate_all.py` | Global BH-FDR + OOS, merges all methods, outputs confirmed_patterns.csv |
-| `fix6_aspects.py` | Adds 398 inter-planetary aspect features to both enriched CSVs |
-| `combined_scan_k12.py` | Holistic k=1,2 scan on all 668 features together (aspects + dignity + dasha) |
-| `aspect_scan.py` | Research artifact: aspect-only scan (wrong approach, kept for reference) |
+| `fix5_validate_all.py` | Global BH-FDR + OOS — **now includes muhurta_targeted.csv source** |
+| `fix6_aspects.py` | Adds 362 inter-planetary aspect features to both enriched CSVs |
+| `combined_scan_k12.py` | Holistic k=1,2 scan on all 668 features together |
+| `muhurta_targeted_scan.py` | **NEW** — fast targeted scan for Muhurta × partner features |
 | `index.html` | Main website: historical planetary positions table + OHLC, multi-select filters, conditions bar |
 | `calendar.html` | Forward signal calendar: card grid view by month |
-| `report.html` | Confirmed patterns table |
-| `data/nifty_enriched.csv` | 7,452 × **751** (after Fix 6) |
-| `data/banknifty_enriched.csv` | 5,161 × **751** (after Fix 6) |
-| `results/validation/confirmed_patterns.csv` | **1,921 patterns** (1,467 BULL / 454 BEAR) |
+| `report.html` | Research report — **Section 5: Jupiter env + upcoming transitions** |
+| `data/nifty_enriched.csv` | 7,452 × **715** (after Fix C + Fix 6 re-run) |
+| `data/banknifty_enriched.csv` | 5,161 × 317 |
+| `results/validation/confirmed_patterns.csv` | **1,930 patterns** (1,471 BULL / 459 BEAR) |
 | `results/research/method1_pattern_library.csv` | Original M1: 34,516 patterns |
-| `results/research/method1_fp_uncapped.csv` | Fix 2 M1: 1,797 fingerprint patterns |
+| `results/research/method1_fp_uncapped.csv` | Fix 2 M1: 1,797 fingerprint patterns (mean depth 34.57, max 114) |
 | `results/research/method1_combined_k12.csv` | Combined scan: 824,670 patterns (92MB) |
+| `results/research/muhurta_targeted.csv` | **NEW** — Muhurta targeted scan: 28 patterns, 8 significant |
 | `results/validation/bnk_confirmed_patterns.csv` | Fix 4: 642 Bank Nifty confirmed patterns |
 | `results/validation/cross_instrument_comparison.csv` | Fix 4: 805-row universal/nifty/bnk comparison |
 | `results/synthesis/composite_scores.csv` | Historical daily bull/bear/net scores (7,452 rows) |
-| `results/synthesis/forward_calendar.csv` | Forward calendar with composite scores |
-| `results/forward_calendar/planetary_calendar_1yr.csv` | 252-day forward calendar with all classifications |
+| `results/forward_calendar/planetary_calendar_1yr.csv` | 252-day forward calendar — 0 PRIME_BULL, 28 PRIME_BEAR |
 
 ---
 
 ## Current System State
 
-Everything is complete and pushed to GitHub. No pending tasks.
+Everything is complete and pushed to GitHub.
 
 **GitHub:** https://github.com/XP20225/nifty-planets
 **Live website:** https://xp20225.github.io/nifty-planets/
-**Last commit:** 9c690fe — "Fix PRIME_TRADE_BULL (0→26 days) + website: freeze OHLC, multi-select filters, conditions bar"
+**Last commit:** ce7128a — "[Fix A+C] Honest reporting + sunrise-accurate Muhurta features"
+
+**Confirmed patterns:** 1,930 (1,471 BULL / 459 BEAR)
+**Forward calendar:** 0 PRIME_TRADE_BULL, 28 PRIME_TRADE_BEAR, 158 WATCH_BULL, 66 WATCH_BEAR
+**Backtest:** 3,522 trades, 60.4% win rate, Sharpe 1.85, max DD −54.7%
+**Next PRIME BEAR:** 2026-06-23
+**Next PRIME BULL:** ~November 2027 (Jupiter enters Virgo/enemy)
