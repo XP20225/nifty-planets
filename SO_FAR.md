@@ -19,7 +19,7 @@ Last updated: 2026-06-21
 | Fix 8 — PRIME_TRADE_BULL (percentile reclassification) | **REVERTED** | Percentile approach was dishonest — removed |
 | Fix A — Honest reporting + Jupiter environment section | COMPLETE | 0 PRIME_BULL reported honestly; Section 5 in report.html |
 | Fix B — Fingerprint depth distribution analysis | COMPLETE | Max k=114, mean k=34.57 — memorization artifact documented |
-| Fix C — Sunrise-accurate Muhurta + new features | COMPLETE | **1,930 confirmed patterns** (1,471 BULL / 459 BEAR) |
+| Fix C — Sunrise-accurate Muhurta + new features | COMPLETE | 1,930 confirmed patterns (1,471 BULL / 459 BEAR) |
 | Fix D — Aspect scan integration into validation pool | COMPLETE | **4,073 confirmed patterns** (2,871 BULL / 1,202 BEAR); Sharpe 2.51 |
 | Website improvements (index.html) | COMPLETE | Frozen OHLC, multi-select, conditions bar |
 
@@ -470,11 +470,11 @@ The 1,237 BULL patterns with no Jupiter condition fire on many days but are outw
 | Classification | Count |
 |---|---|
 | PRIME_TRADE_BULL | **0** (honest) |
-| WATCH_BULL | 158 |
-| WATCH_BEAR | 66 |
-| PRIME_TRADE_BEAR | 28 |
+| WATCH_BULL | 241 |
+| WATCH_BEAR | 5 |
+| PRIME_TRADE_BEAR | 6 |
 
-**Next PRIME_TRADE_BEAR:** 2026-06-23
+**Next PRIME_TRADE_BEAR:** 2026-09-16
 
 ---
 
@@ -581,13 +581,13 @@ Added to `compute_day_features` (forward calendar):
 
 | Metric | Before | After |
 |---|---|---|
-| Total confirmed patterns | 1,921 | **1,930** |
-| BULL patterns | 1,467 | **1,471** |
-| BEAR patterns | 454 | **459** |
-| Truly new patterns | — | +9 |
-| Backtest trades | 3,621 | 3,522 |
-| Backtest win rate | 61.3% | 60.4% |
-| Sharpe ratio | 1.99 | 1.85 |
+| Total confirmed patterns | 1,921 | **1,930** | **4,073** |
+| BULL patterns | 1,467 | **1,471** | **2,871** |
+| BEAR patterns | 454 | **459** | **1,202** |
+| Truly new patterns | — | +9 | +2,144 (Fix D asp_scan) |
+| Backtest trades | 3,621 | 3,522 | 3,896 |
+| Backtest win rate | 61.3% | 60.4% | **65.7%** |
+| Sharpe ratio | 1.99 | 1.85 | **2.51** |
 
 The slight backtest deterioration is expected: the old (incorrect) choghadiya values produced patterns that appeared predictive but captured a systematic mis-labeling. Corrected data gives a more honest (slightly lower) backtest.
 
@@ -680,9 +680,9 @@ Current planetary setup:
 - Saturn in Pisces — neutral dignity
 - Most days: `dig_Ju=exalted + dig_Sa=neutral` → dominant BEAR signature
 
-**PRIME_TRADE_BULL = 0** — honest finding, not a bug. With 459 confirmed BEAR patterns firing on every day, n_bear=0 is never achieved.
+**PRIME_TRADE_BULL = 0** — honest finding, not a bug. With 1,202 confirmed BEAR patterns firing on every day, n_bear=0 is never achieved. New BULL aspect patterns (Fix D) now fire on most days too, pushing PRIME_TRADE_BEAR from 28 → 6.
 
-**Next PRIME_TRADE_BEAR:** 2026-06-23
+**Next PRIME_TRADE_BEAR:** 2026-09-16
 **Next PRIME_TRADE_BULL:** ~November 2027 (Jupiter enters Virgo, enemy dignity, unlocks 58 BULL patterns)
 
 ---
@@ -734,17 +734,18 @@ Current planetary setup:
 | `index.html` | Main website: historical planetary positions table + OHLC, multi-select filters, conditions bar |
 | `calendar.html` | Forward signal calendar: card grid view by month |
 | `report.html` | Research report — **Section 5: Jupiter env + upcoming transitions** |
-| `data/nifty_enriched.csv` | 7,452 × **715** (after Fix C + Fix 6 re-run) |
-| `data/banknifty_enriched.csv` | 5,161 × 317 |
-| `results/validation/confirmed_patterns.csv` | **1,930 patterns** (1,471 BULL / 459 BEAR) |
+| `data/nifty_enriched.csv` | 7,458 × **715** (Fix D update 2026-06-21) |
+| `data/banknifty_enriched.csv` | 5,167 × 715 |
+| `results/validation/confirmed_patterns.csv` | **4,073 patterns** (2,871 BULL / 1,202 BEAR) |
+| `results/research/method1_asp_scan.csv` | **NEW** — Aspect scan: 201,022 patterns; 2,144 confirmed after Fix D |
 | `results/research/method1_pattern_library.csv` | Original M1: 34,516 patterns |
 | `results/research/method1_fp_uncapped.csv` | Fix 2 M1: 1,797 fingerprint patterns (mean depth 34.57, max 114) |
 | `results/research/method1_combined_k12.csv` | Combined scan: 824,670 patterns (92MB) |
 | `results/research/muhurta_targeted.csv` | **NEW** — Muhurta targeted scan: 28 patterns, 8 significant |
 | `results/validation/bnk_confirmed_patterns.csv` | Fix 4: 642 Bank Nifty confirmed patterns |
 | `results/validation/cross_instrument_comparison.csv` | Fix 4: 805-row universal/nifty/bnk comparison |
-| `results/synthesis/composite_scores.csv` | Historical daily bull/bear/net scores (7,452 rows) |
-| `results/forward_calendar/planetary_calendar_1yr.csv` | 252-day forward calendar — 0 PRIME_BULL, 28 PRIME_BEAR |
+| `results/synthesis/composite_scores.csv` | Historical daily bull/bear/net scores (7,458 rows) |
+| `results/forward_calendar/planetary_calendar_1yr.csv` | 252-day forward calendar — 0 PRIME_BULL, 6 PRIME_BEAR; next: 2026-09-16 |
 
 ---
 
