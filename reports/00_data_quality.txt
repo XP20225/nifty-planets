@@ -1,5 +1,5 @@
-Nifty50: 7452 records, 1996-04-22 to 2026-06-11
-BankNifty: 5177 records, 2005-06-09 to 2026-06-11
+Nifty50: 7458 records, 1996-04-22 to 2026-06-19
+BankNifty: 5183 records, 2005-06-09 to 2026-06-19
 Planets: ['Su', 'Mo', 'Me', 'Ve', 'Ma', 'Ju', 'Sa', 'Ra', 'Ke']
 Ayanamsa systems: ['la', 'kp', 'ra', 'yu', 'pu', 'va']
 Duplicate dates: 0

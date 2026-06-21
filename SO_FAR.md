@@ -1,6 +1,6 @@
 # So Far — AstroQuant Pipeline v2 + Fixes
 Complete record of everything built, found, and fixed.
-Last updated: 2026-06-19
+Last updated: 2026-06-21
 
 ---
 
@@ -20,6 +20,7 @@ Last updated: 2026-06-19
 | Fix A — Honest reporting + Jupiter environment section | COMPLETE | 0 PRIME_BULL reported honestly; Section 5 in report.html |
 | Fix B — Fingerprint depth distribution analysis | COMPLETE | Max k=114, mean k=34.57 — memorization artifact documented |
 | Fix C — Sunrise-accurate Muhurta + new features | COMPLETE | **1,930 confirmed patterns** (1,471 BULL / 459 BEAR) |
+| Fix D — Aspect scan integration into validation pool | COMPLETE | **4,073 confirmed patterns** (2,871 BULL / 1,202 BEAR); Sharpe 2.51 |
 | Website improvements (index.html) | COMPLETE | Frozen OHLC, multi-select, conditions bar |
 
 ---
@@ -753,10 +754,10 @@ Everything is complete and pushed to GitHub.
 
 **GitHub:** https://github.com/XP20225/nifty-planets
 **Live website:** https://xp20225.github.io/nifty-planets/
-**Last commit:** ce7128a — "[Fix A+C] Honest reporting + sunrise-accurate Muhurta features"
+**Last commit:** Fix D — Aspect scan validation + data update 2026-06-20
 
-**Confirmed patterns:** 1,930 (1,471 BULL / 459 BEAR)
-**Forward calendar:** 0 PRIME_TRADE_BULL, 28 PRIME_TRADE_BEAR, 158 WATCH_BULL, 66 WATCH_BEAR
-**Backtest:** 3,522 trades, 60.4% win rate, Sharpe 1.85, max DD −54.7%
-**Next PRIME BEAR:** 2026-06-23
+**Confirmed patterns:** 4,073 (2,871 BULL / 1,202 BEAR)
+**Forward calendar:** 0 PRIME_TRADE_BULL, 6 PRIME_TRADE_BEAR, 241 WATCH_BULL, 5 WATCH_BEAR
+**Backtest:** 3,896 trades, 65.7% win rate, Sharpe 2.51, max DD −45.8%
+**Next PRIME BEAR:** 2026-09-16
 **Next PRIME BULL:** ~November 2027 (Jupiter enters Virgo/enemy)

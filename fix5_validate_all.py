@@ -10,6 +10,7 @@ Pools p-values from:
   - method4_cycle_analysis.csv   (M4 ANOVA p-values)
   - method5_sequential_patterns.csv (M5 sequential)
   - method6_anomaly_fingerprints.csv (M6 — adapted for is_bull direction)
+  - method1_asp_scan.csv             (aspect_scan.py — inter-planetary aspects k=1,2)
 
 After BH-FDR across the full pool:
   - Re-evaluate survivors on OOS (2018+) for direction + stability
@@ -163,6 +164,32 @@ if os.path.exists(muhurta_path):
             'source'     : 'muhurta',
         })
     print(f"  Muhurta targeted (p<0.05):  {len(mu_new)} new patterns added")
+
+# Aspect targeted scan (aspect_scan.py — inter-planetary aspects only, k=1,2)
+asp_scan_path = f"{REPO}/results/research/method1_asp_scan.csv"
+if os.path.exists(asp_scan_path):
+    asp = load_csv_safe(asp_scan_path)
+    asp = asp[asp['p_value'] < 0.05]
+    BASE_BULL_RATE = 0.551
+    asp_bull = asp[(asp['outcome'] == 'is_bull') & (asp['win_rate'] > BASE_BULL_RATE)].nlargest(5000, 'wilson_lower')
+    asp_bear = asp[(asp['outcome'] == 'is_bull') & (asp['win_rate'] <= BASE_BULL_RATE)].nsmallest(5000, 'wilson_lower')
+    asp_top = pd.concat([asp_bull, asp_bear], ignore_index=True)
+    m1_keys = set(m1['features'].astype(str) + ':::' + m1['condition'].astype(str))
+    asp_new = asp_top[~(asp_top['features'].astype(str) + ':::' + asp_top['condition'].astype(str)).isin(m1_keys)]
+    for _, row in asp_new.iterrows():
+        pool.append({
+            'features'    : row['features'],
+            'condition'   : row['condition'],
+            'outcome'     : row['outcome'],
+            'n'           : row['n'],
+            'k_pos'       : int(row['k_pos']),
+            'win_rate'    : row['win_rate'],
+            'wilson_lower': row['wilson_lower'],
+            'p_value'     : float(row['p_value']),
+            'complexity'  : row.get('complexity', 2),
+            'source'      : 'method1_asp',
+        })
+    print(f"  Aspect scan top-5K×2 (p<0.05): {len(asp_new)} new patterns added")
 
 # M2 (prefer full uncapped version)
 m2_full_path = f"{REPO}/results/research/method2_full.csv"
